@@ -9,8 +9,8 @@
 #include "hGraph.h"
 
 hGraph::hGraph(int size):NUM_NODES(size) {
-    _adjMatrix.resize(NUM_NODES, NUM_NODES);
-    _degVector.resize(NUM_NODES);
+    _adjMatrix = MatrixXi::Zero(size, size);
+    _degVector = Eigen::VectorXi::Zero(size);
     
 }
 
@@ -26,3 +26,12 @@ void hGraph::print() {
     
 }
 
+void hGraph::setMatrix(MatrixXi data) {
+    _adjMatrix = data;
+}
+
+void hGraph::setVector(Eigen::VectorXi data) {
+    
+    _degVector = data;
+    
+}
