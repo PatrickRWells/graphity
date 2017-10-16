@@ -12,7 +12,13 @@
 using namespace std;
 
 int main() {
-    const int SIZE = 3; //size of adjacency matrix. AKA the number of nodes in the graph
+    
+    int size;
+    cout << "Insert the number of elements: ";
+    cin >> size;
+    cout << "Generating all possible " << size << "x" << size << " adjacency matrices..." << endl;
+    
+    const int SIZE = size; //size of adjacency matrix. AKA the number of nodes in the graph
     
     int max = (SIZE*(SIZE - 1))/2; //the number of possible connections that have to be considered
     
