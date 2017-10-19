@@ -47,7 +47,9 @@ int main() {
                 
                 
             }
-            cout << adjMatrix << endl << endl;      //outputs adjacency matrix for testing purposes. Future versions will simply input the matrix into the appropriate graph object
+            //cout << adjMatrix << endl << endl;      //outputs adjacency matrix for testing purposes. Future versions will simply input the matrix into the appropriate graph object
+            
+            hGraph(SIZE, adjMatrix).print();
 
             
             

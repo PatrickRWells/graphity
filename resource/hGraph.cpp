@@ -14,6 +14,19 @@ hGraph::hGraph(int size):NUM_NODES(size) {
     
 }
 
+hGraph::hGraph(int size, MatrixXi adjMatrix):NUM_NODES(size) {
+    _adjMatrix = MatrixXi::Zero(size, size);
+    _adjMatrix = adjMatrix;
+    _degVector = Eigen::VectorXi::Zero(size);
+    
+    for(int i = 0; i < NUM_NODES; i++) {
+        for(int j = 0; j < size; j++) {
+            _degVector[i] += _adjMatrix(i, j);
+        }
+    }
+}
+
+
 hGraph::~hGraph() {
     
 }
@@ -27,11 +40,6 @@ void hGraph::print() {
 }
 
 void hGraph::setMatrix(MatrixXi data) {
-    _adjMatrix = data;
 }
 
-void hGraph::setVector(Eigen::VectorXi data) {
-    
-    _degVector = data;
-    
-}
+

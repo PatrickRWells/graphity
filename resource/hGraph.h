@@ -25,11 +25,11 @@ private:
     double _hamiltonian = 0;
     
 public:
+    hGraph(int size, MatrixXi adjMatrix);
     hGraph(int size);
     ~hGraph();
     void print();
     void setMatrix(MatrixXi data);
-    void setVector(Eigen::VectorXi data);
 };
 
 
