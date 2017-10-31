@@ -9,18 +9,30 @@
 #include <iostream>
 #include "hGraph.h"
 #include <algorithm>
+#include <string>
 using namespace std;
+
 
 int main() {
     
     int size;
+    string filename;
+    
     cout << "Insert the number of elements: ";
     cin >> size;
+    cout << "Insert a filename for output: ";
+    cin >> filename;
+    filename += ".csv";
+    
     cout << "Generating all possible " << size << "x" << size << " adjacency matrices..." << endl;
+    
+    std::ofstream output;
+    output.open(filename);
     
     const int SIZE = size; //size of adjacency matrix. AKA the number of nodes in the graph
     
     int max = (SIZE*(SIZE - 1))/2; //the number of possible connections that have to be considered
+    int num = 0;
     
     for(int i = 0; i < max; i++) {
         int fill[max];
@@ -49,7 +61,9 @@ int main() {
             }
             //cout << adjMatrix << endl << endl;      //outputs adjacency matrix for testing purposes. Future versions will simply input the matrix into the appropriate graph object
             
-            hGraph(SIZE, adjMatrix).print();
+            hGraph temp(SIZE, adjMatrix);
+            output << temp;
+            num++;
 
             
             
@@ -60,7 +74,10 @@ int main() {
         
     }
     
+    cout << "Number of graphs generated: " << num << endl;
+    output.close();
     
     
 }
+
 

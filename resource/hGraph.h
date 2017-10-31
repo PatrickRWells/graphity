@@ -10,6 +10,7 @@
 #define _hGraph_h
 
 #include <iostream>
+#include <fstream>
 #include "../lib/eigen/Eigen/Dense"
 
 using Eigen::MatrixXi;
@@ -29,8 +30,14 @@ public:
     hGraph(int size);
     ~hGraph();
     void print();
+    void toStream(std::ostream &os) const;
+    void toFile(std::ofstream &fs) const;
     void setMatrix(MatrixXi data);
+    friend std::ostream &operator << (std::ostream &os, const hGraph &rhs);
+    friend std::ofstream &operator <<(std::ofstream &fs, const hGraph &rhs);
 };
+
+
 
 
 
