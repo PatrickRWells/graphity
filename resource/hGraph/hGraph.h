@@ -15,7 +15,6 @@
 class hGraph;
 
 #include "../lib/eigen/Eigen/Dense"
-#include "../hamiltonian/absHamiltonian.h"
 
 using Eigen::MatrixXi;
 
@@ -37,7 +36,6 @@ public:
     void toStream(std::ostream &os) const;
     void toFile(std::ofstream &fs) const;
     void setMatrix(MatrixXi data);
-    void accept(absHamiltonian &ham);
     void setHamiltonian(double val);
     int getDegree(int node);
     int getSize();
