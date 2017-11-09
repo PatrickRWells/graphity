@@ -7,7 +7,8 @@
 //
 
 #include <iostream>
-#include "hGraph.h"
+#include "hGraph/hGraph.h"
+#include "hamiltonian/hamiltonians.h"
 #include <algorithm>
 #include <string>
 using namespace std;
@@ -28,6 +29,8 @@ int main() {
     
     std::ofstream output;
     output.open(filename);
+    
+    output << size << endl; 
     
     const int SIZE = size; //size of adjacency matrix. AKA the number of nodes in the graph
     
@@ -59,9 +62,9 @@ int main() {
                 
                 
             }
-            //cout << adjMatrix << endl << endl;      //outputs adjacency matrix for testing purposes. Future versions will simply input the matrix into the appropriate graph object
             
             hGraph temp(SIZE, adjMatrix);
+            
             output << temp;
             num++;
 
