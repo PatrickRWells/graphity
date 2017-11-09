@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include "hGraph/hGraph.h"
-#include "hamiltonian/hamiltonians.h"
 #include <algorithm>
 #include <string>
 using namespace std;
