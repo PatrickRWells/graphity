@@ -8,7 +8,7 @@ INCLUDES = -I ../resource
 
 default: buildGraphs
 
-buildGraphs: depend/hGraph.o ../resource/hamiltonian/hamiltonians.h
+buildGraphs: depend/hGraph.o
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) buildGraph.cpp
 
 depend/hGraph.o: ../resource/hGraph/hGraph.cpp
