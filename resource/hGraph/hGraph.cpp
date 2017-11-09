@@ -72,12 +72,6 @@ void hGraph::toStream(std::ostream &os) const {
 
 }
 
-void hGraph::accept(absHamiltonian &ham) {
-
-    ham.calculate(*this);
-    
-}
-
 int hGraph::getDegree(int node) {
     if(node < 0 || node >= NUM_NODES) {
         std::cerr << "Critical error, only acceptable node values are between 0 and " << NUM_NODES - 1 << std::endl;
