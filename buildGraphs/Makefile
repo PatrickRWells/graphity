@@ -4,7 +4,7 @@ OBJS = depend/hGraph.o
 HGRAPH = ../resource/hGraph/
 MAIN = buildGraphs
 
-INCLUDES = -I ../resource
+INCLUDES = -I ../resource -I ../hamiltonian
 
 default: buildGraphs
 

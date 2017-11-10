@@ -7,6 +7,8 @@
 //
 
 #include "hGraph.h"
+#include "hamiltonians.h"
+
 
 
 hGraph::hGraph(int size):NUM_NODES(size) {
@@ -85,6 +87,11 @@ int hGraph::getDegree(int node) {
 
 int hGraph:: getSize() {
     return NUM_NODES;
+}
+
+void hGraph::accept(absHamiltonian *ham) {
+    ham->calculate(*this);
+    
 }
     
 
