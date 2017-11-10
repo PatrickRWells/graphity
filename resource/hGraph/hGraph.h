@@ -12,12 +12,10 @@
 #include <iostream>
 #include <fstream>
 
-class hGraph;
-
 #include "../lib/eigen/Eigen/Dense"
 
 using Eigen::MatrixXi;
-
+class absHamiltonian;
 
 class hGraph {
     
@@ -39,6 +37,7 @@ public:
     void setHamiltonian(double val);
     int getDegree(int node);
     int getSize();
+    void accept(absHamiltonian *ham);
     friend std::ostream &operator << (std::ostream &os, const hGraph &rhs);
     friend std::ofstream &operator <<(std::ofstream &fs, const hGraph &rhs);
 };
