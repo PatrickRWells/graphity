@@ -43,11 +43,13 @@ void basic::calculate(hGraph &host) {
     
 }
 
-double basic(hGraph * host) {
-    basic * basicHam;
-    host->accept(basicHam);
-    return basicHam.result();
+
+double basicH(hGraph host) {
+    basic basicCalc;
+    host.accept(basicCalc);
+    return basicCalc.result();
     
 }
+
 
 #endif /* basic_h */

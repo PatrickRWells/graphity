@@ -8,6 +8,7 @@
 
 #include "hGraph.h"
 #include "hamiltonians.h"
+#include "absHamiltonian.h"
 
 
 
