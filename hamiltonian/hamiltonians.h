@@ -11,7 +11,5 @@
 #define hamiltonians_h
 
 #include "basic.h"
-
-
-
+#include "basic2.h"
 #endif /* hamiltonians_h */

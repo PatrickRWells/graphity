@@ -35,9 +35,26 @@ def installHam(name):
             wFile.close()
             installed = True
             break
-
+    
+    
     if installed == False:
         wFile.write(hamName + '\n')
+        wFile.close()
+        hFile = open("hamiltonian/hamiltonians.h", 'r')
+        lookup = "#endif /* hamiltonians_h */"
+        linenum = 0
+        for num, line in enumerate(hFile, 0):
+            if line.strip() == lookup:
+                linenum = num
+                break
+        hFile.seek(0)
+        contents = hFile.readlines()
+        hFile.close()
+        contents.insert(linenum, '#include "' + name + '"' + '\n')
+        eFile = open("hamiltonian/hamiltonians.h", "w")
+        contents = "".join(contents)
+        eFile.write(contents)
+        eFile.close
 
 
 
@@ -82,12 +99,13 @@ while True:
         print(filename)
 
         try:
+
             open(path, "r")
             installHam(filename)
 
         except:
-           print("Hamiltonian not found.")
-           print("Make sure spelling is correct and the file is located in the hamiltonian folder")
+            print("Hamiltonian not found.")
+            print("Make sure the spelling of the filename is correct and the file is located in the hamiltonian folder")
 
 
 
