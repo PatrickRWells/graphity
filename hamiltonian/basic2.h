@@ -10,7 +10,6 @@
 #define basic_h
 
 #include "absHamiltonian.h"
-#include "hGraph/hGraph.h"
 #include <cmath>
 
 class basic : public absHamiltonian {
