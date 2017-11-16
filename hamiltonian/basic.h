@@ -10,7 +10,6 @@
 #define basic_h
 
 #include "absHamiltonian.h"
-#include "hGraph/hGraph.h"
 #include <cmath>
 
 class basic : public absHamiltonian {
@@ -44,9 +43,9 @@ void basic::calculate(hGraph &host) {
 }
 
 double basic(hGraph * host) {
-    basic * basicHam;
+    basic::basic * basicHam;
     host->accept(basicHam);
-    return basicHam.result();
+    return basicHam->result();
     
 }
 
