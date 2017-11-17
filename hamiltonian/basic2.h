@@ -6,33 +6,34 @@
 //
 //
 
-#ifndef basic_h
-#define basic_h
+#ifndef basic2_h
+#define basic2_h
 
 #include "absHamiltonian.h"
 #include <cmath>
-
-class basic : public absHamiltonian {
+void basic2Ham(hGraph &host);
+class basic2 : public absHamiltonian {
     
 private:
     int _result;
 public:
-    basic();
+    basic2();
     double result();
     void calculate(hGraph &host);
     
     
 };
 
-basic::basic() : _result(0.0) {
+basic2::basic2() : _result(0.0) {
     
 }
 
-double basic::result() {
+double basic2::result() {
     return _result;
 }
 
-void basic::calculate(hGraph &host) {
+void basic2::calculate(hGraph &host) {
+    std::cout << "test" << std::endl;
     int size = host.getSize();
     std::cout << size << std::endl;
     for(int i = 0; i < size; i++) {
@@ -42,13 +43,12 @@ void basic::calculate(hGraph &host) {
     
 }
 
-
-double basicH(hGraph host) {
-    basic basicCalc;
-    host.accept(basicCalc);
-    return basicCalc.result();
+void basic2Ham(hGraph &host) {
+    basic2 basic2Ham;
+    host.accept(basic2Ham);
+    std::cout << basic2Ham.result() << std::endl;
+    host.setHamiltonian(basic2Ham.result());
     
 }
 
-
-#endif /* basic_h */
+#endif /* basic2_h */

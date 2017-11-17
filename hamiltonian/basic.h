@@ -33,19 +33,21 @@ double basic::result() {
 }
 
 void basic::calculate(hGraph &host) {
+    std::cout << "test" << std::endl;
     int size = host.getSize();
     std::cout << size << std::endl;
     for(int i = 0; i < size; i++) {
-        _result += host.getDegree(i);
+        _result += 2*host.getDegree(i);
     }
     std::cout << _result << std::endl;
     
 }
 
-double basic(hGraph * host) {
-    basic::basic * basicHam;
-    host->accept(basicHam);
-    return basicHam->result();
+void basicHam(hGraph &host) {
+    basic basicHam;
+    host.accept(basicHam);
+    std::cout << basicHam.result() << std::endl;
+    host.setHamiltonian(basicHam.result());
     
 }
 
