@@ -1,0 +1,37 @@
+Good list of commands can be found at https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/
+
+To initiate a git folder, go tot he folder in terminal and type
+	git init
+
+To add a remote github repository
+	git remote add origin “remote repository URL”
+
+To verify the new remote URL
+	git remote -v
+
+To check status 
+   	git status
+
+To checkout a repository
+	git clone “URL”
+
+To add a file 
+	git add [filename]
+
+To commit 
+	git commit -m "some commit message, good practice is KB: change"
+
+To remove this commit and modify the file, use 
+	git reset --soft HEAD~1 
+	and commit and add the file again.
+
+To make committed file public or to modify master
+	git push
+
+To pull all changes from the master
+	git pull
+
+If you can’t pull because you have modified files do the following:
+	git stash — to stash away your modified files
+	git pull — to pull from master
+	git stash apply — to bring back and merge stashed changes
