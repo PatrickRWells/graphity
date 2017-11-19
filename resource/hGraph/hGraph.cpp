@@ -54,6 +54,10 @@ void hGraph::setHamiltonian(double val) {
     _hamiltonian = val;
 }
 
+double hGraph::getHam() {
+    return _hamiltonian;
+}
+
 void hGraph::setMatrix(MatrixXi data) {
 }
 
@@ -112,8 +116,16 @@ int hGraph:: getSize() {
     return NUM_NODES;
 }
 
+bool hGraph::isConnected(int row, int column) {
+    if(_adjMatrix(row, column) == 1) {
+        return true;
+    }
+    
+    return false;
+    
+}
+
 void hGraph::accept(absHamiltonian &ham) {
-    std::cout << *this << std::endl;
     ham.calculate(*this);
     
 }
@@ -129,6 +141,99 @@ std::ofstream &operator << (std::ofstream &fs, const hGraph &rhs)  {
     return fs;
 }
 
+hList::hList() {
+    _energy = 0;
+    _head = nullptr;
+}
+bool hList::isEmpty() {
+    return _head == nullptr;
+}
+
+hList::~hList() {
+    if(_head != nullptr) {
+        _head->clear();
+    }
+    delete _head;
+}
+
+void hList::clear() {
+    if(_head != nullptr) {
+        _head->clear();
+        delete _head;
+        _head = nullptr;
+    }
+}
+
+double hList::getEnergy() {
+    return _energy;
+}
+
+void hList::prepend(hGraph * graph) {
+    if(_head == nullptr) {
+        _energy = graph->getHam();
+    }
+    hNode * p = _head;
+    hNode * t = new hNode(graph);
+    t->_next = p;
+    _head = t;
+}
+
+void hList::print() {
+    if(_head != nullptr) {
+        _head->print();
+    }
+    else {
+        std::cout << "This list is empty" << std::endl;
+    }
+}
+
+void hList::toFile(std::ofstream &fs) const {
+    if(_head != nullptr) {
+        _head->toFile(fs);
+    }
+}
+std::ofstream &operator <<(std::ofstream &os, const hList & rhs) {
+    rhs.toFile(os);
+    return os;
+}
+
+
+hNode::hNode(hGraph * graph) {
+    _data = graph;
+    _next = nullptr;
+}
+
+hNode::~hNode() {
+    _data = nullptr;
+    _next = nullptr;
+
+    
+}
+
+void hNode::clear() {
+    _data = nullptr;
+    if(_next != nullptr) {
+        _next->clear();
+        delete _next;
+        _next = nullptr;
+    }
+    
+}
+
+void hNode::print() {
+    std::cout << *_data << std::endl;
+    if(_next != nullptr) {
+        _next->print();
+    }
+}
+
+void hNode::toFile(std::ofstream &fs) const {
+    _data->toFile(fs);
+    if(_next != nullptr) {
+        _next->toFile(fs);
+    }
+    
+}
 
 hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer to an array of hGraphs and sets variable num to the number of graphs read from the file
     
@@ -160,6 +265,7 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
     
     int numRead = 0;
     
+    
     while(true) {
         getline(input,line); //gets the next line of the CSV file
         
@@ -173,6 +279,7 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
     input.seekg(0, std::ios::beg);
     getline(input, line);
     graphData = new hGraph[numRead];
+    std::cout << "Reading in graph data..." << std::endl;
     for(int i = 0; i < numRead; i++) {
         getline(input,line); //gets the next line of the CSV file
         
@@ -186,6 +293,7 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
         
     }
     
+    input.close();
     std::cout << "Number of graphs read " << numRead << std::endl;
     num = numRead;
     
