@@ -8,7 +8,7 @@ INCLUDES = -I ../resource -I ../hamiltonian
 
 default: Simulate
 
-Simulate: depend/hGraph.o ../hamiltonian/hamiltonians.h
+Simulate: depend/hGraph.o ../hamiltonian/hamiltonians.h Simulate.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) Simulate.cpp
 
 depend/hGraph.o: ../resource/hGraph/hGraph.cpp 
