@@ -1,5 +1,7 @@
 Good list of commands can be found at https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/
 
+Good primer on merging: https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging#Basic-Merge-Conflicts
+
 To initiate a git folder, go tot he folder in terminal and type
 	git init
 
@@ -35,3 +37,29 @@ If you can’t pull because you have modified files do the following:
 	git stash — to stash away your modified files
 	git pull — to pull from master
 	git stash apply — to bring back and merge stashed changes
+
+To move to a new branch
+	git checkout branchname
+		Note: git won’t let you switch to a new branch if you have uncommitted 			changes. In that case you can stash your uncommitted changes.
+
+To create a new branch and switch to it simultaneously
+	git checkout -b newbranchname
+
+To merge a branch with the master, first switch to the master using git checkout master, then
+	git merge nameofbranchtobemerged
+
+After you merge the branch “nameofbranchtobemerged” you should delete it by
+	git branch -d nameofbranchtobedeleted
+
+
+To resolve conflict first look at the conflicts by typing
+	git mergetool
+Then, if the conflict is in the file called filename.c for example, and you know you want to use your file, then
+	git checkout —ours filename.c
+	git add filename.c
+	git commit -m "using theirs"
+If you want to use theirs,
+	git checkout --theirs filename.c
+	git add filename.c
+	git commit -m "using theirs"
+

@@ -1,0 +1,9 @@
+.DS_Store
+hamiltonians.txt
+<<<<<<< HEAD
+graph9Formated.txt
+graph10Formated.txt
+=======
+>>>>>>> 3abbc3be7a2d4c0ee3a929e3d816cf8867897996
+*.csv
+*.o
