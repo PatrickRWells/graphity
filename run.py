@@ -212,8 +212,7 @@ while True:
     elif access == 2:
         filename = input("Please enter the name of the header file: ")
         path = "hamiltonian/" + filename
-        print(filename)
-
+        
         try:
 
             open(path, "r")

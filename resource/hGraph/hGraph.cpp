@@ -235,6 +235,7 @@ void hNode::toFile(std::ofstream &fs) const {
     
 }
 
+
 hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer to an array of hGraphs and sets variable num to the number of graphs read from the file
     
     int size;
@@ -257,13 +258,15 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
     
     std::string line;
     getline(input, line);
-    size = line[0] - '0'; //if a character represents an integer, subtracting character 0 from it converts its binary representation to the actual integer.
+    size = stoi(line);
+    std::cout << size << std::endl;
+    hGraph * graphData;
+    int numRead = 0;
+
     
     int linesize = 2*size*size; //figures out how much of the line must be grabbed (including commas) to get the adjacency matrix
     int data[size*size];        //creates array that will temporarily hold adjacency matrix data;
-    hGraph * graphData;
     
-    int numRead = 0;
     
     
     while(true) {
@@ -288,10 +291,15 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
         for(int j = 0; j < 2*size*size; j += 2) {
             adjMatrix(j/(2*size), (j/2) % size) = line[j] - '0';   //adds the integer to the adjacency matrix in the appropriate position
         }
-        
+
         graphData[i].setMatrix(size, adjMatrix);
         
+        if(i % 10 == 0) {
+            std::cout << graphData[i] << std::endl << std::endl;
+        }
+        
     }
+    
     
     input.close();
     std::cout << "Number of graphs read " << numRead << std::endl;
