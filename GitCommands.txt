@@ -63,3 +63,5 @@ If you want to use theirs,
 	git add filename.c
 	git commit -m "using theirs"
 
+When getting error while trying to push saying that file size exceeds limit of 100MB, if you mistakenly just delete the file before uncommitting and removing the file, then use the filter-branch command as
+	git filter-branch -f —index-filter “git rm -rf —cached —ignore-unmatch ./locationtofile/filename” —prine-empty — —all
