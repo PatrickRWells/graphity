@@ -1,4 +1,6 @@
 .DS_Store
 hamiltonians.txt
+graph9Formated.txt
+graph10Formated.txt
 *.csv
 *.o
