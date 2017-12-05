@@ -293,11 +293,7 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
         }
 
         graphData[i].setMatrix(size, adjMatrix);
-        
-        if(i % 10 == 0) {
-            std::cout << graphData[i] << std::endl << std::endl;
-        }
-        
+                
     }
     
     

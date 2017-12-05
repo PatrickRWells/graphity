@@ -72,6 +72,8 @@ int main() {
     ofile << *second;
     ofile.close();
     
+    delete graphData;
+    
     
 }
 
