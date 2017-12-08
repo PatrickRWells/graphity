@@ -259,7 +259,6 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
     std::string line;
     getline(input, line);
     size = stoi(line);
-    std::cout << size << std::endl;
     hGraph * graphData;
     int numRead = 0;
 
