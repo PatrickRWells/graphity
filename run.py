@@ -7,9 +7,27 @@
 
 
 import subprocess
-import pexpect
 import os
 import re
+import sys
+import imp
+
+if sys.version_info < (3, 6):
+    sys.tracebacklimit = 0
+    version = ".".join(map(str, sys.version_info[:3]))
+    print('This code requires Python 3.6. You are currently running version ' + version)
+    raise Exception('Please update your python version and try again')
+
+try:
+    imp.find_module('pexpect')
+except:
+    sys.tracebacklimit = 0
+    print("This software requires the Python module pexpect. It can most easily be installed using pip")
+    sys.exit(3)
+
+
+import pexpect
+
 
 def menu(): #simple menu function
     print("Menu:")

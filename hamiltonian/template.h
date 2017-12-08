@@ -16,7 +16,7 @@ void TemplateHam(hGraph &host);
 class Template : public absHamiltonian {
     
 private:
-    int _result; //Result of the computation.
+    double _result; //Result of the computation.
 public:
     Template();
     double result();
@@ -36,12 +36,13 @@ double Template::result() { //There should be no reason to edit this function;
 void Template::calculate(hGraph &host) { //This is where all the main calculation takes place.
     int size = host.getSize();           //see hGraph documentation for available commands.
     for(int i = 0; i < size; i++) {
-        _result += host.getDegree(i);
+        _result += host.getDegree(i);   //
     }
     
 }
 
 void TemplateHam(hGraph &host) { //do not edit this function except to change instances of the word "Template"
+                                 //For example, if your hamiltonian is named "basic" this function should be titled "basicHam"
     Template Ham;
     host.accept(Ham);
     host.setHamiltonian(Ham.result());
