@@ -19,6 +19,7 @@ To checkout a repository
 
 To add a file 
 	git add [filename]
+	git add —-all (to add all changes made)
 
 To commit 
 	git commit -m "some commit message, good practice is KB: change"

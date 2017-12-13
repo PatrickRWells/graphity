@@ -112,6 +112,10 @@ int hGraph::getDegree(int node) {
     
 }
 
+double hGraph::getEulerChar() {
+	return _eulerChar;
+}
+
 int hGraph:: getSize() {
     return NUM_NODES;
 }

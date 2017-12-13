@@ -43,6 +43,7 @@ public:
     
     int getDegree(int node);
     int getSize();
+    double getEulerChar();
     bool isConnected(int row, int column);
     
     double getHam();

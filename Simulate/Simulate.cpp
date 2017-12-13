@@ -17,7 +17,7 @@ int main() {
     int numRead;
     std::function<void(hGraph&)> simFunction;
     
-	simFunction = basicSquareHam;
+	simFunction = EulerCharHam;
     
     hList * first;
     hList * second;
