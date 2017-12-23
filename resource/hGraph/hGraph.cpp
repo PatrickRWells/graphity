@@ -54,6 +54,33 @@ void hGraph::setHamiltonian(double val) {
     _hamiltonian = val;
 }
 
+hGraph hGraph::unitSphere(int node) {
+
+
+    MatrixXi newAdj(NUM_NODES, NUM_NODES);
+    newAdj = _adjMatrix;
+    int rem = 0;
+    for (int i = 0; i < NUM_NODES; i++) {
+    
+        if(_adjMatrix(i, node) == 0) {
+            removeColumn(newAdj, i - rem);
+            removeRow(newAdj, i - rem);
+            rem++;
+
+            
+        }
+        
+    }
+
+    
+    hGraph temp(newAdj.rows(), newAdj);
+    return temp;
+    
+    
+    
+    
+}
+
 double hGraph::getHam() {
     return _hamiltonian;
 }
@@ -306,6 +333,28 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
     
     return graphData;
 
+}
+
+void removeRow(Eigen::MatrixXi& matrix, unsigned int rowToRemove) // these two functions are used for generating the unit sphere
+{
+    unsigned int numRows = matrix.rows()-1;
+    unsigned int numCols = matrix.cols();
+    
+    if( rowToRemove < numRows )
+        matrix.block(rowToRemove,0,numRows-rowToRemove,numCols) = matrix.block(rowToRemove+1,0,numRows-rowToRemove,numCols);
+    
+    matrix.conservativeResize(numRows,numCols);
+}
+
+void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove)
+{
+    unsigned int numRows = matrix.rows();
+    unsigned int numCols = matrix.cols()-1;
+    
+    if( colToRemove < numCols )
+        matrix.block(0,colToRemove,numRows,numCols-colToRemove) = matrix.block(0,colToRemove+1,numRows,numCols-colToRemove);
+    
+    matrix.conservativeResize(numRows,numCols);
 }
 
 

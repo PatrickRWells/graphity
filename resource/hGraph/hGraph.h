@@ -40,6 +40,7 @@ public:
     void setMatrix(MatrixXi data);
     void setMatrix(int size, MatrixXi data);
     void setHamiltonian(double val);
+    hGraph unitSphere(int node);
     
     int getDegree(int node);
     int getSize();
@@ -84,6 +85,9 @@ public:
 };
 
 hGraph * readGraphFile(int &num);
+
+void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove);
+void removeRow(Eigen::MatrixXi& matrix, unsigned int rowToRemove);
 
 
 
