@@ -29,6 +29,7 @@ hGraph::hGraph(int size, MatrixXi adjMatrix):NUM_NODES(size) {
     _adjMatrix = adjMatrix;
     _degVector = Eigen::VectorXi::Zero(size);
     _hamiltonian = 0.0;
+    _dimension = calcDimension();
     
     for(int i = 0; i < NUM_NODES; i++) {
         for(int j = 0; j < size; j++) {
@@ -81,6 +82,30 @@ hGraph hGraph::unitSphere(int node) {
     
 }
 
+double hGraph::calcDimension() {
+    if(NUM_NODES == 0) {
+        return -1;
+    }
+    
+    else {
+        double dimen = 0.0;
+        for(int i = 0; i < NUM_NODES; i++ ) {
+            dimen += unitSphere(i).getDimension();
+        }
+        dimen = dimen/(static_cast<double>(NUM_NODES));
+        return (dimen + 1);
+        
+    }
+    
+    
+}
+
+double hGraph::getDimension() {
+    
+    return _dimension;
+    
+}
+
 double hGraph::getHam() {
     return _hamiltonian;
 }
@@ -95,6 +120,7 @@ void hGraph::setMatrix(int size, MatrixXi data) {
     _degVector.resize(size);
     _degVector = Eigen::VectorXi::Zero(size);
     _hamiltonian = 0.0;
+    _dimension = calcDimension();
     
     for(int i = 0; i < NUM_NODES; i++) {
         for(int j = 0; j < size; j++) {

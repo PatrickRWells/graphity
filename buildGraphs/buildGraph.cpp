@@ -66,8 +66,7 @@ int main() {
             
             output << temp;
             num++;
-
-            
+                        
             
         } while(next_permutation(fill, fill + max)); //modifies the array map to be the next possible permutation of the array for the number of 1s currently in array
                                                      //if there is no next possible permutation, the loop is terminated and the process restarts with a new number of 1s

@@ -41,7 +41,9 @@ public:
     void setMatrix(int size, MatrixXi data);
     void setHamiltonian(double val);
     hGraph unitSphere(int node);
-    
+    double calcDimension();
+
+    double getDimension();
     int getDegree(int node);
     int getSize();
     double getEulerChar();
