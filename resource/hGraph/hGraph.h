@@ -11,6 +11,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <random>
 
 #include "../lib/eigen/Eigen/Dense"
 
@@ -25,9 +27,11 @@ private:
     int NUM_NODES;
     MatrixXi _adjMatrix;
     Eigen::VectorXi _degVector;
-    double _eulerChar;
+    int _eulerChar;
     double _dimension;
     double _hamiltonian;
+    std::vector <int> _numCliques;
+    bool cliquesFound = false;
     
 public:
     hGraph(int size, MatrixXi adjMatrix);
@@ -40,12 +44,20 @@ public:
     void setMatrix(MatrixXi data);
     void setMatrix(int size, MatrixXi data);
     void setHamiltonian(double val);
-    
+    hGraph unitSphere(int node);
+    double calcDimension();
+    void calcEulerChar();
+
+    void numCliques();
+
+
+    double getDimension();
     int getDegree(int node);
     int getSize();
-    double getEulerChar();
+    int getEulerChar();
     bool isConnected(int row, int column);
-    
+    void countCliques();
+    void cliqueSearch(std::vector<int> R, std::vector<int> P);
     double getHam();
     void accept(absHamiltonian &ham);
     friend std::ostream &operator << (std::ostream &os, const hGraph &rhs);
@@ -85,6 +97,12 @@ public:
 
 hGraph * readGraphFile(int &num);
 
+void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove);
+void removeRow(Eigen::MatrixXi& matrix, unsigned int rowToRemove);
+hGraph randomGraph(int size);
+unsigned long int factorial(unsigned int n);
+unsigned long int binom(unsigned int n, unsigned int k);
+hGraph kGraph(int size);
 
 
 

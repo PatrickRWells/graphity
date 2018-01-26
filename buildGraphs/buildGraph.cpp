@@ -55,19 +55,17 @@ int main() {
                     adjMatrix(k, m) = fill[index];  //maps the item in the array to its corresponding entry in the bottom half of the adjacency matrix
                     adjMatrix(m, k) = fill[index];  //maps the item in the array to its corresponding entry in the top half of the adjacency matrix
                     index++;
-                
+                    
                 }
-                
-                
-                
             }
-            
             hGraph temp(SIZE, adjMatrix);
-            
+            if(num == 10000) {
+                std::cout << temp << endl;
+                temp.countCliques();
+            }
             output << temp;
             num++;
-
-            
+                        
             
         } while(next_permutation(fill, fill + max)); //modifies the array map to be the next possible permutation of the array for the number of 1s currently in array
                                                      //if there is no next possible permutation, the loop is terminated and the process restarts with a new number of 1s
