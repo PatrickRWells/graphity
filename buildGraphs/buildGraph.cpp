@@ -55,15 +55,14 @@ int main() {
                     adjMatrix(k, m) = fill[index];  //maps the item in the array to its corresponding entry in the bottom half of the adjacency matrix
                     adjMatrix(m, k) = fill[index];  //maps the item in the array to its corresponding entry in the top half of the adjacency matrix
                     index++;
-                
+                    
                 }
-                
-                
-                
             }
-            
             hGraph temp(SIZE, adjMatrix);
-            
+            if(num == 10000) {
+                std::cout << temp << endl;
+                temp.countCliques();
+            }
             output << temp;
             num++;
                         
