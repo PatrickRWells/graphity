@@ -21,17 +21,26 @@ class absHamiltonian;
 
 class hList;
 class hNode;
+
 class hGraph {
     
 private:
     int NUM_NODES;
-    MatrixXi _adjMatrix;
-    Eigen::VectorXi _degVector;
     int _eulerChar;
     double _dimension;
     double _hamiltonian;
-    std::vector <int> _numCliques;
     bool cliquesFound = false;
+
+
+    MatrixXi _adjMatrix;
+    Eigen::VectorXi _degVector;
+    std::vector <int> _numCliques;
+    
+    void toStream(std::ostream &os) const;
+    void toFile(std::ofstream &fs) const;
+    void accept(absHamiltonian &ham);
+
+
     
 public:
     hGraph(int size, MatrixXi adjMatrix);
@@ -39,9 +48,6 @@ public:
     hGraph();
     ~hGraph();
     void print(); //depricated
-    void toStream(std::ostream &os) const;
-    void toFile(std::ofstream &fs) const;
-    void setMatrix(MatrixXi data);
     void setMatrix(int size, MatrixXi data);
     void setHamiltonian(double val);
     hGraph unitSphere(int node);
@@ -59,10 +65,11 @@ public:
     void countCliques();
     void cliqueSearch(std::vector<int> R, std::vector<int> P);
     double getHam();
-    void accept(absHamiltonian &ham);
     friend std::ostream &operator << (std::ostream &os, const hGraph &rhs);
     friend std::ofstream &operator <<(std::ofstream &fs, const hGraph &rhs);
 };
+
+//Forward declaration of hList class. Used to sort graphs based on their hamiltonian.
 
 class hList {
 private:
@@ -82,6 +89,8 @@ public:
 
 };
 
+//forward declaration of hNode classe, used in hList
+
 class hNode {
 private:
     friend class hList;
@@ -95,13 +104,14 @@ public:
     void toFile(std::ofstream &fs) const;
 };
 
+
+//Forward declaration of needed resource functions
+
 hGraph * readGraphFile(int &num);
 
 void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove);
 void removeRow(Eigen::MatrixXi& matrix, unsigned int rowToRemove);
 hGraph randomGraph(int size);
-unsigned long int factorial(unsigned int n);
-unsigned long int binom(unsigned int n, unsigned int k);
 hGraph kGraph(int size);
 
 
