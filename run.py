@@ -203,7 +203,7 @@ while True:
         setHam(choice)
         print("Building simulation....")
         proc = subprocess.Popen(['make'],
-                stdout=subprocess.PIPE, cwd='Simulate')
+                stdout=subprocess.PIPE, cwd='Simulate/BasicSim')
 
         
         exit_code = proc.wait()

@@ -12,4 +12,5 @@
 
 
 #include "EulerChar.h"
+#include "basicSquare.h"
 #endif /* hamiltonians_h */
