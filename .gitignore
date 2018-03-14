@@ -4,3 +4,4 @@ hamiltonians.txt
 *.o
 funcTest/funcTest
 Simulate/Monte-Carlo/MonteCarlo
+resource/stats/stats
