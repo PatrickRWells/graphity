@@ -26,7 +26,7 @@ class hGraph {
     
 private:
     int NUM_NODES;
-    int _eulerChar;
+    int _eulerChar = 0;
     double _dimension;
     double _hamiltonian;
     bool cliquesFound = false;

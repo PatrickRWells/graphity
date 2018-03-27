@@ -64,7 +64,7 @@ hGraph::hGraph(int size, MatrixXi adjMatrix):NUM_NODES(size) { //Takes a size an
     _adjMatrix = adjMatrix;
     _degVector = Eigen::VectorXi::Zero(size);
     _hamiltonian = 0.0;
-    _dimension = 0.0; //calcDimension();
+    _dimension = 0; //calcDimension();
     _numCliques = std::vector<int> (size, 0);
     for(int i = 0; i < NUM_NODES; i++) {
         for(int j = 0; j < size; j++) {
@@ -207,6 +207,8 @@ double hGraph::calcDimension() { //Calculates dimensionality recursively. See Kn
     
 }
 
+
+
 hGraph hGraph::unitSphere(int node) { //outputs the unit sphere around a given. Node the united sphere contains
     //all nodes connected to the given node, as well as all edges between those nodes
     
@@ -292,10 +294,19 @@ void hGraph::toFile(std::ofstream &fs) const { //outputs hGraphs to a file in a 
             fs << temp << ",";
             
         }
+        if(NUM_NODES > 20) {
+            fs << "\n";
+        }
     }
-    
+    if (NUM_NODES > 20) {
+        fs << "\n";
+    }
     for(int i = 0; i < NUM_NODES; i++) {
         fs << _degVector[i] << ",";
+    }
+    
+    if(NUM_NODES > 20) {
+        fs << "\n";
     }
     
     fs << _eulerChar << "," << _hamiltonian << std::endl;
@@ -321,8 +332,6 @@ std::ostream &operator << (std::ostream &os, const hGraph &rhs)  { //Allows use 
     rhs.toStream(os);
     return os;
 }
-
-
 
 
 void hGraph::print() { //No longer used.
