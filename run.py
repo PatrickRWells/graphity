@@ -197,7 +197,7 @@ while True:
 
     elif access == 1:
         path = None
-        simType = input("Do a Monte-Carlo simulation? (Y/N)").upper()
+        simType = input("Do a Monte-Carlo simulation? (Y/N): ").upper()
         monteC = True
         if simType == 'N':
             monteC = False

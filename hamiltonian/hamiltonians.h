@@ -1,4 +1,3 @@
-//
 //  hamiltonians.h
 //  
 //
@@ -9,6 +8,5 @@
 
 #ifndef hamiltonians_h
 #define hamiltonians_h
-
 
 #endif /* hamiltonians_h */
