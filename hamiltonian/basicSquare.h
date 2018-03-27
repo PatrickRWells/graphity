@@ -26,7 +26,6 @@ public:
     basicSquare(int node1, int node2);
     double result();
     void calculate(hGraph &host); //Don't mess with these
-    void calculate(hGraph &host, int nodeA, int nodeB);
     double getDifference() {
         return _partial;
     }
