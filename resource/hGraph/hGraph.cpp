@@ -162,6 +162,11 @@ void hGraph::flipEdge(int nodeA, int nodeB) {
     
 }
 
+void hGraph::acceptPartial(double partial) {
+    _hamiltonian += partial;
+    
+}
+
 //---------------------------END SETTERS---------------------------//
 
 

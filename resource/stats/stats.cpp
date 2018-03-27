@@ -58,17 +58,26 @@ int main() {
     sum = sum/(NUMGRAPHS*NUMTESTS);
     double stddev = sqrt(sum);
 
-    double sum2;
+    double sum3;
     for(int i = 0; i < NUMGRAPHS; i++) {
-        sum2 += data[i][NUMTESTS];
+        sum3 += data[i][NUMTESTS];
     }
-    double avg2 = sum2/NUMGRAPHS;
-    
+    double avg3 = sum3/NUMGRAPHS;
+    sum3 = 0;
+    for(int i = 0; i < NUMGRAPHS; i++) {
+            double val = data[i][NUMTESTS] - avg3;
+            sum3 += val*val;
+
+    }
+
+    double stddev3 = sqrt(sum3/NUMGRAPHS);
     std::cout << "Complete               " << std::endl;
     
     std:: cout << "Average: " << avg << std::endl;
     std::cout << "Standard Deviation: " << stddev << std::endl;
-    std::cout << "Average energy: " << avg2 << std::endl;
+    std::cout << "Average energy: " << avg3 << std::endl;
+    std::cout << "Standard Deviation: " << stddev3 << std::endl;
+
 }
 
 void calculate(double ** data, int numgraphs, int numtests, int size, int offset, std::function<void(hGraph&)> simulate) {
@@ -83,7 +92,7 @@ void calculate(double ** data, int numgraphs, int numtests, int size, int offset
         hGraph * graph = new hGraph(size);
         (*graph) = randomGraph(size);
         simulate(*graph);
-        data[i][numtests+1] = graph->getHam();
+        data[i][NUMTESTS] = graph->getHam();
         for (int j = 0; j < numtests; j++) {
             data[i][j] = -(graph->getHam());
             hGraph * newGraph = new hGraph(size);

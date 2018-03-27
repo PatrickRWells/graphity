@@ -1,5 +1,10 @@
-
-
+//
+//  MonteCarlo.cpp
+//  
+//
+//  Created by Patrick on 2/19/18.
+//
+//
 
 
 #include <iostream>
@@ -26,8 +31,8 @@ int main() {
     std::function<void(hGraph&)> simFunction;
     std::function<double(hGraph&,int, int)> simPartial;
     
-	simFunction = basicSquareHam;
-	simPartial = basicSquarePartial;
+    simFunction = basicSquareHam;
+    simPartial = basicSquarePartial;
     
     std::random_device rd; //c++11 random number generator
     std::mt19937 gen(rd());

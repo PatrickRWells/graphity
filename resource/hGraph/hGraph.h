@@ -54,6 +54,8 @@ public:
     void calcEulerChar();
     void accept(absHamiltonian &ham);
     void flipEdge(int nodeA, int nodeB);
+    void acceptPartial(double partial);
+
 
 
     void numCliques();
