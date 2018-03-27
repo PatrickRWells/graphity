@@ -11,5 +11,4 @@
 #define hamiltonians_h
 
 
-#include "EulerChar.h"
 #endif /* hamiltonians_h */

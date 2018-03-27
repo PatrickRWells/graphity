@@ -2,16 +2,16 @@ CXX = g++
 CXXFLAGS = -std=c++11
 OBJS = depend/hGraph.o
 HGRAPH = ../resource/hGraph/
-MAIN = Simulate
+MAIN = funcTest
 
 INCLUDES = -I ../resource -I ../hamiltonian
 
-default: Simulate
+default: funcTest
 
-Simulate: depend/hGraph.o ../hamiltonian/hamiltonians.h Simulate.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) Simulate.cpp
+funcTest: depend/hGraph.o
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) funcTest.cpp
 
-depend/hGraph.o: ../resource/hGraph/hGraph.cpp 
+depend/hGraph.o: ../resource/hGraph/hGraph.cpp
 	$ mkdir -p depend
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c  ../resource/hGraph/hGraph.cpp -o depend/hGraph.o
 

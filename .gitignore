@@ -3,3 +3,5 @@ hamiltonians.txt
 *.csv
 *.o
 funcTest/funcTest
+Simulate/Monte-Carlo/MonteCarlo
+resource/stats/stats

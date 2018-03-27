@@ -8,20 +8,20 @@
 
 #include <iostream>
 #include "hGraph/hGraph.h"
+#include "hamiltonians.h"
 #include <algorithm>
 #include <string>
 using namespace std;
 
 
 int main() {
-    hGraph test = randomGraph(100);
-    std::ofstream output;
-    output.open("test.csv");
-    output << "100\n";
-    output << test;
-    output.close();
-    
-    
+    hGraph test = kGraph(20);
+    basicSquareHam(test);
+    double testA = partialBasicSquare(test, 1, 6);
+    std::cout << test.getHam() << ", " << testA << std::endl;
+    test.acceptPartial(testA);
+    std::cout << test.getHam() << std::endl;
+
 }
 
 

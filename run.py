@@ -125,32 +125,46 @@ def uninstallHam(name):
 
 
 
-
-
-
-# Modifies Simulation.cpp to set it to run the correct hamiltonian
+# Modifies simulation source file to set it to run the correct hamiltonian
 # Can be found on line that reads 'simFunction = ......."
+# For the Monte-Carlo simulation, also edits the partial hamiltonian line
 # As an input, takes the name of a hamiltonian as it reads in hamiltonian.txt (assumes associated header file is there)
 
 
-def setHam(name):
+def setHam(name, monte):
+    partialName = name + "Partial"
     name += "Ham" #Naming convention
-    simFile = open("Simulate/Simulate.cpp" , 'r')
-    lookup = "simFunction = "
+    simFile = None
+    if not monte:
+        simFile = open("Simulate/BasicSim/Simulate.cpp" , 'r')
+    else:
+        simFile = open("Simulate/Monte-Carlo/MonteCarlo.cpp" , 'r')
+    lookup = "simFunction ="
+    lookup2 = "simPartial = "
     linenum = 0
     for num, line in enumerate(simFile, 0):
         if line.strip().startswith(lookup):
             linenum = num
             break
+
+    print("Line number: ")
+    print(linenum)
+
     simFile.seek(0)
     contents = simFile.readlines()
     simFile.close()
-    contents[linenum] = '\t' + lookup + name + ";\n"
-    oFile = open("Simulate/Simulate.cpp", "w")
-    contents = "".join(contents)
-    oFile.write(contents)
-    oFile.close
-    
+    contents[linenum] = '\t' + lookup + ' ' + name + ";\n"
+    if monte:
+        contents[linenum + 1] = '\t' + lookup2 + partialName + ";\n"
+        oFile = open("Simulate/Monte-Carlo/MonteCarlo.cpp", "w")
+        contents = "".join(contents)
+        oFile.write(contents)
+        oFile.close
+    else:
+        oFile = open("Simulate/BasicSim/Simulate.cpp", "w")
+        contents = "".join(contents)
+        oFile.write(contents)
+        oFile.close
 
 buildCanRun = False
 
@@ -182,6 +196,14 @@ while True:
 
 
     elif access == 1:
+        path = None
+        simType = input("Do a Monte-Carlo simulation? (Y/N)").upper()
+        monteC = True
+        if simType == 'N':
+            monteC = False
+            path = "Simulate/BasicSim"
+        else:
+            path = "Simulate/Monte-Carlo"
         hFile = open("hamiltonian/hamiltonians.txt", "r")
         found = False
         choice = ""
@@ -200,10 +222,10 @@ while True:
             print("Hamiltonian not found")
             hFile.seek(0)
 
-        setHam(choice)
+        setHam(choice, monteC)
         print("Building simulation....")
         proc = subprocess.Popen(['make'],
-                stdout=subprocess.PIPE, cwd='Simulate')
+                                stdout=subprocess.PIPE, cwd=path)
 
         
         exit_code = proc.wait()
@@ -217,11 +239,15 @@ while True:
             print("terminating")
             break
         if simCanRun:
-            proc2 = pexpect.spawn('./Simulate/Simulate')
-            proc2.interact()
-            
+            if monteC:
+                proc2 = pexpect.spawn('./Simulate/Monte-Carlo/MonteCarlo')
+                proc2.interact()
+            else:
+                proc2 = pexpect.spawn('./Simulate/BasicSim/Simulate')
+                proc2.interact()
+
         proc = subprocess.Popen(['make', 'clean'],
-                stdout=subprocess.PIPE, cwd='Simulate')
+                stdout=subprocess.PIPE, cwd=path)
 
         
 

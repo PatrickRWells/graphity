@@ -98,6 +98,7 @@ double hGraph::getHam() {  //simple getter function
 }
 
 int hGraph::getEulerChar() { //simple getter function
+    calcEulerChar();
     return _eulerChar;
 }
 
@@ -142,6 +143,29 @@ void hGraph::setHamiltonian(double val) { //sets the value of the hamoiltonian
     _hamiltonian = val;
 }
 
+void hGraph::flipEdge(int nodeA, int nodeB) {    
+    if(isConnected(nodeA, nodeB)) {
+        _adjMatrix(nodeA, nodeB) = 0;
+        _adjMatrix(nodeB, nodeA) = 0;
+        _degVector[nodeA]--;
+        _degVector[nodeB]--;
+        
+    }
+    else {
+        _adjMatrix(nodeA, nodeB) = 1;
+        _adjMatrix(nodeB, nodeA) = 1;
+        _degVector[nodeA]++;
+        _degVector[nodeB]++;
+    }
+
+    cliquesFound = false;
+    
+}
+
+void hGraph::acceptPartial(double partial) {
+    _hamiltonian += partial;
+    
+}
 
 //---------------------------END SETTERS---------------------------//
 
@@ -549,6 +573,7 @@ hGraph randomGraph(int size) { //generates a random graph of a given size.
     
     std::random_device rd; //c++11 random number generator
     std::mt19937 gen(rd());
+
     
     
     int fill[max];

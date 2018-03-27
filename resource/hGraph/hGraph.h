@@ -1,4 +1,4 @@
-//
+  //
 //   hGraph.h
 //  
 //
@@ -38,7 +38,6 @@ private:
     
     void toStream(std::ostream &os) const;
     void toFile(std::ofstream &fs) const;
-    void accept(absHamiltonian &ham);
 
 
     
@@ -53,6 +52,11 @@ public:
     hGraph unitSphere(int node);
     double calcDimension();
     void calcEulerChar();
+    void accept(absHamiltonian &ham);
+    void flipEdge(int nodeA, int nodeB);
+    void acceptPartial(double partial);
+
+
 
     void numCliques();
 
