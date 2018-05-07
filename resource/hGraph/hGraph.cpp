@@ -242,11 +242,11 @@ void hGraph::countCliques() { //Declares necessary objects for initial call of c
     }
     
     cliqueSearch(vectorR, vectorP);
-    std::cout << "Number of cliques of each size" << std::endl;
+    /*std::cout << "Number of cliques of each size" << std::endl;
     for(int i = 0; i < NUM_NODES; i++) {
         std::cout << i+1 << ": " << _numCliques[i] << std::endl;
         
-    }
+    }*/
     cliquesFound = true;
 }
 
@@ -280,6 +280,20 @@ void hGraph::cliqueSearch(std::vector<int> R, std::vector<int> P) { //Uses a mod
         }
     }
 }
+
+/*int hGraph::pathL(int length, int a, int b) { //determines the number of paths of given length that connect vertices a and b. See arXiv:0801.0861 [hep-th], page 4
+    int sum = 0;
+    int prod = 0;
+    for(int i = 0; i < NUM_NODES; i++) {
+        prod = _adjMatrix(a,i) * _adjMatrix(i,b);
+        sum += prod;
+        
+    }
+    
+    
+    
+    
+}*/
 
 
 //---------------------------END CALCULATIONS---------------------------//

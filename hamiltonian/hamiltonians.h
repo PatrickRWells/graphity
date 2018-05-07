@@ -9,4 +9,6 @@
 #ifndef hamiltonians_h
 #define hamiltonians_h
 
+#include "basicSquare.h"
+#include "EulerChar.h"
 #endif /* hamiltonians_h */

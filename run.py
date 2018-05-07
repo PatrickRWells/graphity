@@ -147,9 +147,6 @@ def setHam(name, monte):
             linenum = num
             break
 
-    print("Line number: ")
-    print(linenum)
-
     simFile.seek(0)
     contents = simFile.readlines()
     simFile.close()

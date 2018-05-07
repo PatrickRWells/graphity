@@ -1,4 +1,4 @@
-
+    
 
 
 
@@ -10,11 +10,14 @@
 int main() {
     double TINV;
     int SIZE;
+    int maxSweeps;
     
     std::cout << "How large of a graph would you like to use? ";
     std::cin >> SIZE;
     std::cout << std::endl << "Input the inverse temperature: ";
     std::cin >> TINV;
+    std::cout << "How many sweeps would you like to perform? ";
+    std::cin >> maxSweeps;
     
     std::ofstream file;
     file.open("output.csv");
@@ -38,6 +41,7 @@ int main() {
     int nodeA = 0;
     int nodeB = 0;
     int sweeps = 0;
+    int sweepNUM = ((SIZE)*(SIZE-1))/2;
     int n = 0;
     int increases = 0;
     int swaps = 0;
@@ -74,23 +78,23 @@ int main() {
         nodeA = 0;
         nodeB = 0;
         n++;
-        if(n == 150) {
+        if(n == sweepNUM) {
             n = 0;
             sweeps++;
-            if(sweeps %100 == 0) {
+            if(sweeps % (maxSweeps/10) == 0) {
                 std::cout << sweeps << " sweeps performed" << std::endl;
             }
 
         }
         
-        if(sweeps == 1000) {
+        if(sweeps == maxSweeps) {
             run = false;
         }
         
         
 
     }
-    std::cout << "Graph outputed to file" << std::endl;
+    std::cout << *graph << std::endl;
     file << *graph;
     std::cout << "Moves that increased energy: " << increases << std::endl;
     std::cout << "total swaps accepted: " << swaps <<std::endl;
