@@ -17,12 +17,9 @@ using namespace std;
 
 int main() {
     
-    hGraph test = kGraph(10);
-    test.setThreads(3);
-    std::cout << test.getDimension() << std::endl;
-    test.setThreads(1);
-    test.calcDimension();
-    std::cout << test.getDimension() << std::endl;
+    hGraph test = compGraph(10);
+    std::cout << test << std::endl;
+    
 }
 
 

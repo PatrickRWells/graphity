@@ -122,7 +122,7 @@ hGraph * readGraphFile(int &num);
 void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove);
 void removeRow(Eigen::MatrixXi& matrix, unsigned int rowToRemove);
 hGraph randomGraph(int size);
-hGraph kGraph(int size);
+hGraph compGraph(int size);
 
 
 
