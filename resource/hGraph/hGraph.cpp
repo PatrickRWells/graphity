@@ -64,7 +64,7 @@ hGraph::hGraph(int size, MatrixXi adjMatrix):NUM_NODES(size) { //Takes a size an
     _adjMatrix = adjMatrix;
     _degVector = Eigen::VectorXi::Zero(size);
     _hamiltonian = 0.0;
-    _dimension = 0; //calcDimension();
+    _dimension = 0; //this is not initialized by default due to the high computing cost. ???Why is there a phase transition at 36 nodes???
     _numCliques = std::vector<int> (size, 0);
     for(int i = 0; i < NUM_NODES; i++) {
         for(int j = 0; j < size; j++) {
@@ -88,7 +88,9 @@ hGraph::~hGraph() { //Since the hGraph class does not include any pointers, ther
 //---------------------------GETTERS---------------------------//
 
 double hGraph::getDimension() { //simple getter function
-    
+    if(_dimension == 0) {
+        calcDimension();
+    }
     return _dimension;
     
 }
@@ -143,6 +145,10 @@ void hGraph::setHamiltonian(double val) { //sets the value of the hamoiltonian
     _hamiltonian = val;
 }
 
+void hGraph::setThreads(int threads) {
+    _numThreads = threads;
+}
+
 void hGraph::flipEdge(int nodeA, int nodeB) {    
     if(isConnected(nodeA, nodeB)) {
         _adjMatrix(nodeA, nodeB) = 0;
@@ -189,22 +195,71 @@ void hGraph::calcEulerChar() { //Based on the definition by Oliver Knills. Requi
     
 }
 
-double hGraph::calcDimension() { //Calculates dimensionality recursively. See Knill, "On the dimensionanity and Euler Characteristic of Random Graphs"
+void hGraph::calcDimension() { //Calculates dimensionality recursively. See Knill, "On the dimensionanity and Euler Characteristic of Random Graphs"
     if(NUM_NODES == 0) {         //for information regarding this algorithm.
+        _dimension =  -1;
+    }
+    
+    else if (_numThreads == 1) {
+        double dimen = 0.0;
+        for(int i = 0; i < NUM_NODES; i++ ) {
+            dimen += unitSphere(i).dimension(0, unitSphere(i).getSize(), false);
+        }
+        dimen = dimen/(static_cast<double>(NUM_NODES));
+        _dimension = (dimen + 1);
+        
+    }
+    
+    else {
+        int num = NUM_NODES/_numThreads;
+        int extra = NUM_NODES%_numThreads; //extra nodes that don't divide evenly into number of threads.
+        int distributed = 0;
+        std::vector<std::future<double>> futures;
+        for(int i = 0; i < _numThreads -1; i++) {
+            if(extra != 0) {
+                distributed++;
+                extra--;//If there are extra nodes, they are distributed to the various threads as they are called until there are no extra ones left.
+                futures.push_back(std::async(std::launch::async, &hGraph::dimension, this, num*i + distributed-1, num*(i+1) + distributed, true) );
+            }
+            else {
+                futures.push_back(std::async(std::launch::async, &hGraph::dimension, this, num*i + distributed, num*(i+1) + distributed, true) );
+
+            }
+        }
+        double sum = dimension(num*(_numThreads-1) + distributed, NUM_NODES, true); //The main thread does some work as well.
+        for(int i = 0; i <_numThreads -1; i++) {
+            sum += futures[i].get();
+        }
+        double dimen = sum/(static_cast<double>(NUM_NODES));
+        _dimension = dimen + 1;
+        
+    }
+    
+    
+    
+}
+
+double hGraph::dimension(int a, int b, bool multi) { //This function is NOT called by the user. It is used by the public function.
+     if(NUM_NODES == 0) {                            //Allows the function to be multithreaded with an arbitrary number of threads.
         return -1;
     }
     
     else {
         double dimen = 0.0;
-        for(int i = 0; i < NUM_NODES; i++ ) {
-            dimen += unitSphere(i).getDimension();
+        for(int i = a; i < b; i++ ) {
+            hGraph unit = unitSphere(i);
+            int size = unit.getSize();
+            dimen += unitSphere(i).dimension(0, size, false);
         }
+        if(!multi) {
         dimen = dimen/(static_cast<double>(NUM_NODES));
-        return (dimen + 1);
+         return (dimen + 1);
+        }
+        else {
+            return dimen;
+        }
         
     }
-    
-    
 }
 
 
@@ -356,7 +411,7 @@ void hGraph::setMatrix(int size, MatrixXi data) { //resets the matrix based on n
     _degVector.resize(size);
     _degVector = Eigen::VectorXi::Zero(size);
     _hamiltonian = 0.0;
-    _dimension = calcDimension();
+    _dimension = 0;
     _numCliques = std::vector<int> (size, 0);
     cliquesFound = false;
     
@@ -581,7 +636,7 @@ hGraph randomGraph(int size) { //generates a random graph of a given size.
         fill[i] = 0;
     }
     unsigned int fillNum;
-    std::uniform_int_distribution<int> dist(max/4, max); //The graph will have at least 1/4th of the maximum number of possible edges
+    std::uniform_int_distribution<int> dist(0, max/3); //The graph will have at least 1/4th of the maximum number of possible edges
     fillNum = dist(gen);                                 //Ensures graphs are dense enough to be useful.
     std::uniform_int_distribution<int> dist2(0, max-1);  //random number generator that can pick a random edge connection.
     

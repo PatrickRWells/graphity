@@ -1,6 +1,6 @@
   //
 //   hGraph.h
-//  
+//   MULTITHREADED VERSION
 //
 //  Created by Patrick Wells on 10/14/17.
 //
@@ -13,6 +13,8 @@
 #include <fstream>
 #include <vector>
 #include <random>
+#include <thread>
+#include <future>
 
 #include "../lib/eigen/Eigen/Dense"
 
@@ -25,6 +27,7 @@ class hNode;
 class hGraph {
     
 private:
+    int _numThreads = 1;
     int NUM_NODES;
     int _eulerChar = 0;
     double _dimension;
@@ -38,6 +41,8 @@ private:
     
     void toStream(std::ostream &os) const;
     void toFile(std::ofstream &fs) const;
+    double dimension(int a, int b, bool multi);     //Single threaded version for recursive calls
+
 
 
     
@@ -50,11 +55,12 @@ public:
     void setMatrix(int size, MatrixXi data);
     void setHamiltonian(double val);
     hGraph unitSphere(int node);
-    double calcDimension();
+    void calcDimension(); //Multithreaded version
     void calcEulerChar();
     void accept(absHamiltonian &ham);
     void flipEdge(int nodeA, int nodeB);
     void acceptPartial(double partial);
+    void setThreads(int threads);
 
 
 

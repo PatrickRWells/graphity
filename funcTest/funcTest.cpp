@@ -11,17 +11,18 @@
 #include "hamiltonians.h"
 #include <algorithm>
 #include <string>
+#include <chrono>
 using namespace std;
 
 
 int main() {
-    hGraph test = kGraph(20);
-    basicSquareHam(test);
-    double testA = partialBasicSquare(test, 1, 6);
-    std::cout << test.getHam() << ", " << testA << std::endl;
-    test.acceptPartial(testA);
-    std::cout << test.getHam() << std::endl;
-
+    
+    hGraph test = kGraph(10);
+    test.setThreads(3);
+    std::cout << test.getDimension() << std::endl;
+    test.setThreads(1);
+    test.calcDimension();
+    std::cout << test.getDimension() << std::endl;
 }
 
 
