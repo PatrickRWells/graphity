@@ -32,7 +32,7 @@ public:
     
 };
 
-basicSquare::basicSquare() : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
+basicSquare::basicSquare() : _result(0.0) {
     
 }
 

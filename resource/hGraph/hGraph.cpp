@@ -211,8 +211,19 @@ void hGraph::calcDimension() { //Calculates dimensionality recursively. See Knil
     }
     
     else {
-        int num = NUM_NODES/_numThreads;
-        int extra = NUM_NODES%_numThreads; //extra nodes that don't divide evenly into number of threads.
+        int num;
+        int extra;
+        if(NUM_NODES < _numThreads) {
+            num = 1;
+            _numThreads = NUM_NODES;
+            std::cout << "Warning: Too many threads for dimension calculation. Thread count has been set to " << _numThreads << std::endl;
+            extra = 0;
+        }
+        else {
+            num = NUM_NODES/_numThreads;
+            extra = NUM_NODES%_numThreads; //extra nodes that don't divide evenly into number of threads.
+            
+        }
         int distributed = 0;
         std::vector<std::future<double>> futures;
         for(int i = 0; i < _numThreads -1; i++) {
@@ -602,7 +613,7 @@ void hNode::toFile(std::ofstream &fs) const { //Outputs hNode data to files. Use
 
 //---------------------------GRAPH GENERATORS---------------------------//
 
-hGraph kGraph(int size) { //generates a complete graph of given size.
+hGraph compGraph(int size) { //generates a complete graph of given size.
     
     MatrixXi adjMatrix = MatrixXi::Zero(size, size);
     for(int i = 0; i < size; i++) {
@@ -613,8 +624,8 @@ hGraph kGraph(int size) { //generates a complete graph of given size.
         }
     }
     
-    hGraph kGraph(size, adjMatrix);
-    return kGraph;
+    hGraph graph(size, adjMatrix);
+    return graph;
     
     
     
@@ -636,7 +647,7 @@ hGraph randomGraph(int size) { //generates a random graph of a given size.
         fill[i] = 0;
     }
     unsigned int fillNum;
-    std::uniform_int_distribution<int> dist(0, max/3); //The graph will have at least 1/4th of the maximum number of possible edges
+    std::uniform_int_distribution<int> dist(max/4, (3*max)/4); //The graph will have at least 1/4th of the maximum number of possible edges
     fillNum = dist(gen);                                 //Ensures graphs are dense enough to be useful.
     std::uniform_int_distribution<int> dist2(0, max-1);  //random number generator that can pick a random edge connection.
     

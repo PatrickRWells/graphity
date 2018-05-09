@@ -5,3 +5,5 @@ hamiltonians.txt
 funcTest/funcTest
 Simulate/Monte-Carlo/MonteCarlo
 resource/stats/stats
+Simulate/Monte-Carlo/test.png
+*.png
