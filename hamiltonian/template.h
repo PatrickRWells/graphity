@@ -16,12 +16,19 @@ void TemplateHam(hGraph &host);
 class Template : public absHamiltonian {
     
 private:
-    double _result; //Result of the computation.
+    double _result; //Use this attribute to store the result of full energy calculations.
+    double _partial;//Use this attribute to store the result of partial energy calculations.
+    int nodeA;
+    int nodeB;
+    bool isPartial = false;
 public:
     Template();
+    Template(int node1, int node2);
     double result();
     void calculate(hGraph &host); //Don't mess with these
-    
+    double getDifference() {
+        return _partial;
+    }
     
 };
 
@@ -29,14 +36,30 @@ Template::Template() : _result(0.0) { //unlikely that it should be changed, unle
     
 }
 
+Template::Template(int node1, int node2) : _result(0.0) { //This constructor is used by the utility function when doing only a partial calculation.
+    nodeA = node1;
+    nodeB = node2;
+    isPartial = true;
+    
+}
+
+
 double Template::result() { //There should be no reason to edit this function;
     return _result;
 }
 
 void Template::calculate(hGraph &host) { //This is where all the main calculation takes place.
     int size = host.getSize();           //see hGraph documentation for available commands.
-    for(int i = 0; i < size; i++) {
-        _result += host.getDegree(i);   //
+    
+    if(isPartial) {                     //This function can take care of both full and partial calculations.
+                                        //It is determined by the isPartial attribute, which is set automatically if the second constructor is used.
+        _partial += host.getDegree(nodeA) + host.getDegree(nodeB);
+        
+    }
+    else {
+        for(int i = 0; i < size; i++) {
+            _result += host.getDegree(i);   //
+        }
     }
     
 }
@@ -46,6 +69,14 @@ void TemplateHam(hGraph &host) { //do not edit this function except to change in
     Template Ham;
     host.accept(Ham);
     host.setHamiltonian(Ham.result());
+    
+}
+//Note the difference between the partial hamiltonian and the full one. The full one sets the value in the graph object, the partial just returns a value
+double TemplatePartial(hGraph &host, int nodeA, int nodeB) {    //Do not edit this function except to change instance of the word "Template"
+    Template Ham(nodeA, nodeB);
+    host.accept(Ham);
+    return Ham.getDifference();
+    
     
 }
 
