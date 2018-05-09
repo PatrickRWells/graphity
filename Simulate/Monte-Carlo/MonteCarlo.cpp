@@ -6,6 +6,7 @@
 #include "TGraphErrors.h"
 #include "TCanvas.h"
 #include "TMultiGraph.h"
+#include "TLegend.h"
 #include <thread>
 
 void monteCarlo(hGraph * graph, std::vector<double> * energy);
@@ -78,8 +79,9 @@ int main() {
     }
     
     
+    
     //-----------------------------Graph Drawing-----------------------//
-    TCanvas *c1 = new TCanvas("c1","Graph Examples",200,10,600,400);
+    TCanvas *c1 = new TCanvas("c1","Graph Examples",200,10,1200,800);
 
     //Specifics here are not important
     TMultiGraph *graphMulti = new TMultiGraph();
@@ -87,20 +89,32 @@ int main() {
     
     
     TGraph *gr1 = new TGraph (points, x, y);
+    gr1->SetName("gr1");
+    gr1->SetTitle("Graph 1");
     gr1->SetLineColor(2);
     gr1->SetLineWidth(1);
     gr1->SetFillStyle(3005);
     //Sets display preferences for the two data series.
     TGraph *gr2 = new TGraph (points, x2, y2);
+    gr1->SetName("gr2");
+    gr1->SetTitle("Graph 2");
+
     gr2->SetLineColor(4);
     gr2->SetLineWidth(1);
     gr2->SetFillStyle(3005);
 
+    TLegend * legend = new TLegend(.7, .9, .9, .7);
+    legend->SetHeader("Legend", "C");
+    legend->AddEntry(gr1, "Random gaph seed");
+    legend->AddEntry(gr2, "Complete graph seed");
+    
     
     graphMulti->Add(gr1);
     graphMulti->Add(gr2);
     //Adds the data series to the window.
     graphMulti->Draw("AC");
+    legend->Draw();
+    //c1->BuildLegend();
     c1->Print("test.png");
     //draws the graph and outputs it to a file.
     
@@ -116,7 +130,9 @@ int main() {
 
     corrGraph->Draw("AC");
     c2->Print("correlation.png");
-
+    //-----------------------------End Graph Drawing-----------------------//
+    
+    
     //deletes pointers
     delete energyStore;
     delete energyStore2;
