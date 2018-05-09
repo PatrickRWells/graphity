@@ -34,6 +34,7 @@ int main() {
     std::vector<double> * energyStore = new std::vector<double>;
     std::vector<double> * energyStore2 = new std::vector<double>;
     std::vector<double> * corrFn = new std::vector<double>;
+
     
     //sets parameters for the simulation.
     std::cout << "How large of a graph would you like to use? ";
@@ -42,8 +43,7 @@ int main() {
     std::cin >> TINV;
     std::cout << "How many sweeps would you like to perform? ";
     std::cin >> maxSweeps;
-    
-    
+        
     hGraph * graph = new hGraph(SIZE);
     (*graph) = randomGraph(SIZE);
     //Two graphs are created. One is a complete graph, the other is a random graph with fill probability between 0.25 and 0.75;
@@ -196,6 +196,7 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
             sweeps++;
             energy->push_back(graph->getHam());
             if((maxSweeps >= 10) && sweeps % (maxSweeps/10) == 0) {
+
                 std::cout << sweeps << " sweeps performed" << std::endl;
             }
             
@@ -210,6 +211,7 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
     }
     std::cout << std::endl;
     std::cout << *graph << std::endl;
+
     std::cout << "Moves that increased energy: " << increases << std::endl;
     std::cout << "total swaps accepted: " << swaps <<std::endl;
 

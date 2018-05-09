@@ -8,4 +8,5 @@
 #define hamiltonians_h
 
 #include "basicSquare.h"
+
 #endif /* hamiltonians_h */

@@ -2,8 +2,11 @@
 hamiltonians.txt
 *.csv
 *.o
+*.png
 funcTest/funcTest
 Simulate/Monte-Carlo/MonteCarlo
 resource/stats/stats
 Simulate/Monte-Carlo/test.png
-*.png
+doc/Emergent dimensions in Background Independent Quantum Gravity.aux
+doc/Emergent dimensions in Background Independent Quantum Gravity.log
+doc/Emergent dimensions in Background Independent Quantum Gravity.synctex.gz
