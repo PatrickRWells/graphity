@@ -1,5 +1,3 @@
-//  hamiltonians.h
-//  
 //
 //  Created by Patrick on 10/31/17.
 //
@@ -10,5 +8,5 @@
 #define hamiltonians_h
 
 #include "basicSquare.h"
-#include "EulerChar.h"
+
 #endif /* hamiltonians_h */

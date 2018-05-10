@@ -2,7 +2,7 @@
 //  funcTest.cpp
 //  
 //
-//  Allows the user to test out functions.
+//  Allows the user to test out functions. The makefile links everything that other modules in this project might use, including Root and Eigen.
 //
 //
 
@@ -11,14 +11,13 @@
 #include "hamiltonians.h"
 #include <algorithm>
 #include <string>
+#include <chrono>
 using namespace std;
 
 
 int main() {
-    std::ofstream outfile;
-    outfile.open("test.csv");
-    hGraph test = kGraph(50);
-    outfile << test;
-
+    
+    hGraph test = compGraph(10);
+    std::cout << test << std::endl;
+    
 }
-
