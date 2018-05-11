@@ -59,6 +59,7 @@ public:
     void calcEulerChar();
     void accept(absHamiltonian &ham);
     void flipEdge(int nodeA, int nodeB);
+    void flipEdge(std::vector<int> nodeA, std::vector<int> nodeB);
     void acceptPartial(double partial);
     void setThreads(int threads);
 
@@ -123,6 +124,7 @@ void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove);
 void removeRow(Eigen::MatrixXi& matrix, unsigned int rowToRemove);
 hGraph randomGraph(int size);
 hGraph compGraph(int size);
+hGraph zeroGraph(int size);
 
 
 

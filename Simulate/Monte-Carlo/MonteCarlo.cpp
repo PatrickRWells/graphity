@@ -1,18 +1,15 @@
 #include <iostream>
 #include <string>
 #include "hamiltonians.h"
+#include "graphics/graphingUtil.hpp"
 #include <cmath>
 #include <vector>
-#include "TGraphErrors.h"
-#include "TCanvas.h"
-#include "TMultiGraph.h"
-#include "TLegend.h"
 #include <thread>
 
 void monteCarlo(hGraph * graph, std::vector<double> * energy);
 void correlationFn(std::vector<double> * data, std::vector <double> * output); //Simulation itself must be a function in order to be paralelized.
 
-
+int NUM_CORES; //Number of cores in the CPU
 double TINV;    //Beta
 int SIZE;       //Number of nodes in the graphs
 int maxSweeps;  //Number of sweeps that will be performed
@@ -20,7 +17,7 @@ int maxSweeps;  //Number of sweeps that will be performed
 
 //------Simulation Functions------//
 std::function<void(hGraph&)> simFunction;
-std::function<double(hGraph&,int, int)> simPartial;
+std::function<double(hGraph&,std::vector<int>,std::vector<int>)> simPartial;
 //All these variables are declared to be global so that they can be used by multiple threads.
 
 
@@ -33,7 +30,7 @@ int main() {
     //Vectors used to store the energies of the graph at its various states.
     std::vector<double> * energyStore = new std::vector<double>;
     std::vector<double> * energyStore2 = new std::vector<double>;
-    std::vector<double> * corrFn = new std::vector<double>;
+    std::vector<double> * energyStore3 = new std::vector<double>;
 
     
     //sets parameters for the simulation.
@@ -50,94 +47,72 @@ int main() {
     hGraph * graphK = new hGraph(SIZE);
     *graphK = compGraph(SIZE);
     
+    hGraph * graphEmpty = new hGraph(SIZE);
+    (*graphEmpty) = zeroGraph(SIZE);
+    
     
     std::thread threadA(monteCarlo, graph, energyStore);    //Creates a thread to simulate on the random graph
+    std::thread threadB(monteCarlo, graphEmpty, energyStore3);
     monteCarlo(graphK, energyStore2);                       //Main thread handles the complete graph
-    
+
     threadA.join();
+    threadB.join();
+    
+    std::cout << "Calculating correlation functions...";
     
     int points = energyStore->size();
     int points2 = energyStore2->size();
+    int points3 = energyStore3->size();
+    
+    std::cout << "Graphing energy:" << std::endl;
+    
+    std::vector<std::vector<double>> xVals;
+    std::vector<std::vector<double>> yVals;
+    std::vector<double> temp;
+    for(int i = 0; i < points; i++)
+        temp.push_back(i);
+    xVals.push_back(temp);
+    yVals.push_back(*energyStore);
+    temp.clear();
+    for(int i = 0; i < points2; i++)
+        temp.push_back(i);
+    xVals.push_back(temp);
+    yVals.push_back(*energyStore2);
+    temp.clear();
+    for(int i = 0; i < points3; i++)
+        temp.push_back(i);
+    
+    xVals.push_back(temp);
+    yVals.push_back(*energyStore3);
+    
+    drawMultiGraph(xVals, yVals);
+    
+    std::vector<double> * corr1 = new std::vector<double>;
+    std::vector<double> * corr2 = new std::vector<double>;
+    std::vector<double> * corr3 = new std::vector<double>;
 
-    Double_t x[points], y[points], x2[points2], y2[points2], corrY[points]; //Declares arrays for use as data values when drawing plots.
-    correlationFn(energyStore, corrFn); //calculates the correlation function for all time steps
+    std::thread threadC(correlationFn, energyStore, corr1);
+    std::thread threadD(correlationFn, energyStore2, corr2);
+    correlationFn(energyStore3, corr3);
+    threadC.join();
+    threadD.join();
+    
+    yVals.clear();
+    yVals.push_back(*corr1);
+    yVals.push_back(*corr2);
+    yVals.push_back(*corr3);
+    
+    std::cout << "Graphing correlation function: " << std::endl;
+    drawMultiGraph(xVals, yVals);
 
-
-    for(int i = 0; i < points; i++) {
-        x[i] = i;
-        y[i] = (*energyStore)[i];   //fills the data arrays for use when drawing plots. Note, this is necessary because the energy storage containers are vectors,
-                                    //but Root takes arrays as parameters when creating gaphs
-    }
-    
-    for(int i = 0; i < points2; i++) {
-        x2[i] = i;
-        y2[i] = (*energyStore2)[i];
-    }
-    for(int i = 0; i < points; i++) {
-        corrY[i] = (*corrFn)[i];
-        
-    }
-    
-    
-    
-    //-----------------------------Graph Drawing-----------------------//
-    TCanvas *c1 = new TCanvas("c1","Graph Examples",200,10,1200,800);
-
-    //Specifics here are not important
-    TMultiGraph *graphMulti = new TMultiGraph();
-    graphMulti->SetTitle("Energy"); //Set the title to be drawn on the graph
-    
-    
-    TGraph *gr1 = new TGraph (points, x, y);
-    gr1->SetName("gr1");
-    gr1->SetTitle("Graph 1");
-    gr1->SetLineColor(2);
-    gr1->SetLineWidth(1);
-    gr1->SetFillStyle(3005);
-    //Sets display preferences for the two data series.
-    TGraph *gr2 = new TGraph (points, x2, y2);
-    gr1->SetName("gr2");
-    gr1->SetTitle("Graph 2");
-
-    gr2->SetLineColor(4);
-    gr2->SetLineWidth(1);
-    gr2->SetFillStyle(3005);
-
-    TLegend * legend = new TLegend(.7, .9, .9, .7);
-    legend->SetHeader("Legend", "C");
-    legend->AddEntry(gr1, "Random gaph seed");
-    legend->AddEntry(gr2, "Complete graph seed");
-    
-    
-    graphMulti->Add(gr1);
-    graphMulti->Add(gr2);
-    //Adds the data series to the window.
-    graphMulti->Draw("AC");
-    legend->Draw();
-    //c1->BuildLegend();
-    c1->Print("test.png");
-    //draws the graph and outputs it to a file.
-    
-    //The following does everything above but for the correlation function.
-    TCanvas *c2 = new TCanvas("c2","Autocorrelation Examples",200,10,600,400);
-    
-    TGraph * corrGraph = new TGraph(points, x, corrY);
-    corrGraph->SetTitle("Autocorrelation function");
-    
-    corrGraph->SetLineColor(2);
-    corrGraph->SetLineWidth(1);
-    corrGraph->SetFillStyle(3005);
-
-    corrGraph->Draw("AC");
-    c2->Print("correlation.png");
-    //-----------------------------End Graph Drawing-----------------------//
-    
     
     //deletes pointers
     delete energyStore;
     delete energyStore2;
-    delete corrFn;
-    
+    delete energyStore3;
+    delete corr1;
+    delete corr2;
+    delete corr3;
 }
 
 void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
@@ -145,6 +120,8 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> randNode(0, SIZE - 1);
     std::uniform_real_distribution<> probDis(0.0, 1.0);
+    std::uniform_int_distribution<int> randNum(1, ceil(double(SIZE)/2));
+    
     //Parameters needed for individual simulation steps.
     bool run = true;
     int nodeA = 0;
@@ -158,36 +135,77 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
 
     
     while(run) {
+        std::vector<int> xVals;
+        std::vector<int> yVals;
         
-        while(nodeA == nodeB) { //Randomly selects two nodes;
-            nodeA = randNode(gen);
-            nodeB = randNode(gen);
+        int numFlips = randNum(gen);
+        int numAccept = 0;
+        
+        bool isFull = false;
+        while(!isFull) {
+            while(nodeA == nodeB) { //Randomly selects two nodes;
+                nodeA = randNode(gen);
+                nodeB = randNode(gen);
+            }
+            bool same = false;
+            for(int l = 0; l < xVals.size(); l++) {
+                if(nodeA == xVals[l]) {
+                    if(nodeB == yVals[l]) {
+                        same = true;
+                    }
+                }
+                
+                else if (nodeA == yVals[l]) {
+                    if(nodeB == xVals[l]) {
+                        same = true;
+                    }
+                }
+            }
             
+            if(!same) {
+                xVals.push_back(nodeA);
+                yVals.push_back(nodeB);
+                numAccept++;
+            }
+            if(numAccept == numFlips) {
+                isFull = true;
+            }
+            nodeA = 0;
+            nodeB = 0;
         }
         
+
+        int multiSwap = 0;
         simFunction(*graph); //calculates inital graph energy;
 
         double hamInitial = graph->getHam();
-        double hamDiff = simPartial(*graph, nodeA, nodeB); //gets the change in energy if edge between nodeA and nodeB is flipped
+        double hamDiff = simPartial(*graph, xVals, yVals); //gets the change in energy if edge between nodeA and nodeB is flipped
         if(hamDiff <= 0) {  //Accepts change if it decreases energy.
-            graph->flipEdge(nodeA,nodeB);
+            graph->flipEdge(xVals,yVals);
             graph->acceptPartial(hamDiff);
             swaps++;
+            if(xVals.size() > 1) {
+                multiSwap++;
+            }
         }
         else { //If swap increases energy, the change is accepted given a particular probability.
             
             double prob = exp(TINV*(-hamDiff));
             if(probDis(gen) <= prob) {
-                graph->flipEdge(nodeA,nodeB);
+                graph->flipEdge(xVals,yVals);
                 graph->acceptPartial(hamDiff);
                 increases++;
                 swaps++;
+                if(xVals.size() > 1) {
+                    multiSwap++;
+                }
 
             }
             
             
         }
-        
+        xVals.clear();
+        yVals.clear();
         nodeA = 0;
         nodeB = 0;  //resets
         n++;        //counts number of attempts
@@ -195,10 +213,7 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
             n = 0;
             sweeps++;
             energy->push_back(graph->getHam());
-            if((maxSweeps >= 10) && sweeps % (maxSweeps/10) == 0) {
 
-                std::cout << sweeps << " sweeps performed" << std::endl;
-            }
             
         }
         
@@ -210,10 +225,10 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
         
     }
     std::cout << std::endl;
-    std::cout << *graph << std::endl;
 
-    std::cout << "Moves that increased energy: " << increases << std::endl;
-    std::cout << "total swaps accepted: " << swaps <<std::endl;
+    std::cout << "Accepted swaps that increased energy: " << increases << std::endl;
+    std::cout << "Total swaps accepted: " << swaps <<std::endl;
+    std::cout << "Accepted swaps of multitple edges: " << swaps << std::endl;
 
     
     
@@ -221,8 +236,8 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
 }
 
 void correlationFn(std::vector<double> * data, std::vector <double> * output) {
-    std::cout << "Calculating autocorrelation function..." << std::endl;    //Calculates the autocorrelation function when passed a vector with data and a vector to place results
-                                                                            //(pointers). See Monte Carlo Methods in Statistical Physics - 3.21
+                                        //Calculates the autocorrelation function when passed a vector with data and a vector to place results
+                                        //(pointers). See Monte Carlo Methods in Statistical Physics - 3.21
     int tMax = data->size();
     for(int t = 0; t < tMax; t++ ) {    //The algorithm uses the same variable names (with tp for t') as the algorithm in the book does.
         double sum = 0;                 //Calculates the function at all times. 
@@ -247,10 +262,14 @@ void correlationFn(std::vector<double> * data, std::vector <double> * output) {
         
         partialSum *= partialSum2;
         sum -= partialSum;
+        if(t > 0) {
+            sum /= (*output)[0];
+        }
         
         output->push_back(sum);
         
     }
+    (*output)[0] = 1;
     
 }
 

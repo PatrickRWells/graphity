@@ -18,12 +18,13 @@ class Template : public absHamiltonian {
 private:
     double _result; //Use this attribute to store the result of full energy calculations.
     double _partial;//Use this attribute to store the result of partial energy calculations.
-    int nodeA;
-    int nodeB;
+    std::vector<int> nodeA;
+    std::vector<int> nodeB;
+    int numEdges = 0;
     bool isPartial = false;
 public:
     Template();
-    Template(int node1, int node2);
+    Template(std::vector<int> node1, std::vector<int> node2);
     double result();
     void calculate(hGraph &host); //Don't mess with these
     double getDifference() {
@@ -36,9 +37,10 @@ Template::Template() : _result(0.0) { //unlikely that it should be changed, unle
     
 }
 
-Template::Template(int node1, int node2) : _result(0.0) { //This constructor is used by the utility function when doing only a partial calculation.
+Template::Template(std::vector<int> node1, std::vector<int> node2) : _result(0.0) { //This constructor is used by the utility function when doing only a partial calculation.
     nodeA = node1;
     nodeB = node2;
+    numEdges = node1.size();
     isPartial = true;
     
 }
@@ -52,9 +54,10 @@ void Template::calculate(hGraph &host) { //This is where all the main calculatio
     int size = host.getSize();           //see hGraph documentation for available commands.
     
     if(isPartial) {                     //This function can take care of both full and partial calculations.
-                                        //It is determined by the isPartial attribute, which is set automatically if the second constructor is used.
-        _partial += host.getDegree(nodeA) + host.getDegree(nodeB);
-        
+        hGraph temp(host.getSize()) = host;                               //It is determined by the isPartial attribute, which is set automatically if the second constructor is used.
+        for(int i = 0; i < numEdges; i++) {
+            temp.flipEdge(nodeA[i], nodeB[i])'
+        }
     }
     else {
         for(int i = 0; i < size; i++) {

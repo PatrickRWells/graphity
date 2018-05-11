@@ -18,12 +18,13 @@ class basicSquare : public absHamiltonian {
 private:
     int _result; //Result of the computation. Should not be changed.
     int _partial;
-    int nodeA;
-    int nodeB;
+    std::vector<int> nodeA;
+    std::vector<int> nodeB;
+    int numEdges = 0;
     bool isPartial = false;
 public:
     basicSquare();
-    basicSquare(int node1, int node2);
+    basicSquare(std::vector<int> node1, std::vector<int> node2);
     double result();
     void calculate(hGraph &host); //Don't mess with these
     double getDifference() {
@@ -36,9 +37,10 @@ basicSquare::basicSquare() : _result(0.0) {
     
 }
 
-basicSquare::basicSquare(int node1, int node2) : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
+basicSquare::basicSquare(std::vector<int> node1, std::vector<int> node2) : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
     nodeA = node1;
     nodeB = node2;
+    numEdges = node1.size();
     isPartial = true;
     
 }
@@ -61,7 +63,10 @@ void basicSquare::calculate(hGraph &host) { //This is where all the main calcula
     else {
         hGraph temp(host.getSize());
         temp = host;
-        temp.flipEdge(nodeA,nodeB);
+        for(int i = 0; i < numEdges; i++) {
+            temp.flipEdge(nodeA[i],nodeB[i]);
+
+        }
         basicSquareHam(temp);
         double diff = temp.getHam() - host.getHam();
         _partial = diff;
@@ -77,7 +82,11 @@ void basicSquareHam(hGraph &host) {
     
 }
 
-double basicSquarePartial(hGraph &host, int nodeA, int nodeB) {
+double basicSquarePartial(hGraph &host, std::vector<int> nodeA, std::vector<int> nodeB) {
+    if(nodeA.size() != nodeB.size()) {
+        std::cout << "Fatal error: vectors passed to a partial hamiltonian must contain the same number of elements" << std::endl;
+        exit(2);
+    }
     basicSquare Ham(nodeA, nodeB);
     host.accept(Ham);
     return Ham.getDifference();

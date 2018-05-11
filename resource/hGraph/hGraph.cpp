@@ -168,6 +168,26 @@ void hGraph::flipEdge(int nodeA, int nodeB) {
     
 }
 
+void hGraph::flipEdge(std::vector<int> nodeA, std::vector<int> nodeB) {
+    for(int i = 0; i < nodeA.size(); i++) {
+        if(isConnected(nodeA[i], nodeB[i])) {
+            _adjMatrix(nodeA[i], nodeB[i]) = 0;
+            _adjMatrix(nodeB[i], nodeA[i]) = 0;
+            _degVector[nodeA[i]]--;
+            _degVector[nodeB[i]]--;
+        
+        }
+        else {
+            _adjMatrix(nodeA[i], nodeB[i]) = 1;
+            _adjMatrix(nodeB[i], nodeA[i]) = 1;
+            _degVector[nodeA[i]]++;
+            _degVector[nodeB[i]]++;
+        }
+    }
+    
+    
+}
+
 void hGraph::acceptPartial(double partial) {
     _hamiltonian += partial;
     
@@ -689,6 +709,14 @@ hGraph randomGraph(int size) { //generates a random graph of a given size.
     }
     hGraph randGraph(size, adjMatrix);  //Creates an hGraph object using the adjacency matrix.
     return randGraph;
+}
+
+hGraph zeroGraph(int size) {
+    MatrixXi adjMatrix = MatrixXi::Zero(size, size);
+    hGraph graph(size, adjMatrix);
+    return graph;
+
+    
 }
 
 //---------------------------END GRAPH GENERATORS---------------------------//
