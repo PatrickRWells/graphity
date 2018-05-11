@@ -9,6 +9,7 @@
 #include "TCanvas.h"
 #include "TMultiGraph.h"
 #include "TLegend.h"
+#include "TAxis.h"
 
 void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vector<double>> yVals);
 

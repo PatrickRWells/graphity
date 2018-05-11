@@ -165,6 +165,7 @@ void hGraph::flipEdge(int nodeA, int nodeB) {
     }
 
     cliquesFound = false;
+    _dimension = 0;
     
 }
 

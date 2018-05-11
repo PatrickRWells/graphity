@@ -14,8 +14,6 @@ void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vec
     std::string fileName;
     std::cout << "Input a filename for the graph: ";
     //std::cin >> fileName;
-    std::cin.clear();
-    std::cin.ignore(100, '\n');
     std::getline(std::cin, fileName);
     fileName += ".png";
     int numSeries = xVals.size();
@@ -24,6 +22,14 @@ void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vec
     std::string gname;
     std::cout << "Enter a title for the graph: ";
     std::getline(std::cin, gname);
+    
+    std::string xname;
+    std::cout << "Enter a title for the x-axis: ";
+    std::getline(std::cin, xname);
+    
+    std::string yname;
+    std::cout << "Enter a title for the y-axis: ";
+    std::getline(std::cin, yname);
     
     bool valid = false;
     char legendIn;
@@ -73,6 +79,7 @@ void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vec
         multiGraph->Add(graphs[i]);
     }
     multiGraph->SetTitle(gname.c_str());
+    
     TLegend * legend = new TLegend(.7, .9, .9, .7);
     legend->SetHeader("Legend", "C");
     if(isLegend) {
@@ -90,6 +97,9 @@ void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vec
         legend->Draw();
         
     }
+    multiGraph->GetXaxis()->SetTitle(xname.c_str());
+    multiGraph->GetYaxis()->SetTitle(yname.c_str());
+
     c1->Print(fileName.c_str());
     delete multiGraph;
     delete [] graphs;

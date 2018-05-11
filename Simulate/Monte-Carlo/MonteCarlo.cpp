@@ -6,10 +6,10 @@
 #include <vector>
 #include <thread>
 
-void monteCarlo(hGraph * graph, std::vector<double> * energy);
+void monteCarlo(hGraph * graph, std::vector<double> * energy, std::vector<double> * dimensions, bool progress, std::string descriptor);
 void correlationFn(std::vector<double> * data, std::vector <double> * output); //Simulation itself must be a function in order to be paralelized.
 
-int NUM_CORES; //Number of cores in the CPU
+int NUM_CORES = 4; //Number of cores in the CPU
 double TINV;    //Beta
 int SIZE;       //Number of nodes in the graphs
 int maxSweeps;  //Number of sweeps that will be performed
@@ -31,8 +31,11 @@ int main() {
     std::vector<double> * energyStore = new std::vector<double>;
     std::vector<double> * energyStore2 = new std::vector<double>;
     std::vector<double> * energyStore3 = new std::vector<double>;
+    //vectors used to store the dimensionality of the graph at its varius states.
+    std::vector<double> * dimensions1 = new std::vector<double>;
+    std::vector<double> * dimensions2 = new std::vector<double>;
+    std::vector<double> * dimensions3 = new std::vector<double>;
 
-    
     //sets parameters for the simulation.
     std::cout << "How large of a graph would you like to use? ";
     std::cin >> SIZE;
@@ -50,19 +53,32 @@ int main() {
     hGraph * graphEmpty = new hGraph(SIZE);
     (*graphEmpty) = zeroGraph(SIZE);
     
-    
-    std::thread threadA(monteCarlo, graph, energyStore);    //Creates a thread to simulate on the random graph
-    std::thread threadB(monteCarlo, graphEmpty, energyStore3);
-    monteCarlo(graphK, energyStore2);                       //Main thread handles the complete graph
+    std::cout << "Displaying progress for complete graph seed: " << std::endl;
+    std::thread threadA(monteCarlo, graph, energyStore, dimensions1, false, "Random Graph");    //Creates a thread to simulate on the random graph
+    std::thread threadB(monteCarlo, graphEmpty, energyStore2, dimensions2, false, "Empty Graph");
+    monteCarlo(graphK, energyStore3, dimensions3, true, "Complete Graph");                       //Main thread handles the complete graph
 
     threadA.join();
     threadB.join();
     
-    std::cout << "Calculating correlation functions...";
+    std::cout << "Calculating correlation functions..."  << std::endl;
+    
+    std::vector<double> * corr1 = new std::vector<double>;
+    std::vector<double> * corr2 = new std::vector<double>;
+    std::vector<double> * corr3 = new std::vector<double>;
+    
+    std::thread threadC(correlationFn, energyStore, corr1);
+    std::thread threadD(correlationFn, energyStore2, corr2);
+    correlationFn(energyStore3, corr3);
+    threadC.join();
+    threadD.join();
+
     
     int points = energyStore->size();
     int points2 = energyStore2->size();
     int points3 = energyStore3->size();
+    
+    std::cout << points << ", " << points2 << ", " << points3 << std::endl;
     
     std::cout << "Graphing energy:" << std::endl;
     
@@ -85,17 +101,13 @@ int main() {
     xVals.push_back(temp);
     yVals.push_back(*energyStore3);
     
+    std::cin.clear();
+    std::cin.ignore(100, '\n');
+
+    
     drawMultiGraph(xVals, yVals);
     
-    std::vector<double> * corr1 = new std::vector<double>;
-    std::vector<double> * corr2 = new std::vector<double>;
-    std::vector<double> * corr3 = new std::vector<double>;
 
-    std::thread threadC(correlationFn, energyStore, corr1);
-    std::thread threadD(correlationFn, energyStore2, corr2);
-    correlationFn(energyStore3, corr3);
-    threadC.join();
-    threadD.join();
     
     yVals.clear();
     yVals.push_back(*corr1);
@@ -106,6 +118,14 @@ int main() {
     drawMultiGraph(xVals, yVals);
 
     
+    yVals.clear();
+    yVals.push_back(*dimensions1);
+    yVals.push_back(*dimensions2);
+    yVals.push_back(*dimensions3);
+    
+    std::cout << "Graphing dimensionality: " << std::endl;
+    drawMultiGraph(xVals, yVals);
+    
     //deletes pointers
     delete energyStore;
     delete energyStore2;
@@ -115,7 +135,8 @@ int main() {
     delete corr3;
 }
 
-void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
+void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<double> * dimensions, bool progress, std::string descriptor) {
+    graph->setThreads(NUM_CORES/3);
     std::random_device rd; //c++11 random number generator
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> randNode(0, SIZE - 1);
@@ -132,6 +153,9 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
     int increases = 0;  //number of times an increase in energy is accepted
     int swaps = 0;      //number of times an edge flip is accepted.
     
+    
+    simFunction(*graph); //calculates inital graph energy;
+    energy->push_back(graph->getHam());
 
     
     while(run) {
@@ -176,8 +200,6 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
         
 
         int multiSwap = 0;
-        simFunction(*graph); //calculates inital graph energy;
-
         double hamInitial = graph->getHam();
         double hamDiff = simPartial(*graph, xVals, yVals); //gets the change in energy if edge between nodeA and nodeB is flipped
         if(hamDiff <= 0) {  //Accepts change if it decreases energy.
@@ -213,9 +235,16 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
             n = 0;
             sweeps++;
             energy->push_back(graph->getHam());
+            graph->setThreads(NUM_CORES/3);
+            graph->calcDimension();
+            dimensions->push_back(graph->getDimension());
+            if((progress == true) && (((sweeps % (maxSweeps/100)) == 0))) {
+                std::cout << sweeps << " sweeps completed." << std::endl;
+            }
 
             
         }
+        
         
         if(sweeps == maxSweeps) {   //terminates simulation when the maximum number of sweeps has been reached.
             run = false;
@@ -225,10 +254,7 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy ) {
         
     }
     std::cout << std::endl;
-
-    std::cout << "Accepted swaps that increased energy: " << increases << std::endl;
-    std::cout << "Total swaps accepted: " << swaps <<std::endl;
-    std::cout << "Accepted swaps of multitple edges: " << swaps << std::endl;
+    std::cout << "Simulation on graph " << descriptor << " complete" << std::endl;
 
     
     
