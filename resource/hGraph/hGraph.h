@@ -69,6 +69,7 @@ public:
 
 
     double getDimension();
+    
     int getDegree(int node);
     int getSize();
     int getEulerChar();

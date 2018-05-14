@@ -23,6 +23,8 @@ std::function<double(hGraph&,std::vector<int>,std::vector<int>)> simPartial;
 
 
 int main() {
+    std::ofstream corrOut("correlation.csv");
+    std::ofstream("dimensionality.csv");
     //Sets simulation functions
     simFunction = basicSquareHam;
     simPartial = basicSquarePartial;
@@ -78,7 +80,6 @@ int main() {
     int points2 = energyStore2->size();
     int points3 = energyStore3->size();
     
-    std::cout << points << ", " << points2 << ", " << points3 << std::endl;
     
     std::cout << "Graphing energy:" << std::endl;
     
@@ -105,7 +106,7 @@ int main() {
     std::cin.ignore(100, '\n');
 
     
-    drawMultiGraph(xVals, yVals);
+    //drawMultiGraph(xVals, yVals);
     
 
     
@@ -115,7 +116,17 @@ int main() {
     yVals.push_back(*corr3);
     
     std::cout << "Graphing correlation function: " << std::endl;
-    drawMultiGraph(xVals, yVals);
+    for (int i = 0; i < 3; i++) {
+        for(int j = 0; j < points; j++) {
+            corrOut << yVals[i][j];
+            corrOut << ',';
+            
+        }
+        corrOut << '\n';
+        
+    }
+    
+    //drawMultiGraph(xVals, yVals);
 
     
     yVals.clear();
@@ -124,7 +135,7 @@ int main() {
     yVals.push_back(*dimensions3);
     
     std::cout << "Graphing dimensionality: " << std::endl;
-    drawMultiGraph(xVals, yVals);
+   // drawMultiGraph(xVals, yVals);
     
     //deletes pointers
     delete energyStore;
@@ -230,8 +241,8 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<doubl
         yVals.clear();
         nodeA = 0;
         nodeB = 0;  //resets
-        n++;        //counts number of attempts
-        if(n == sweepNUM) { //Counts number of sweeps that have been made.
+        n += numFlips;        //counts number of attempts
+        if(n >= sweepNUM) { //Counts number of sweeps that have been made.
             n = 0;
             sweeps++;
             energy->push_back(graph->getHam());
@@ -253,6 +264,10 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<doubl
         
         
     }
+    descriptor += ".csv";
+    std::ofstream output(descriptor);
+    output << *graph;
+    output.close();
     std::cout << std::endl;
     std::cout << "Simulation on graph " << descriptor << " complete" << std::endl;
 

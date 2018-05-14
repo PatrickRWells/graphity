@@ -217,10 +217,25 @@ void hGraph::calcEulerChar() { //Based on the definition by Oliver Knills. Requi
 }
 
 void hGraph::calcDimension() { //Calculates dimensionality recursively. See Knill, "On the dimensionanity and Euler Characteristic of Random Graphs"
+    int kEdges = ((NUM_NODES)*(NUM_NODES - 1))/2;
+    int kSum = 0;
+    for(int i = 0; i < NUM_NODES; i++) {
+        
+        kSum += _degVector[i];
+        
+    }
+    
+    
+    kSum /= 2;
+    
     if(NUM_NODES == 0) {         //for information regarding this algorithm.
         _dimension =  -1;
     }
-    
+    else if(kSum == kEdges) {
+        
+        _dimension = NUM_NODES - 1;
+        
+    }
     else if (_numThreads == 1) {
         double dimen = 0.0;
         for(int i = 0; i < NUM_NODES; i++ ) {
@@ -272,8 +287,21 @@ void hGraph::calcDimension() { //Calculates dimensionality recursively. See Knil
 }
 
 double hGraph::dimension(int a, int b, bool multi) { //This function is NOT called by the user. It is used by the public function.
-     if(NUM_NODES == 0) {                            //Allows the function to be multithreaded with an arbitrary number of threads.
+    int kEdges = ((NUM_NODES)*(NUM_NODES - 1))/2;   //Allows the function to be multithreaded with an arbitrary number of threads.
+    int kSum = 0;
+    for(int i = 0; i < NUM_NODES; i++) {
+        
+        kSum += _degVector[i];
+        
+    }
+    kSum /= 2;
+    
+    if(NUM_NODES == 0) {
         return -1;
+    }
+    
+    else if(kSum == kEdges) {
+        return NUM_NODES -1;
     }
     
     else {
@@ -283,9 +311,10 @@ double hGraph::dimension(int a, int b, bool multi) { //This function is NOT call
             int size = unit.getSize();
             dimen += unitSphere(i).dimension(0, size, false);
         }
+        
         if(!multi) {
-        dimen = dimen/(static_cast<double>(NUM_NODES));
-         return (dimen + 1);
+            dimen = dimen/(static_cast<double>(NUM_NODES));
+            return (dimen + 1);
         }
         else {
             return dimen;
@@ -293,6 +322,7 @@ double hGraph::dimension(int a, int b, bool multi) { //This function is NOT call
         
     }
 }
+
 
 
 

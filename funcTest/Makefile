@@ -12,7 +12,7 @@ funcTest: depend/hGraph.o depend/graphingUtil.o
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) funcTest.cpp `root-config --glibs`
 
 depend/graphingUtil.o: ../resource/graphics/graphingUtil.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c ../resource/graphics/graphingUtil.cpp -o depend/graphingUtil.o `root-config --glibs`
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c ../resource/graphics/graphingUtil.cpp -o depend/graphingUtil.o
 
 
 depend/hGraph.o: ../resource/hGraph/hGraph.cpp

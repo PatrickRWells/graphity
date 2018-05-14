@@ -20,48 +20,10 @@ using namespace std;
 
 int main() {
     
-    std::vector<std::vector<int>> xVals;
-    std::vector<std::vector<int>> yVals;
-    
-    std::vector<int> tempX;
-    std::vector<int> tempY;
-    for(int i = 0; i < 10; i++) {
-        tempX.push_back(i);
-        tempY.push_back(2*i);
-        
-    }
-    
-    xVals.push_back(tempX);
-    yVals.push_back(tempY);
-    
-    tempX.clear();
-    tempY.clear();
-    
-    for(int i = 0; i < 10; i++) {
-        tempX.push_back(i);
-        tempY.push_back(-2*i + 20);
-        
-    }
-    
-    xVals.push_back(tempX);
-    yVals.push_back(tempY);
-    
-    tempX.clear();
-    tempY.clear();
-    
-    for(int i = 0; i < 10; i++) {
-        tempX.push_back(i);
-        tempY.push_back(10);
-        
-    }
-    
-    xVals.push_back(tempX);
-    yVals.push_back(tempY);
-    
-    drawMultiGraph(xVals, yVals);
-
-
-    
+    hGraph test = compGraph(20);
+    test.flipEdge(1,2);
+    test.setThreads(4);
+    std::cout << test.getDimension() << std::endl;
 
 
     
