@@ -89,7 +89,6 @@ void basicSquare::calculate(hGraph &host) { //This is where all the main calcula
     
 }
 
-
 void basicSquareHam(hGraph &host) {
     basicSquare Ham;
     host.accept(Ham);

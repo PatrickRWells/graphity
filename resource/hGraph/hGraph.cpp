@@ -95,6 +95,14 @@ double hGraph::getDimension() { //simple getter function
     
 }
 
+std::vector<double> hGraph::getSpectralDimen() {
+    if (_spectralDimen.size() == 0) {
+        calcSpectralDimen();
+    }
+    return _spectralDimen;
+    
+}
+
 double hGraph::getHam() {  //simple getter function
     return _hamiltonian;
 }
@@ -310,9 +318,6 @@ double hGraph::dimension(int a, int b, bool multi) { //This function is NOT call
             hGraph unit = unitSphere(i);
             int size = unit.getSize();
             dimen += unitSphere(i).dimension(0, size, false);
-            if(multi) {
-                std::cout << "Node " << i << "completed." << std::endl;
-            }
         }
         
         if(!multi) {
@@ -326,6 +331,31 @@ double hGraph::dimension(int a, int b, bool multi) { //This function is NOT call
     }
 }
 
+void hGraph::calcSpectralDimen() {
+    double partialSum = 0;
+    Eigen::Matrix<unsigned long long int, Eigen::Dynamic, Eigen::Dynamic> walkMatrix;
+    walkMatrix.resize(NUM_NODES, NUM_NODES);
+    walkMatrix = _adjMatrix.cast <unsigned long long int> ();
+    for(int i = 0; i < NUM_NODES; i++) {
+        
+        walkMatrix *= _adjMatrix.cast <unsigned long long int> ();
+        
+        for(int j = 0; j <  NUM_NODES; j++) {
+            double partial = walkMatrix(j,j);
+            double num = 0;
+            for(int k = 0; k < NUM_NODES; k++) {
+                num += walkMatrix(j,k);
+            }
+            partial /= num;
+            partialSum += partial;
+        }
+        partialSum /= NUM_NODES;
+        if(partialSum <= 0) {
+            break;
+        }
+        _spectralDimen.push_back(log(partialSum));
+    }
+}
 
 
 

@@ -20,15 +20,12 @@ using namespace std;
 
 int main() {
     
-    hGraph test = compGraph(20);
-    test.flipEdge(0,1);
-    test.flipEdge(2,3);
-    test.flipEdge(4,5);
-    test.flipEdge(6,7);
-    test.flipEdge(8,9);
-    test.flipEdge(10,11);
-    test.flipEdge(12,13);
-    std::cout << test.getDimension() << std::endl;
+    hGraph test = randomGraph(20);
+    std::vector<double> dimen = test.getSpectralDimen();
+    for(int i = 0; i < dimen.size(); i++ ) {
+        std::cout << dimen[i] << std::endl;
+    }
+    std::cout << dimen.size() << std::endl;
 
 
     

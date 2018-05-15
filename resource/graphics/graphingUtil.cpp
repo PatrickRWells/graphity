@@ -12,15 +12,31 @@
 
 void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vector<double>> yVals) {
     std::string fileName;
-    std::cout << "Input a filename for the graph: ";
+    std::cout << "Input a filename for the plot: ";
     //std::cin >> fileName;
     std::getline(std::cin, fileName);
     fileName += ".png";
     int numSeries = xVals.size();
-    std::cout << numSeries << " data series detected" << std::endl;
+    int values = xVals[0].size();
     
+    std::string lowBoundS;
+    std::string highBoundS;
+    
+    int lowBound;
+    int highBound;
+    
+    std::cout << numSeries << " data series detected" << std::endl;
+    std::cout << "After how many sweeps would you like to start plotting? [0.." << values-1 << "] ";
+    std::getline(std::cin, lowBoundS);
+    lowBound = std::stoi(lowBoundS);
+    
+    std::cout << "After how many sweeps would you like to stop plotting? [" << lowBound+1 << ".." << values-1 << "] ";
+    std::getline(std::cin, highBoundS);
+    highBound = std::stoi(highBoundS);
+
+
     std::string gname;
-    std::cout << "Enter a title for the graph: ";
+    std::cout << "Enter a title for the plot: ";
     std::getline(std::cin, gname);
     
     std::string xname;
@@ -58,15 +74,19 @@ void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vec
     
     TGraph **graphs = new TGraph * [numSeries];
     for(int i = 0; i < numSeries; i++) {
-        int numVals = xVals[i].size();
-        double xArray[numVals];
-        double yArray[numVals];
-        for(int j = 0; j < numVals; j++) {
-            xArray[j] = xVals[i][j];
-            yArray[j] = yVals[i][j];
+        int numValues = highBound - lowBound + 1;
+        double xArray[numValues];
+        double yArray[numValues];
+        for(int j = lowBound; j <= highBound; j++) {
+            
+            xArray[j-lowBound] = xVals[i][j];
+            yArray[j-lowBound] = yVals[i][j];
+            
+            
         }
         
-        graphs[i] = new TGraph(numVals, xArray, yArray);
+        
+        graphs[i] = new TGraph(numValues, xArray, yArray);
         std::string name = "gr";
         std::string title = "Graph ";
         char num = '0' + i;

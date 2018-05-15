@@ -31,6 +31,7 @@ private:
     int NUM_NODES;
     int _eulerChar = 0;
     double _dimension;
+    std::vector<double> _spectralDimen;
     double _hamiltonian;
     bool cliquesFound = false;
 
@@ -56,6 +57,7 @@ public:
     void setHamiltonian(double val);
     hGraph unitSphere(int node);
     void calcDimension(); //Multithreaded version
+    void calcSpectralDimen();
     void calcEulerChar();
     void accept(absHamiltonian &ham);
     void flipEdge(int nodeA, int nodeB);
@@ -69,6 +71,7 @@ public:
 
 
     double getDimension();
+    std::vector<double> getSpectralDimen();
     
     int getDegree(int node);
     int getSize();
