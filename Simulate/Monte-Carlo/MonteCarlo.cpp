@@ -24,7 +24,7 @@ std::function<double(hGraph&,std::vector<int>,std::vector<int>)> simPartial;
 
 int main() {
     std::ofstream corrOut("correlation.csv");
-    std::ofstream("dimensionality.csv");
+    std::ofstream dimenOut("dimensionality.csv");
     //Sets simulation functions
     simFunction = basicSquareHam;
     simPartial = basicSquarePartial;
@@ -46,19 +46,19 @@ int main() {
     std::cout << "How many sweeps would you like to perform? ";
     std::cin >> maxSweeps;
         
-    hGraph * graph = new hGraph(SIZE);
-    (*graph) = randomGraph(SIZE);
+    hGraph * random1 = new hGraph(SIZE);
+    (*random1) = randomGraph(SIZE);
     //Two graphs are created. One is a complete graph, the other is a random graph with fill probability between 0.25 and 0.75;
-    hGraph * graphK = new hGraph(SIZE);
-    *graphK = compGraph(SIZE);
+    hGraph * random2 = new hGraph(SIZE);
+    *random2 = randomGraph(SIZE);
     
     hGraph * graphEmpty = new hGraph(SIZE);
     (*graphEmpty) = zeroGraph(SIZE);
     
-    std::cout << "Displaying progress for complete graph seed: " << std::endl;
-    std::thread threadA(monteCarlo, graph, energyStore, dimensions1, false, "Random Graph");    //Creates a thread to simulate on the random graph
-    std::thread threadB(monteCarlo, graphEmpty, energyStore2, dimensions2, false, "Empty Graph");
-    monteCarlo(graphK, energyStore3, dimensions3, true, "Complete Graph");                       //Main thread handles the complete graph
+    std::cout << "Displaying progress for random graph seed (2): " << std::endl;
+    std::thread threadA(monteCarlo, random1, energyStore, dimensions1, false, "Random Graph 1");    //Creates a thread to simulate on the random graph
+    std::thread threadB(monteCarlo, random2, energyStore2, dimensions2, false, "Random Graph 2");
+    monteCarlo(graphEmpty, energyStore3, dimensions3, true, "Empty Graph");                       //Main thread handles the complete graph
 
     threadA.join();
     threadB.join();
@@ -77,8 +77,6 @@ int main() {
 
     
     int points = energyStore->size();
-    int points2 = energyStore2->size();
-    int points3 = energyStore3->size();
     
     
     std::cout << "Graphing energy:" << std::endl;
@@ -91,12 +89,12 @@ int main() {
     xVals.push_back(temp);
     yVals.push_back(*energyStore);
     temp.clear();
-    for(int i = 0; i < points2; i++)
+    for(int i = 0; i < points; i++)
         temp.push_back(i);
     xVals.push_back(temp);
     yVals.push_back(*energyStore2);
     temp.clear();
-    for(int i = 0; i < points3; i++)
+    for(int i = 0; i < points; i++)
         temp.push_back(i);
     
     xVals.push_back(temp);
@@ -106,7 +104,7 @@ int main() {
     std::cin.ignore(100, '\n');
 
     
-    //drawMultiGraph(xVals, yVals);
+    drawMultiGraph(xVals, yVals);
     
 
     
@@ -119,14 +117,18 @@ int main() {
     for (int i = 0; i < 3; i++) {
         for(int j = 0; j < points; j++) {
             corrOut << yVals[i][j];
-            corrOut << ',';
-            
+            if(j != points-1) {
+                corrOut << ',';
+            }
+
         }
         corrOut << '\n';
         
     }
     
-    //drawMultiGraph(xVals, yVals);
+    corrOut.close();
+    
+    drawMultiGraph(xVals, yVals);
 
     
     yVals.clear();
@@ -134,8 +136,20 @@ int main() {
     yVals.push_back(*dimensions2);
     yVals.push_back(*dimensions3);
     
+    for (int i = 0; i < 3; i++) {
+        for(int j = 0; j < points; j++) {
+            dimenOut << yVals[i][j];
+            if(j != points-1) {
+                dimenOut << ',';
+            }
+        }
+        dimenOut << '\n';
+        
+    }
+    dimenOut.close();
+    
     std::cout << "Graphing dimensionality: " << std::endl;
-   // drawMultiGraph(xVals, yVals);
+    drawMultiGraph(xVals, yVals);
     
     //deletes pointers
     delete energyStore;
@@ -164,9 +178,11 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<doubl
     int increases = 0;  //number of times an increase in energy is accepted
     int swaps = 0;      //number of times an edge flip is accepted.
     
-    
     simFunction(*graph); //calculates inital graph energy;
     energy->push_back(graph->getHam());
+    
+    graph->calcDimension();
+    dimensions->push_back(graph->getDimension());
 
     
     while(run) {
@@ -224,6 +240,7 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<doubl
         else { //If swap increases energy, the change is accepted given a particular probability.
             
             double prob = exp(TINV*(-hamDiff));
+            
             if(probDis(gen) <= prob) {
                 graph->flipEdge(xVals,yVals);
                 graph->acceptPartial(hamDiff);
@@ -249,7 +266,7 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<doubl
             graph->setThreads(NUM_CORES/3);
             graph->calcDimension();
             dimensions->push_back(graph->getDimension());
-            if((progress == true) && (((sweeps % (maxSweeps/100)) == 0))) {
+            if((maxSweeps >= 100 ) && (progress == true) && (((sweeps % (maxSweeps/100)) == 0))) {
                 std::cout << sweeps << " sweeps completed." << std::endl;
             }
 
@@ -264,12 +281,12 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<doubl
         
         
     }
+    std::cout << "Simulation on graph " << descriptor << " complete" << std::endl;
     descriptor += ".csv";
     std::ofstream output(descriptor);
     output << *graph;
     output.close();
     std::cout << std::endl;
-    std::cout << "Simulation on graph " << descriptor << " complete" << std::endl;
 
     
     

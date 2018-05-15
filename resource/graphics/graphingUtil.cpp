@@ -74,8 +74,9 @@ void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vec
         title += num;
         graphs[i]->SetName(name.c_str());
         graphs[i]->SetTitle(name.c_str());
-        graphs[i]->SetLineColor(i+1);
-        graphs[i]->SetLineWidth(1);
+        graphs[i]->SetMarkerColor(i+1);
+        graphs[i]->SetMarkerStyle(8);
+        graphs[i]->SetMarkerSize(0.5);
         multiGraph->Add(graphs[i]);
     }
     multiGraph->SetTitle(gname.c_str());
@@ -92,7 +93,7 @@ void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vec
         }
     }
     
-    multiGraph->Draw("AC");
+    multiGraph->Draw("AP");
     if(isLegend) {
         legend->Draw();
         

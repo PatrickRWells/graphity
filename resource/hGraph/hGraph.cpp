@@ -310,6 +310,9 @@ double hGraph::dimension(int a, int b, bool multi) { //This function is NOT call
             hGraph unit = unitSphere(i);
             int size = unit.getSize();
             dimen += unitSphere(i).dimension(0, size, false);
+            if(multi) {
+                std::cout << "Node " << i << "completed." << std::endl;
+            }
         }
         
         if(!multi) {
