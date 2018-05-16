@@ -52,7 +52,7 @@ void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vec
     bool isLegend = false;
     
     while(!valid) {
-        std::cout << "Would you like to draw a legend (y/n)?";
+        std::cout << "Would you like to draw a legend (y/n)? ";
         std::string legendString;
         std::getline(std::cin, legendString);
         if(toupper(legendString[0]) == 'Y' ) {
@@ -130,3 +130,42 @@ void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vec
     
     
 }
+
+void correlationFn(std::vector<double> * data, std::vector <double> * output) {
+    //Calculates the autocorrelation function when passed a vector with data and a vector to place results
+    //(pointers). See Monte Carlo Methods in Statistical Physics - 3.21
+    int tMax = data->size();
+    for(int t = 0; t < tMax; t++ ) {    //The algorithm uses the same variable names (with tp for t') as the algorithm in the book does.
+        double sum = 0;                 //Calculates the function at all times.
+        double partialSum = 0;
+        double partialSum2 = 0;
+        for(int tp = 0; tp < tMax - t; tp++) {
+            partialSum += (*data)[tp]*(*data)[tp + t];
+        }
+        partialSum /= (tMax -t);
+        sum += partialSum;
+        partialSum = 0;
+        
+        for(int tp = 0; tp < tMax - t; tp++) {
+            partialSum += (*data)[tp];
+        }
+        partialSum /= (tMax - t);
+        
+        for(int tp = 0; tp < tMax - t; tp++) {
+            partialSum2 += (*data)[tp +t];
+        }
+        partialSum2 /= (tMax -t);
+        
+        partialSum *= partialSum2;
+        sum -= partialSum;
+        if(t > 0) {
+            sum /= (*output)[0];
+        }
+        
+        output->push_back(sum);
+        
+    }
+    (*output)[0] = 1;
+    
+}
+

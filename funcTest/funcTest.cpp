@@ -14,16 +14,17 @@
 #include <string>
 #include <chrono>
 #include <string>
+#include <iomanip>
 
 using namespace std;
 
 
 int main() {
     
-    hGraph test = randomGraph(20);
+    hGraph test = randomGraph(10);
     std::vector<double> dimen = test.getSpectralDimen();
     for(int i = 0; i < dimen.size(); i++ ) {
-        std::cout << dimen[i] << std::endl;
+        std::cout << std::setprecision(15) << dimen[i] << std::endl;
     }
     std::cout << dimen.size() << std::endl;
 

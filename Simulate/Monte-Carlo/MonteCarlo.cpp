@@ -7,7 +7,6 @@
 #include <thread>
 
 void monteCarlo(hGraph * graph, std::vector<double> * energy, std::vector<double> * dimensions, bool progress, std::string descriptor);
-void correlationFn(std::vector<double> * data, std::vector <double> * output); //Simulation itself must be a function in order to be paralelized.
 
 int NUM_CORES = 4; //Number of cores in the CPU
 double TINV;    //Beta
@@ -325,41 +324,4 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<doubl
     
 }
 
-void correlationFn(std::vector<double> * data, std::vector <double> * output) {
-                                        //Calculates the autocorrelation function when passed a vector with data and a vector to place results
-                                        //(pointers). See Monte Carlo Methods in Statistical Physics - 3.21
-    int tMax = data->size();
-    for(int t = 0; t < tMax; t++ ) {    //The algorithm uses the same variable names (with tp for t') as the algorithm in the book does.
-        double sum = 0;                 //Calculates the function at all times. 
-        double partialSum = 0;
-        double partialSum2 = 0;
-        for(int tp = 0; tp < tMax - t; tp++) {
-            partialSum += (*data)[tp]*(*data)[tp + t];
-        }
-        partialSum /= (tMax -t);
-        sum += partialSum;
-        partialSum = 0;
-        
-        for(int tp = 0; tp < tMax - t; tp++) {
-            partialSum += (*data)[tp];
-        }
-        partialSum /= (tMax - t);
-        
-        for(int tp = 0; tp < tMax - t; tp++) {
-            partialSum2 += (*data)[tp +t];
-        }
-        partialSum2 /= (tMax -t);
-        
-        partialSum *= partialSum2;
-        sum -= partialSum;
-        if(t > 0) {
-            sum /= (*output)[0];
-        }
-        
-        output->push_back(sum);
-        
-    }
-    (*output)[0] = 1;
-    
-}
 

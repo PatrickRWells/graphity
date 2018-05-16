@@ -332,14 +332,13 @@ double hGraph::dimension(int a, int b, bool multi) { //This function is NOT call
 }
 
 void hGraph::calcSpectralDimen() {
-    double partialSum = 0;
     Eigen::Matrix<unsigned long long int, Eigen::Dynamic, Eigen::Dynamic> walkMatrix;
     walkMatrix.resize(NUM_NODES, NUM_NODES);
     walkMatrix = _adjMatrix.cast <unsigned long long int> ();
-    for(int i = 0; i < NUM_NODES; i++) {
-        
+    std::vector<double> temp;
+    for(int i = 0; i < 500; i++) {
+        double sum = 0;
         walkMatrix *= _adjMatrix.cast <unsigned long long int> ();
-        
         for(int j = 0; j <  NUM_NODES; j++) {
             double partial = walkMatrix(j,j);
             double num = 0;
@@ -347,14 +346,21 @@ void hGraph::calcSpectralDimen() {
                 num += walkMatrix(j,k);
             }
             partial /= num;
-            partialSum += partial;
+            sum += partial;
         }
-        partialSum /= NUM_NODES;
-        if(partialSum <= 0) {
+        sum /= NUM_NODES;
+        if(sum <= 0) {
             break;
         }
-        _spectralDimen.push_back(log(partialSum));
+        temp.push_back(log(sum));
     }
+    for(int i = 0; i < temp.size(); i++) {
+        //double temp1 = temp[i] - temp[i-1];
+        //double temp2 = log(i+2) - log(i+1);
+        _spectralDimen.push_back(-2.0*(temp[i]/log(i+2)));
+        
+    }
+    
 }
 
 

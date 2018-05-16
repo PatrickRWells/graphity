@@ -12,6 +12,8 @@
 #include "TAxis.h"
 
 void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vector<double>> yVals);
+void correlationFn(std::vector<double> * data, std::vector <double> * output); 
+
 
 #ifndef graphingUtil_hpp
 #define graphingUtil_hpp
