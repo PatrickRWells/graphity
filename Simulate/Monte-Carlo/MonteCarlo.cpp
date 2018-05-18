@@ -1,12 +1,13 @@
 #include <iostream>
 #include <string>
 #include "hamiltonians.h"
-#include "graphics/graphingUtil.hpp"
+#include "graphics/graphUtil/graphingUtil.hpp"
+#include "graphics/graphImager/graphImager.h"
 #include <cmath>
 #include <vector>
 #include <thread>
 
-void monteCarlo(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][5], int simNum, bool progress, std::string descriptor);
+void monteCarlo(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor);
 
 int NUM_CORES = 4; //Number of cores in the CPU
 double TINV;    //Beta
@@ -19,6 +20,7 @@ const int DIMEN_CORR = 1; //These constants determine which vector from the arra
 const int ENERGY_CORR = 2;
 const int USER_IN = 3;
 const int ENERGY = 4;
+const int AVG_DEGREE = 5;
 
 
 //------Simulation Functions------//
@@ -30,7 +32,7 @@ std::function<double(hGraph&,std::vector<int>,std::vector<int>)> simPartial;
 
 int main() {
     
-    std::vector<bool> observables (5, false); //true/false. Tells the program which data to save.
+    std::vector<bool> observables (NUM_OBSERVABLES, false); //true/false. Tells the program which data to save.
     
     std::ofstream engOut("energy.csv");
     std::ofstream paramOut("parameters.txt");
@@ -38,6 +40,7 @@ int main() {
     std::ofstream dimenCorrOut;
     std::ofstream dimenOut; //Output files streams (may or may not be used depending on what the user actuall needs);
     std::ofstream engCorrOut;
+    std::ofstream aveDegOut;
     std::ofstream allOut;
     
     
@@ -87,7 +90,7 @@ int main() {
     else {
         numGraphs = 3;
     }
-    std::vector<double> data[numGraphs][5];
+    std::vector<double> data[numGraphs][NUM_OBSERVABLES];
     
     //sets parameters for the simulation.
     if(!observables[USER_IN]) {
@@ -177,6 +180,30 @@ int main() {
         }
     }
     
+    while(true) {
+        std::cout << "Would you like to calculate the average node degree? (y/n) ";
+        char c = getchar();
+        if (toupper(c) == 'Y') {
+            observables[AVG_DEGREE] = true;
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+            break;
+        }
+        else if(toupper(c) == 'N') {
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+            break;
+        }
+        else {
+            std::cout << "Invalid input." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+        }
+    }
+    
     
     
     paramOut << "Graph size: " << SIZE << std::endl;
@@ -190,9 +217,8 @@ int main() {
     std::cin.clear();
     
     
-    
+    std::string description[numGraphs];
     if(observables[USER_IN]) {
-        std::string description[numGraphs];
         for(int i = 0; i < numGraphs; i++){
             std::cout << "Enter a short descriptor for graph " << i << ": "; //Prompts the users for ways to describe the graph if the graphs were input from a file.
             getline(std::cin, description[i]);
@@ -214,9 +240,13 @@ int main() {
         graphs[2] = new hGraph(SIZE);
         *graphs[2] = zeroGraph(SIZE);
         numGraphs = 3;
-        monteCarlo(graphs[0], observables, data, 0, true, "Random Graph 1");    //As the only truly multithreaded calculation is the dimensionality, it is a more efficient use of
-        monteCarlo(graphs[1], observables, data, 1, true, "Random Graph 2");   //processing power to do the individual simulations in series to avoid threads being underutilized.
-        monteCarlo(graphs[2], observables, data, 2, true, "Empty Graph");
+        description[0] = "Random Graph 1";
+        description[1] = "Random Graph 2";
+        description[2] = "Empty Graph";
+
+        monteCarlo(graphs[0], observables, data, 0, true, description[0]);    //As the only truly multithreaded calculation is the dimensionality, it is a more efficient use of
+        monteCarlo(graphs[1], observables, data, 1, true, description[1]);   //processing power to do the individual simulations in series to avoid threads being underutilized.
+        monteCarlo(graphs[2], observables, data, 2, true, description[2]);
     }
     
     
@@ -311,6 +341,8 @@ int main() {
     }
     
     
+    
+    
     std::cout << "Data outputed to CSV files" << std::endl;
 
     
@@ -338,11 +370,47 @@ int main() {
         drawMultiGraph(data, numGraphs, DIMEN_CORR);
     }
     
+    if(observables[AVG_DEGREE]) {
+        std::cout << "Graph average node degree" << std::endl; //plots dimensionality correlation function
+        drawMultiGraph(data, numGraphs, AVG_DEGREE);
+        
+    }
+    
+    while(true) {
+        std::cout << "Would you like to make images of the graphs? (y/n) "; //Checks if the user would like to input a graph from a file (vs. using randomly initialized graphs);
+        char c = getchar();
+        if (toupper(c) == 'Y') {
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            for(int i = 0; i < numGraphs; i++) {
+                std::cout << "Imaging graph " << description[i] << "..." << std::endl;
+                graphImage(*graphs[i]);
+                
+            }
+            
+            break;
+        }
+        else if(toupper(c) == 'N') {
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+            break;
+        }
+        else {
+            std::cout << "Invalid input." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+        }
+    }
+
+    
+    
     std::cout << "Be sure to move all result files to a different folder to ensure they are not overwritten." << std::endl;
     
 }
 
-void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> data[][5], int simNum, bool progress, std::string descriptor) {
+void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor) {
     graph->setThreads(NUM_CORES);
     std::random_device rd; //c++11 random number generator
     std::mt19937 gen(rd());
@@ -365,6 +433,14 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
     if(observe[DIMEN]) {
         graph->calcDimension();
         data[simNum][DIMEN].push_back(graph->getDimension());
+    }
+    
+    if(observe[AVG_DEGREE]) {
+        double sum = 0;
+        for(int i = 0; i < SIZE; i++) {
+            sum += graph->getDegree(i);
+        }
+        data[simNum][AVG_DEGREE].push_back(sum/SIZE);
     }
 
     
@@ -453,6 +529,15 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
                 data[simNum][DIMEN].push_back(graph->getDimension());
                 
             }
+            
+            if(observe[AVG_DEGREE]) {
+                double sum = 0;
+                for(int i = 0; i < SIZE; i++) {
+                    sum += graph->getDegree(i);
+                }
+                data[simNum][AVG_DEGREE].push_back(sum/SIZE);
+            }
+            
             if((maxSweeps >= 100 ) && (progress == true) && (((sweeps % (maxSweeps/100)) == 0))) {
                 std::cout << descriptor << ": " << sweeps << " sweeps completed." << std::endl;
             }

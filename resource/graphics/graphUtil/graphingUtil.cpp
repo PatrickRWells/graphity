@@ -11,7 +11,7 @@
 #include <cctype>
 #include <array>
 
-void drawMultiGraph(std::vector<double> data[][5], int numSeries, int observable) {
+void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, int observable) {
     std::string fileName;
     std::cout << "Input a filename for the plot: ";
     //std::cin >> fileName;
@@ -131,7 +131,7 @@ void drawMultiGraph(std::vector<double> data[][5], int numSeries, int observable
     
 }
 
-void correlationFn(std::vector<double> data[][5], int run, int inData, int outData) {
+void correlationFn(std::vector<double> data[][NUM_OBSERVABLES], int run, int inData, int outData) {
     //Calculates the autocorrelation function when passed a vector with data and a vector to place results
     //(pointers). See Monte Carlo Methods in Statistical Physics - 3.21
     int tMax = data[run][inData].size();

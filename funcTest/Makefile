@@ -11,8 +11,8 @@ default: funcTest
 funcTest: depend/hGraph.o depend/graphingUtil.o funcTest.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) funcTest.cpp `root-config --glibs`
 
-depend/graphingUtil.o: ../resource/graphics/graphingUtil.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c ../resource/graphics/graphingUtil.cpp -o depend/graphingUtil.o
+depend/graphingUtil.o: ../resource/graphics/graphUtil/graphingUtil.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c ../resource/graphics/graphUtil/graphingUtil.cpp -o depend/graphingUtil.o
 
 
 depend/hGraph.o: ../resource/hGraph/hGraph.cpp

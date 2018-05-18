@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include "hGraph/hGraph.h"
-#include "graphics/graphingUtil.hpp"
+#include "graphics/graphUtil/graphingUtil.hpp"
 #include "hamiltonians.h"
 #include <algorithm>
 #include <string>
@@ -26,7 +26,4 @@ int main() {
         std::cout << test[i] << std::endl;
         
     }
-    
-
-    
 }
