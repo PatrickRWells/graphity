@@ -48,6 +48,10 @@ hGraph::hGraph(int size):NUM_NODES(size) { //Basic constructor. Creates an graph
     _adjMatrix = MatrixXi::Zero(size, size);
     _degVector = Eigen::VectorXi::Zero(size);
     _numCliques = std::vector <int> (size, 0);
+    for(int i = 0; i < size; i++) {
+        _eccentricities.push_back(0);
+        
+    }
     
 }
 
@@ -67,10 +71,14 @@ hGraph::hGraph(int size, MatrixXi adjMatrix):NUM_NODES(size) { //Takes a size an
     _dimension = 0; //this is not initialized by default due to the high computing cost. ???Why is there a phase transition at 36 nodes???
     _numCliques = std::vector<int> (size, 0);
     for(int i = 0; i < NUM_NODES; i++) {
+        _eccentricities.push_back(0);
         for(int j = 0; j < size; j++) {
             _degVector[i] += _adjMatrix(i, j);
         }
     }
+    
+
+    
 }
 
 //---------------------------END CONSTRUCTORS---------------------------//
@@ -131,7 +139,6 @@ int hGraph::getDegree(int node) { //simply gets the degree of a given node.
     
     return _degVector(node);
     
-    
 }
 
 bool hGraph::isConnected(int row, int column) { //checks if two nodes are connected.
@@ -140,6 +147,38 @@ bool hGraph::isConnected(int row, int column) { //checks if two nodes are connec
     }
     
     return false;
+    
+}
+
+std::vector<int> hGraph::getEccentricity() {
+    if(_eccentricities[0] == 0 && _eccentricities[NUM_NODES/2] == 0) {
+        calculateEccen();
+    }
+    return _eccentricities;
+    
+}
+
+int hGraph::getDiameter() {
+    std::vector<int> temp = getEccentricity();
+    int val = 0;
+    for(int i = 0; i < temp.size(); i++ ) {
+        if(temp[i] > val) {
+            val = temp[i];
+        }
+    }
+    
+    return val;
+    
+}
+
+std::vector<double> hGraph::getHausdorffDimen() {
+    
+    if(_hausdorffDimen.size() == 0) {
+        calculateHausDimen();
+        
+    }
+    
+    return _hausdorffDimen;
     
 }
 
@@ -221,6 +260,37 @@ void hGraph::calcEulerChar() { //Based on the definition by Oliver Knills. Requi
         }
     }
     _eulerChar = sum;
+    
+}
+
+MatrixXi hGraph::getShortestPaths() {
+    MatrixXi pathMatrix(NUM_NODES, NUM_NODES);
+    pathMatrix = _adjMatrix;
+    for(int i = 0; i < NUM_NODES; i++) {
+        for (int j = 0; j < NUM_NODES; j++ ) {
+            
+            if((i != j) && (pathMatrix(i,j) == 0)) {
+                pathMatrix(i,j) = 10000000;
+            }
+            
+        }
+    }
+    
+    
+    for(int k = 0; k < NUM_NODES; k++) {
+        for(int i = 0; i < NUM_NODES; i++) {
+            for(int j = 0; j < NUM_NODES; j++) {
+                
+                if(pathMatrix(i,j) > (pathMatrix(i,k) + pathMatrix(j, k))) {
+                    pathMatrix(i,j) = (pathMatrix(i,k) + pathMatrix(j,k));
+                }
+                
+                
+            }
+        }
+    }
+    return pathMatrix;
+    
     
 }
 
@@ -363,6 +433,35 @@ void hGraph::calcSpectralDimen() {
     
 }
 
+void hGraph::calculateHausDimen() {
+    MatrixXi temp;
+    temp.resize(NUM_NODES, NUM_NODES);
+    temp = getShortestPaths();
+    int i = 2;
+    while(true) {
+        int numFound = 0;
+        
+        for (int j = 0; j < NUM_NODES; j++) {
+            for (int k = 0; k < NUM_NODES; k++) {
+                if(temp(j,k) == i) {
+                    numFound += 1;
+                }
+            }
+        }
+        if(numFound == 0 ) {
+            break;
+        }
+        _hausdorffDimen.push_back(log(numFound)/log(i));
+        i++;
+    }
+    
+    
+
+    
+    
+}
+
+
 
 
 hGraph hGraph::unitSphere(int node) { //outputs the unit sphere around a given. Node the united sphere contains
@@ -437,6 +536,39 @@ void hGraph::cliqueSearch(std::vector<int> R, std::vector<int> P) { //Uses a mod
     }
 }
 
+void hGraph::calculateEccen() {
+    Eigen::Matrix<long unsigned int, Eigen::Dynamic, Eigen::Dynamic> walkMatrix;
+    walkMatrix.resize(NUM_NODES, NUM_NODES);
+    walkMatrix = _adjMatrix.cast<long unsigned int>();
+    int length = 1;
+    int numFound = 0;
+    while(true) {
+        for(int i = 0; i < NUM_NODES; i++) {
+            
+            if(_eccentricities[i] != 0) {
+                continue;
+            }
+            
+            for(int j = 0; j < NUM_NODES; j++ ) {
+                if (walkMatrix(i,j) == 0 && (i != j)) {
+                    break;
+                }
+                else if(j == (NUM_NODES-1)) {
+                    _eccentricities[i] = length;
+                    numFound++;
+                }
+            }
+        }
+        if((numFound == NUM_NODES) || (length == NUM_NODES)) {
+            break;
+        }
+        walkMatrix *= _adjMatrix.cast<long unsigned int>();
+        length++;
+    }
+    
+}
+
+
 /*int hGraph::pathL(int length, int a, int b) { //determines the number of paths of given length that connect vertices a and b. See arXiv:0801.0861 [hep-th], page 4
     int sum = 0;
     int prod = 0;
@@ -464,20 +596,14 @@ void hGraph::toFile(std::ofstream &fs) const { //outputs hGraphs to a file in a 
             fs << temp << ",";
             
         }
-        if(NUM_NODES > 20) {
-            fs << "\n";
-        }
-    }
-    if (NUM_NODES > 20) {
         fs << "\n";
     }
+    fs << "\n";
     for(int i = 0; i < NUM_NODES; i++) {
         fs << _degVector[i] << ",";
     }
     
-    if(NUM_NODES > 20) {
-        fs << "\n";
-    }
+    fs << "\n";
     
     fs << _eulerChar << "," << _hamiltonian << std::endl;
 }
@@ -535,6 +661,10 @@ void hGraph::setMatrix(int size, MatrixXi data) { //resets the matrix based on n
         for(int j = 0; j < size; j++) {
             _degVector[i] += _adjMatrix(i, j);
         }
+    }
+    _eccentricities.clear();
+    for(int i = 0; i < size; i++) {
+        _eccentricities.push_back(0);
     }
     
 }
@@ -802,10 +932,10 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
     char cSize;
     std::string filename;
     std::ifstream input;
-    
+    std::cin.clear();
     while(true) {
         std::cout << "Input graph data filename: "; //gets input file name
-        std::cin >> filename;
+        std::getline(std::cin, filename);
         input.open(filename);
         if(input.good()) {                  //makes sure file exists
             break;
@@ -823,11 +953,11 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
     int numRead = 0;
 
     
-    int linesize = 2*size*size; //figures out how much of the line must be grabbed (including commas) to get the adjacency matrix
     int data[size*size];        //creates array that will temporarily hold adjacency matrix data;
     
     
-    
+    int numLines = size + 2;
+    int count = 0;
     while(true) {
         getline(input,line); //gets the next line of the CSV file
         
@@ -835,31 +965,42 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
             break;
         }
         
-        numRead++;
+        count++;
+        if(count == numLines) {
+            numRead++;
+            count = 0;
+        }
     }
     input.clear();
     input.seekg(0, std::ios::beg);
     getline(input, line);
     graphData = new hGraph[numRead];
+    
     std::cout << "Reading in graph data..." << std::endl;
     for(int i = 0; i < numRead; i++) {
-        getline(input,line); //gets the next line of the CSV file
-        
         MatrixXi adjMatrix = MatrixXi::Zero(size, size);
-        
-        for(int j = 0; j < 2*size*size; j += 2) {
-            adjMatrix(j/(2*size), (j/2) % size) = line[j] - '0';   //adds the integer to the adjacency matrix in the appropriate position
-        }
+        for(int j = 0; j < numLines - 2; j ++) {
+            getline(input,line); //gets the next line of the CSV file
+            for(int k = 0; k < 2*size; k+= 2) {
+                
+                adjMatrix(j, k/2 ) = (line[k] - '0');
+                
+            }
 
+            
+        }
+        
         graphData[i].setMatrix(size, adjMatrix);
+        getline(input, line);
+        getline(input, line);
+        getline(input, line);
                 
     }
     
     
     input.close();
-    std::cout << "Number of graphs read " << numRead << std::endl;
     num = numRead;
-    
+    std::cout << "Number of graphs read: " << numRead << std::endl;
     return graphData;
 
 }

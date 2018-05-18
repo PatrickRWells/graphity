@@ -8,7 +8,7 @@ INCLUDES = -I ../resource -I ../hamiltonian -I $(HOME)/root/include
 
 default: funcTest
 
-funcTest: depend/hGraph.o depend/graphingUtil.o
+funcTest: depend/hGraph.o depend/graphingUtil.o funcTest.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) funcTest.cpp `root-config --glibs`
 
 depend/graphingUtil.o: ../resource/graphics/graphingUtil.cpp

@@ -6,13 +6,19 @@
 #include <vector>
 #include <thread>
 
-void monteCarlo(hGraph * graph, std::vector<double> * energy, std::vector<double> * dimensions, bool progress, std::string descriptor);
+void monteCarlo(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][5], int simNum, bool progress, std::string descriptor);
 
 int NUM_CORES = 4; //Number of cores in the CPU
 double TINV;    //Beta
 int SIZE;       //Number of nodes in the graphs
 int maxSweeps;  //Number of sweeps that will be performed
 int sweepCollect;
+
+const int DIMEN = 0;
+const int DIMEN_CORR = 1; //These constants determine which vector from the array declared below to look at when looking for a particular data set
+const int ENERGY_CORR = 2;
+const int USER_IN = 3;
+const int ENERGY = 4;
 
 
 //------Simulation Functions------//
@@ -23,84 +29,235 @@ std::function<double(hGraph&,std::vector<int>,std::vector<int>)> simPartial;
 
 
 int main() {
-    std::ofstream corrOut("correlation.csv");
-    std::ofstream dimenOut("dimensionality.csv");
+    
+    std::vector<bool> observables (5, false); //true/false. Tells the program which data to save.
+    
     std::ofstream engOut("energy.csv");
     std::ofstream paramOut("parameters.txt");
+
+    std::ofstream dimenCorrOut;
+    std::ofstream dimenOut; //Output files streams (may or may not be used depending on what the user actuall needs);
+    std::ofstream engCorrOut;
+    std::ofstream allOut;
+    
+    
     //Sets simulation functions
     simFunction = basicSquareHam;
     simPartial = basicSquarePartial;
 
-    //Vectors used to store the energies of the graph at its various states.
-    std::vector<double> * energyStore = new std::vector<double>;
-    std::vector<double> * energyStore2 = new std::vector<double>;
-    std::vector<double> * energyStore3 = new std::vector<double>;
-    //vectors used to store the dimensionality of the graph at its varius states.
-    std::vector<double> * dimensions1 = new std::vector<double>;
-    std::vector<double> * dimensions2 = new std::vector<double>;
-    std::vector<double> * dimensions3 = new std::vector<double>;
 
+    while(true) {
+        std::cout << "Would you like to input a graph from a file? (y/n) "; //Checks if the user would like to input a graph from a file (vs. using randomly initialized graphs);
+        char c = getchar();
+        if (toupper(c) == 'Y') {
+            observables[USER_IN] = true;
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+            break;
+        }
+        else if(toupper(c) == 'N') {
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+            break;
+        }
+        else {
+            std::cout << "Invalid input." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+        }
+    }
+    
+    hGraph ** graphs;
+    int numGraphs = 0;
+    
+    if(observables[USER_IN]) { //reads in the graph file if the user chooses to use one.
+        hGraph * temp = readGraphFile(numGraphs);
+        graphs = new hGraph *[numGraphs];
+        for(int i = 0; i < numGraphs; i++) {
+            graphs[i] = new hGraph;
+            *graphs[i] =temp[i];
+        }
+       
+        SIZE = graphs[0]->getSize();
+        std::cout << "Graph size detected to be " << SIZE << std::endl;
+    }
+    else {
+        numGraphs = 3;
+    }
+    std::vector<double> data[numGraphs][5];
+    
     //sets parameters for the simulation.
+    if(!observables[USER_IN]) {
     std::cout << "How large of a graph would you like to use? ";
     std::cin >> SIZE;
-    std::cout << std::endl << "Input the inverse temperature: ";
+    }
+    std::cout << "Input the inverse temperature: ";
     std::cin >> TINV;
     std::cout << "How many sweeps would you like to perform? ";
     std::cin >> maxSweeps;
     std::cout << "Number of available threads? ";
     std::cin >> NUM_CORES;
     
+    std::cin.clear();
+    std::cin.ignore(100, '\n');
+
+    
+    while(true) { //Prompts the user regarding which quantities should be calculated (and therefore plotted as well);
+        std::cout << "Would you like to calculate the dimensionality? (y/n) ";
+        char c = getchar();
+        if (toupper(c) == 'Y') {
+            observables[DIMEN] = true;
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+
+            break;
+        }
+        else if(toupper(c) == 'N') {
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+
+            break;
+        }
+        else {
+            std::cout << "Invalid input." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+
+        }
+    }
+    if(observables[DIMEN]) {
+        while(true) {
+            std::cout << "Would you like to calculate the correlation function for the dimensionality? (y/n) ";
+            char c = getchar();
+            if (toupper(c) == 'Y') {
+                observables[DIMEN_CORR] = true;
+                std::cin.clear();
+                std::cin.ignore(100, '\n');
+                
+                break;
+            }
+            else if(toupper(c) == 'N') {
+                std::cin.clear();
+                std::cin.ignore(100, '\n');
+                
+                break;
+            }
+            else {
+                std::cout << "Invalid input." << std::endl;
+                std::cin.clear();
+                std::cin.ignore(100, '\n');
+                
+            }
+        }
+    }
+    while(true) {
+        std::cout << "Would you like to calculate the correlation function for the energy? (y/n) ";
+        char c = getchar();
+        if (toupper(c) == 'Y') {
+            observables[ENERGY_CORR] = true;
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+            break;
+        }
+        else if(toupper(c) == 'N') {
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+            break;
+        }
+        else {
+            std::cout << "Invalid input." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+        }
+    }
+    
+    
+    
     paramOut << "Graph size: " << SIZE << std::endl;
     paramOut << "Inverse Temperature: " << TINV << std::endl;
     paramOut << "Sweeps performed: " << maxSweeps << std::endl;
-    paramOut << "Source term: 0.1" << std::endl;
-    paramOut.close();
+    paramOut << "Source term: -0.1" << std::endl;
+    paramOut.close(); //This parameter file contians all the simulation's parameters for future reference.
+    
+    
+
+    std::cin.clear();
+    
+    
+    
+    if(observables[USER_IN]) {
+        std::string description[numGraphs];
+        for(int i = 0; i < numGraphs; i++){
+            std::cout << "Enter a short descriptor for graph " << i << ": "; //Prompts the users for ways to describe the graph if the graphs were input from a file.
+            getline(std::cin, description[i]);
+        }
+
+        for(int i = 0; i < numGraphs; i++) { //Runs the monte-carlo simulations
+            monteCarlo(graphs[i], observables, data, i, true, description[i]);
+            
+        }
         
-    hGraph * random1 = new hGraph(SIZE); //Three graphs are used, two random ones with a fill fraction between .25 and .75, the other is the empty graph
-    (*random1) = randomGraph(SIZE);
-    hGraph * random2 = new hGraph(SIZE);
-    *random2 = randomGraph(SIZE);
-    
-    hGraph * graphEmpty = new hGraph(SIZE);
-    (*graphEmpty) = zeroGraph(SIZE);
-    
-    monteCarlo(random1, energyStore, dimensions1, true, "Random Graph 1");    //As the only truly multithreaded calculation is the dimensionality, it is a more efficient use of
-    monteCarlo(random2, energyStore2, dimensions2, true, "Random Graph 2");   //processing power to do the individual simulations in series to avoid threads being underutilized.
-    monteCarlo(graphEmpty, energyStore3, dimensions3, true, "Empty Graph");
+    }
 
-    
-    std::cout << "Calculating correlation functions..."  << std::endl;
-    
-    std::vector<double> * corr1 = new std::vector<double>;
-    std::vector<double> * corr2 = new std::vector<double>;
-    std::vector<double> * corr3 = new std::vector<double>;
-    
-    std::thread threadC(correlationFn, dimensions1, corr1);
-    std::thread threadD(correlationFn, dimensions2, corr2);
-    correlationFn(dimensions3, corr3);
-    threadC.join();
-    threadD.join();
-
-    
-    int points = energyStore->size();
+    else { //If the user did not input the graphs from a file, two random graphs and an empty graph are used as seeds.
+        graphs = new hGraph * [3];
+        graphs[0] = new hGraph(SIZE);
+        *graphs[0] = randomGraph(SIZE);
+        graphs[1] = new hGraph(SIZE);
+        *graphs[1] = randomGraph(SIZE);
+        graphs[2] = new hGraph(SIZE);
+        *graphs[2] = zeroGraph(SIZE);
+        numGraphs = 3;
+        monteCarlo(graphs[0], observables, data, 0, true, "Random Graph 1");    //As the only truly multithreaded calculation is the dimensionality, it is a more efficient use of
+        monteCarlo(graphs[1], observables, data, 1, true, "Random Graph 2");   //processing power to do the individual simulations in series to avoid threads being underutilized.
+        monteCarlo(graphs[2], observables, data, 2, true, "Empty Graph");
+    }
     
     
-    std::vector<std::vector<double>> xVals; //These next several lines of code save all the data to CSV files in case there is an issue while plotting.
-    std::vector<std::vector<double>> yVals;
-    std::vector<double> temp;
-    for(int i = 0; i < points; i++)
-        temp.push_back(i);
-    xVals.push_back(temp);
-    yVals.push_back(*energyStore);
-    xVals.push_back(temp);
-    yVals.push_back(*energyStore2);
-    xVals.push_back(temp);
-    yVals.push_back(*energyStore3);
     
-    for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < points; j++) {
-            engOut << yVals[i][j];
-            if(j != points-1) {
+    
+    
+    allOut.open("allOut.csv");
+    allOut << SIZE << std::endl;
+    for(int i = 0; i < numGraphs; i++) {
+        allOut << *(graphs[0]); //Outputs all the graphs to a single file. Graphs are also outputted to individual files in the monte-carlo simulation.
+    }
+    allOut.close();
+    
+    
+    if(observables[DIMEN_CORR]) {
+        std::cout << "Calculating dimensionality corrrelation function..."  << std::endl;
+        for(int i = 0; i < numGraphs; i++) {
+            correlationFn(data, i, DIMEN, DIMEN_CORR);
+        }
+        
+        std::cout << "Dimensionality correlation function calculation complete" << std::endl;
+    }
+    
+    
+    
+    if(observables[ENERGY_CORR]) {
+        std::cout << "Calculating energy correlation function..." << std::endl;
+            for(int i = 0; i < numGraphs; i++) {
+                correlationFn(data, i, ENERGY, ENERGY_CORR);
+            }
+        std::cout << "Energy correlation function calculation complete" << std::endl;
+    }
+        
+        
+        
+    
+    
+    for (int i = 0; i < numGraphs; i++) { //Outputs energy to a CSV file
+        for(int j = 0; j < data[i][ENERGY].size(); j++) {
+            engOut << data[i][ENERGY][j];
+            if(j != data[i][ENERGY].size()-1) {
                 engOut << ',';
             }
             
@@ -110,95 +267,88 @@ int main() {
     }
     engOut.close();
     
-    yVals.clear();
-    yVals.push_back(*corr1);
-    yVals.push_back(*corr2);
-    yVals.push_back(*corr3);
-    
-    for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < points; j++) {
-            corrOut << yVals[i][j];
-            if(j != points-1) {
-                corrOut << ',';
+    if(observables[DIMEN_CORR]) { //Outputs dimensionality correlation function to a CSV file
+        dimenCorrOut.open("dimenCorrelation.csv");
+        for (int i = 0; i < numGraphs; i++) {
+            for(int j = 0; j < data[i][DIMEN_CORR].size(); j++) {
+                dimenCorrOut << data[i][DIMEN_CORR][j];
+                if(j != data[i][DIMEN_CORR].size() - 1) {
+                    dimenCorrOut << ',';
+                }
+                
             }
-            
+            dimenCorrOut << '\n';
         }
-        corrOut << '\n';
-        
+        dimenCorrOut.close();
     }
-    corrOut.close();
 
-    
-    yVals.clear();
-    yVals.push_back(*dimensions1);
-    yVals.push_back(*dimensions2);
-    yVals.push_back(*dimensions3);
-    
-    for (int i = 0; i < 3; i++) {
-        for(int j = 0; j < points; j++) {
-            dimenOut << yVals[i][j];
-            if(j != points-1) {
-                dimenOut << ',';
+    if(observables[DIMEN]) { //outputs dimensionality to a CSV file
+        dimenOut.open("dimensionality.csv");
+        for (int i = 0; i < numGraphs; i++) {
+            for(int j = 0; j < data[i][DIMEN].size(); j++) {
+                dimenOut << data[i][DIMEN][j];
+                if(j != data[i][DIMEN].size()-1) {
+                    dimenOut << ',';
+                }
             }
+            dimenOut << '\n';
         }
-        dimenOut << '\n';
-        
+        dimenOut.close();
     }
-    dimenOut.close();
+    
+    if(observables[ENERGY_CORR]) { //Outputs the energy correlation function to a CSV file
+        engCorrOut.open("energyCorrelation.csv");
+        for (int i = 0; i < numGraphs; i++) {
+            for(int j = 0; j < data[i][ENERGY_CORR].size(); j++) {
+                engCorrOut << data[i][ENERGY_CORR][j];
+                if(j != data[i][ENERGY_CORR].size()-1) {
+                    engCorrOut << ',';
+                }
+            }
+            engCorrOut << '\n';
+        }
+        engCorrOut.close();
+    }
+    
+    
+    std::cout << "Data outputed to CSV files" << std::endl;
 
     
     std::cin.clear();
-    std::cin.ignore(100, '\n');
+    //std::cin.ignore(100, '\n');
     
-    yVals.clear();
-    
-    yVals.push_back(*energyStore);
-    yVals.push_back(*energyStore2);
-    yVals.push_back(*energyStore3);
     
     std::cout << "Graphing energy..." << std::endl; //plots energy
+    drawMultiGraph(data, numGraphs, ENERGY);
     
-    drawMultiGraph(xVals, yVals);
     
+    if(observables[ENERGY_CORR]) {
+        std::cout << "Graphing energy correlation function... " << std::endl; //plots energy correlation function
+        drawMultiGraph(data, numGraphs, ENERGY_CORR);
+        
+    }
 
+    if(observables[DIMEN]) {
+        std::cout << "Graphing dimensionality... " << std::endl; //plots dimensionality.
+        drawMultiGraph(data, numGraphs, DIMEN);
+    }
     
-    yVals.clear();
-    yVals.push_back(*corr1);
-    yVals.push_back(*corr2);
-    yVals.push_back(*corr3);
-    
-    std::cout << "Graphing correlation function... " << std::endl; //plots correlation function
-    drawMultiGraph(xVals, yVals);
-
-    
-    yVals.clear();
-    yVals.push_back(*dimensions1);
-    yVals.push_back(*dimensions2);
-    yVals.push_back(*dimensions3);
-    
-    
-    std::cout << "Graphing dimensionality... " << std::endl; //plots dimensionality.
-    drawMultiGraph(xVals, yVals);
+    if(observables[DIMEN_CORR]) {
+        std::cout << "Graph dimensionality correlation function... " << std::endl; //plots dimensionality correlation function
+        drawMultiGraph(data, numGraphs, DIMEN_CORR);
+    }
     
     std::cout << "Be sure to move all result files to a different folder to ensure they are not overwritten." << std::endl;
     
-    //deletes pointers
-    delete energyStore;
-    delete energyStore2;
-    delete energyStore3;
-    delete corr1;
-    delete corr2;
-    delete corr3;
 }
 
-void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<double> * dimensions, bool progress, std::string descriptor) {
+void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> data[][5], int simNum, bool progress, std::string descriptor) {
     graph->setThreads(NUM_CORES);
     std::random_device rd; //c++11 random number generator
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> randNode(0, SIZE - 1);
     std::uniform_real_distribution<> probDis(0.0, 1.0);
     std::uniform_int_distribution<int> randNum(1, ceil(double(SIZE)/2));
-    
     //Parameters needed for individual simulation steps.
     bool run = true;
     int nodeA = 0;
@@ -210,10 +360,12 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<doubl
     int swaps = 0;      //number of times an edge flip is accepted.
     
     simFunction(*graph); //calculates inital graph energy;
-    energy->push_back(graph->getHam());
-    
-    graph->calcDimension();
-    dimensions->push_back(graph->getDimension());
+    data[simNum][ENERGY].push_back(graph->getHam());
+
+    if(observe[DIMEN]) {
+        graph->calcDimension();
+        data[simNum][DIMEN].push_back(graph->getDimension());
+    }
 
     
     while(run) {
@@ -293,10 +445,14 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<doubl
         if(n >= sweepNUM) { //Counts number of sweeps that have been made.
             n = 0;
             sweeps++;
-            energy->push_back(graph->getHam());
-            graph->setThreads(NUM_CORES);
-            graph->calcDimension();
-            dimensions->push_back(graph->getDimension());
+            data[simNum][ENERGY].push_back(graph->getHam());
+            
+            if(observe[DIMEN]) {
+                graph->setThreads(NUM_CORES);
+                graph->calcDimension();
+                data[simNum][DIMEN].push_back(graph->getDimension());
+                
+            }
             if((maxSweeps >= 100 ) && (progress == true) && (((sweeps % (maxSweeps/100)) == 0))) {
                 std::cout << descriptor << ": " << sweeps << " sweeps completed." << std::endl;
             }
@@ -315,6 +471,7 @@ void monteCarlo (hGraph * graph, std::vector<double> * energy, std::vector<doubl
     std::cout << "Simulation on graph " << descriptor << " complete" << std::endl;
     descriptor += ".csv";
     std::ofstream output(descriptor);
+    output << graph->getSize() << std::endl;
     output << *graph;
     output.close();
     std::cout << std::endl;

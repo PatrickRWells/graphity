@@ -11,8 +11,8 @@
 #include "TLegend.h"
 #include "TAxis.h"
 
-void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vector<double>> yVals);
-void correlationFn(std::vector<double> * data, std::vector <double> * output); 
+void drawMultiGraph(std::vector<double> data[][5], int numSeries, int observable);
+void correlationFn(std::vector<double> data[][5], int run, int inData, int outData);
 
 
 #ifndef graphingUtil_hpp

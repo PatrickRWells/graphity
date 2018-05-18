@@ -15,6 +15,8 @@
 #include <random>
 #include <thread>
 #include <future>
+#include <limits>
+
 
 #include "../lib/eigen/Eigen/Dense"
 
@@ -32,8 +34,11 @@ private:
     int _eulerChar = 0;
     double _dimension;
     std::vector<double> _spectralDimen;
+    std::vector<double> _hausdorffDimen;
     double _hamiltonian;
     bool cliquesFound = false;
+    
+    std::vector<int> _eccentricities;
 
 
     MatrixXi _adjMatrix;
@@ -43,6 +48,8 @@ private:
     void toStream(std::ostream &os) const;
     void toFile(std::ofstream &fs) const;
     double dimension(int a, int b, bool multi);     //Single threaded version for recursive calls
+    void calculateEccen();
+    void calculateHausDimen();
 
 
 
@@ -64,14 +71,17 @@ public:
     void flipEdge(std::vector<int> nodeA, std::vector<int> nodeB);
     void acceptPartial(double partial);
     void setThreads(int threads);
-
+    std::vector<int> getEccentricity();
+    int getDiameter();
+    MatrixXi _paths;
 
 
     void numCliques();
-
+    MatrixXi getShortestPaths();
 
     double getDimension();
     std::vector<double> getSpectralDimen();
+    std::vector<double> getHausdorffDimen();
     
     int getDegree(int node);
     int getSize();

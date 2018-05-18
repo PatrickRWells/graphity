@@ -20,14 +20,13 @@ using namespace std;
 
 
 int main() {
-    
-    hGraph test = randomGraph(10);
-    std::vector<double> dimen = test.getSpectralDimen();
-    for(int i = 0; i < dimen.size(); i++ ) {
-        std::cout << std::setprecision(15) << dimen[i] << std::endl;
+    int numRead = 0;
+    hGraph * test = readGraphFile(numRead);
+    for(int i = 0; i < numRead; i++) {
+        std::cout << test[i] << std::endl;
+        
     }
-    std::cout << dimen.size() << std::endl;
-
+    
 
     
 }

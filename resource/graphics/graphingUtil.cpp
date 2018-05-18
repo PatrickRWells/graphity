@@ -9,15 +9,15 @@
 #include <string>
 #include <iostream>
 #include <cctype>
+#include <array>
 
-void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vector<double>> yVals) {
+void drawMultiGraph(std::vector<double> data[][5], int numSeries, int observable) {
     std::string fileName;
     std::cout << "Input a filename for the plot: ";
     //std::cin >> fileName;
     std::getline(std::cin, fileName);
     fileName += ".png";
-    int numSeries = xVals.size();
-    int values = xVals[0].size();
+    int values = data[0][observable].size();
     
     std::string lowBoundS;
     std::string highBoundS;
@@ -79,8 +79,8 @@ void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vec
         double yArray[numValues];
         for(int j = lowBound; j <= highBound; j++) {
             
-            xArray[j-lowBound] = xVals[i][j];
-            yArray[j-lowBound] = yVals[i][j];
+            xArray[j-lowBound] = j;
+            yArray[j-lowBound] = data[i][observable][j];
             
             
         }
@@ -131,41 +131,40 @@ void drawMultiGraph(std::vector<std::vector<double>> xVals, std::vector<std::vec
     
 }
 
-void correlationFn(std::vector<double> * data, std::vector <double> * output) {
+void correlationFn(std::vector<double> data[][5], int run, int inData, int outData) {
     //Calculates the autocorrelation function when passed a vector with data and a vector to place results
     //(pointers). See Monte Carlo Methods in Statistical Physics - 3.21
-    int tMax = data->size();
+    int tMax = data[run][inData].size();
     for(int t = 0; t < tMax; t++ ) {    //The algorithm uses the same variable names (with tp for t') as the algorithm in the book does.
         double sum = 0;                 //Calculates the function at all times.
         double partialSum = 0;
         double partialSum2 = 0;
         for(int tp = 0; tp < tMax - t; tp++) {
-            partialSum += (*data)[tp]*(*data)[tp + t];
+            partialSum += (data[run][inData][tp])*(data[run][inData][tp + t]);
         }
-        partialSum /= (tMax -t);
+        
+        partialSum /= (tMax - t);
         sum += partialSum;
         partialSum = 0;
         
         for(int tp = 0; tp < tMax - t; tp++) {
-            partialSum += (*data)[tp];
+            partialSum += data[run][inData][tp];
         }
         partialSum /= (tMax - t);
         
         for(int tp = 0; tp < tMax - t; tp++) {
-            partialSum2 += (*data)[tp +t];
+            partialSum2 += data[run][inData][tp +t];
         }
         partialSum2 /= (tMax -t);
         
         partialSum *= partialSum2;
         sum -= partialSum;
         if(t > 0) {
-            sum /= (*output)[0];
+            sum /= data[run][outData][0];
         }
-        
-        output->push_back(sum);
+        data[run][outData].push_back(sum);
         
     }
-    (*output)[0] = 1;
-    
+    data[run][outData][0] = 1;
 }
 
