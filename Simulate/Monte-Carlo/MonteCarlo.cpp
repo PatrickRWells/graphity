@@ -8,20 +8,13 @@
 #include <thread>
 
 void monteCarlo(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor);
+bool getTF();
 
 int NUM_CORES = 4; //Number of cores in the CPU
 double TINV;    //Beta
 int SIZE;       //Number of nodes in the graphs
 int maxSweeps;  //Number of sweeps that will be performed
 int sweepCollect;
-
-const int DIMEN = 0;
-const int DIMEN_CORR = 1; //These constants determine which vector from the array declared below to look at when looking for a particular data set
-const int ENERGY_CORR = 2;
-const int USER_IN = 3;
-const int ENERGY = 4;
-const int AVG_DEGREE = 5;
-
 
 //------Simulation Functions------//
 std::function<void(hGraph&)> simFunction;
@@ -32,7 +25,8 @@ std::function<double(hGraph&,std::vector<int>,std::vector<int>)> simPartial;
 
 int main() {
     
-    std::vector<bool> observables (NUM_OBSERVABLES, false); //true/false. Tells the program which data to save.
+    std::vector<bool> observables (NUM_OBSERVABLES, false); // true/false. Tells the program which data to save.
+    std::vector<bool> plot(NUM_OBSERVABLES, false);
     
     std::ofstream engOut("energy.csv");
     std::ofstream paramOut("parameters.txt");
@@ -40,7 +34,7 @@ int main() {
     std::ofstream dimenCorrOut;
     std::ofstream dimenOut; //Output files streams (may or may not be used depending on what the user actuall needs);
     std::ofstream engCorrOut;
-    std::ofstream aveDegOut;
+    std::ofstream avgDegOut;
     std::ofstream allOut;
     
     
@@ -49,29 +43,9 @@ int main() {
     simPartial = basicSquarePartial;
 
 
-    while(true) {
-        std::cout << "Would you like to input a graph from a file? (y/n) "; //Checks if the user would like to input a graph from a file (vs. using randomly initialized graphs);
-        char c = getchar();
-        if (toupper(c) == 'Y') {
-            observables[USER_IN] = true;
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            
-            break;
-        }
-        else if(toupper(c) == 'N') {
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            
-            break;
-        }
-        else {
-            std::cout << "Invalid input." << std::endl;
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            
-        }
-    }
+    std::cout << "Would you like to input a graph from a file? (y/n) "; //Checks if the user would like to input a graph from a file (vs. using randomly initialized graphs);
+    observables[USER_IN] = getTF(); //The constants corresponding to parameters (such as USER_IN) are defined in graphingUtil.hpp
+
     
     hGraph ** graphs;
     int numGraphs = 0;
@@ -97,6 +71,8 @@ int main() {
     std::cout << "How large of a graph would you like to use? ";
     std::cin >> SIZE;
     }
+    std::cout << "Input the source term.";
+    std::cin >> SOURCE;
     std::cout << "Input the inverse temperature: ";
     std::cin >> TINV;
     std::cout << "How many sweeps would you like to perform? ";
@@ -108,109 +84,29 @@ int main() {
     std::cin.ignore(100, '\n');
 
     
-    while(true) { //Prompts the user regarding which quantities should be calculated (and therefore plotted as well);
-        std::cout << "Would you like to calculate the dimensionality? (y/n) ";
-        char c = getchar();
-        if (toupper(c) == 'Y') {
-            observables[DIMEN] = true;
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
+    std::cout << "Would you like to calculate the dimensionality? (y/n) ";
+    observables[DIMEN] = getTF();
 
-            break;
-        }
-        else if(toupper(c) == 'N') {
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-
-            break;
-        }
-        else {
-            std::cout << "Invalid input." << std::endl;
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-
-        }
-    }
     if(observables[DIMEN]) {
-        while(true) {
-            std::cout << "Would you like to calculate the correlation function for the dimensionality? (y/n) ";
-            char c = getchar();
-            if (toupper(c) == 'Y') {
-                observables[DIMEN_CORR] = true;
-                std::cin.clear();
-                std::cin.ignore(100, '\n');
-                
-                break;
-            }
-            else if(toupper(c) == 'N') {
-                std::cin.clear();
-                std::cin.ignore(100, '\n');
-                
-                break;
-            }
-            else {
-                std::cout << "Invalid input." << std::endl;
-                std::cin.clear();
-                std::cin.ignore(100, '\n');
-                
-            }
-        }
+        std::cout << "Would you like to calculate the correlation function for the dimensionality? (y/n) ";
+        observables[DIMEN_CORR] = getTF();
     }
-    while(true) {
-        std::cout << "Would you like to calculate the correlation function for the energy? (y/n) ";
-        char c = getchar();
-        if (toupper(c) == 'Y') {
-            observables[ENERGY_CORR] = true;
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            
-            break;
-        }
-        else if(toupper(c) == 'N') {
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            
-            break;
-        }
-        else {
-            std::cout << "Invalid input." << std::endl;
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            
-        }
-    }
+
+    std::cout << "Would you like to calculate the correlation function for the energy? (y/n) ";
+    observables[ENERGY_CORR] = getTF();
+
     
-    while(true) {
-        std::cout << "Would you like to calculate the average node degree? (y/n) ";
-        char c = getchar();
-        if (toupper(c) == 'Y') {
-            observables[AVG_DEGREE] = true;
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            
-            break;
-        }
-        else if(toupper(c) == 'N') {
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            
-            break;
-        }
-        else {
-            std::cout << "Invalid input." << std::endl;
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            
-        }
-    }
+    std::cout << "Would you like to calculate the average node degree? (y/n) ";
+    observables[AVG_DEGREE] = getTF();
+
     
     
     
     paramOut << "Graph size: " << SIZE << std::endl;
     paramOut << "Inverse Temperature: " << TINV << std::endl;
     paramOut << "Sweeps performed: " << maxSweeps << std::endl;
-    paramOut << "Source term: -0.1" << std::endl;
-    paramOut.close(); //This parameter file contians all the simulation's parameters for future reference.
+    paramOut << "Source term: " << SOURCE << std::endl;
+    paramOut.close(); //This file contians all the simulation's parameters for future reference.
     
     
 
@@ -260,7 +156,20 @@ int main() {
     }
     allOut.close();
     
+    for (int i = 0; i < numGraphs; i++) { //Outputs energy to a CSV file
+        for(int j = 0; j < data[i][ENERGY].size(); j++) {
+            engOut << data[i][ENERGY][j];
+            if(j != data[i][ENERGY].size()-1) {
+                engOut << ',';
+            }
+            
+        }
+        engOut << '\n';
+        
+    }
+    engOut.close();
     
+    //plots various data sets
     if(observables[DIMEN_CORR]) {
         std::cout << "Calculating dimensionality corrrelation function..."  << std::endl;
         for(int i = 0; i < numGraphs; i++) {
@@ -279,23 +188,8 @@ int main() {
             }
         std::cout << "Energy correlation function calculation complete" << std::endl;
     }
-        
-        
-        
     
     
-    for (int i = 0; i < numGraphs; i++) { //Outputs energy to a CSV file
-        for(int j = 0; j < data[i][ENERGY].size(); j++) {
-            engOut << data[i][ENERGY][j];
-            if(j != data[i][ENERGY].size()-1) {
-                engOut << ',';
-            }
-            
-        }
-        engOut << '\n';
-        
-    }
-    engOut.close();
     
     if(observables[DIMEN_CORR]) { //Outputs dimensionality correlation function to a CSV file
         dimenCorrOut.open("dimenCorrelation.csv");
@@ -340,67 +234,75 @@ int main() {
         engCorrOut.close();
     }
     
+    if(observables[AVG_DEGREE]) {
+        avgDegOut.open("averageDegree.csv");
+        for (int i = 0; i < numGraphs; i++) {
+            for(int j = 0; j < data[i][AVG_DEGREE].size(); j++) {
+                avgDegOut << data[i][AVG_DEGREE][j];
+                if(j != data[i][ENERGY_CORR].size()-1) {
+                    avgDegOut << ',';
+                }
+            }
+            avgDegOut << '\n';
+        }
+        avgDegOut.close();
+    }
+    
     
     
     
     std::cout << "Data outputed to CSV files" << std::endl;
-
+    
     
     std::cin.clear();
-    //std::cin.ignore(100, '\n');
     
+    std::cout << "Would you like to graph the energy? (y/n) ";
     
-    std::cout << "Graphing energy..." << std::endl; //plots energy
-    drawMultiGraph(data, numGraphs, ENERGY);
-    
+    if(getTF()) {
+        std::cout << "Graphing energy..." << std::endl; //plots energy
+        drawMultiGraph(data, numGraphs, ENERGY);
+    }
     
     if(observables[ENERGY_CORR]) {
-        std::cout << "Graphing energy correlation function... " << std::endl; //plots energy correlation function
-        drawMultiGraph(data, numGraphs, ENERGY_CORR);
+        std::cout << "Would you like to graph the energy correlation function? (y/n) ";
+        if(getTF()) {
+            std::cout << "Graphing energy correlation function... " << std::endl; //plots energy correlation function
+            drawMultiGraph(data, numGraphs, ENERGY_CORR);
+        }
         
     }
 
     if(observables[DIMEN]) {
-        std::cout << "Graphing dimensionality... " << std::endl; //plots dimensionality.
-        drawMultiGraph(data, numGraphs, DIMEN);
+        std::cout << " Would you like to graph the dimensionality? (y/n) ";
+        if(getTF() ){
+            std::cout << "Graphing dimensionality... " << std::endl; //plots dimensionality.
+            drawMultiGraph(data, numGraphs, DIMEN);
+        }
     }
     
     if(observables[DIMEN_CORR]) {
-        std::cout << "Graph dimensionality correlation function... " << std::endl; //plots dimensionality correlation function
-        drawMultiGraph(data, numGraphs, DIMEN_CORR);
+        std::cout << " Would you like to graph the dimensionality correlation function? (y/n) ";
+        if(getTF()) {
+            std::cout << "Graph dimensionality correlation function... " << std::endl; //plots dimensionality correlation function
+            drawMultiGraph(data, numGraphs, DIMEN_CORR);
+        }
     }
     
     if(observables[AVG_DEGREE]) {
-        std::cout << "Graph average node degree" << std::endl; //plots dimensionality correlation function
-        drawMultiGraph(data, numGraphs, AVG_DEGREE);
+        std::cout << " Would you like to graph the average node degree?? (y/n) ";
+        if(getTF()) {
+            std::cout << "Graph average node degree" << std::endl; //plots dimensionality correlation function
+            drawMultiGraph(data, numGraphs, AVG_DEGREE);
+            
+        }
         
     }
     
-    while(true) {
-        std::cout << "Would you like to make images of the graphs? (y/n) "; //Checks if the user would like to input a graph from a file (vs. using randomly initialized graphs);
-        char c = getchar();
-        if (toupper(c) == 'Y') {
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            for(int i = 0; i < numGraphs; i++) {
-                std::cout << "Imaging graph " << description[i] << "..." << std::endl;
-                graphImage(*graphs[i]);
-                
-            }
-            
-            break;
-        }
-        else if(toupper(c) == 'N') {
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            
-            break;
-        }
-        else {
-            std::cout << "Invalid input." << std::endl;
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            
+    std::cout << "Would you like to make images of the graphs? (y/n) "; //Asks the user if they want to create a fancy PNG of the graph. See graphImager
+    if(getTF()) {
+        for(int i = 0; i < numGraphs; i++) {
+            std::cout << "Imaging graph " << description[i] << "..." << std::endl;
+            graphImage(*graphs[i]);
         }
     }
 
@@ -535,7 +437,7 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
                 for(int i = 0; i < SIZE; i++) {
                     sum += graph->getDegree(i);
                 }
-                data[simNum][AVG_DEGREE].push_back(sum/SIZE);
+                data[simNum][AVG_DEGREE].push_back(double(sum)/SIZE);
             }
             
             if((maxSweeps >= 100 ) && (progress == true) && (((sweeps % (maxSweeps/100)) == 0))) {
@@ -565,5 +467,34 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
     
     
 }
+
+bool getTF() {
+    while(true) {
+        char c = getchar();
+        if (toupper(c) == 'Y') {
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            return true;
+            
+        }
+        else if(toupper(c) == 'N') {
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            return false;
+            
+        }
+        else {
+            std::cout << "Invalid input." << std::endl;
+            std::cout << "Please enter a 'y' or an 'n': ";
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+        }
+    }
+}
+
+
+                                                   
+                                                
 
 

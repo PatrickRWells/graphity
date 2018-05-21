@@ -1,6 +1,6 @@
 //
 //  graphingUtil.cpp
-//  
+//  It's actually a plotting tool, but I'm too lazy to change the name and then edit makefiles.
 //
 //  Created by Patrick on 5/10/18.
 //
@@ -10,11 +10,24 @@
 #include <iostream>
 #include <cctype>
 #include <array>
+#include <cstdarg>
+
+
+
 
 void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, int observable) {
+    /*
+     Takes in three parameters. A double array with all the data. An integer indicating the number
+     of data series (typically the number of graphs simulated over in the Monte-Carlo simulation,
+     and one of the integers defined in graphingUtil.hpp, which tells it which observable you are actually
+     graphing.
+     */
+    
+
+    
+    
     std::string fileName;
     std::cout << "Input a filename for the plot: ";
-    //std::cin >> fileName;
     std::getline(std::cin, fileName);
     fileName += ".png";
     int values = data[0][observable].size();
@@ -24,7 +37,7 @@ void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, 
     
     int lowBound;
     int highBound;
-    
+    //Allows the user to decide over what range of the values they would like to plot
     std::cout << numSeries << " data series detected" << std::endl;
     std::cout << "After how many sweeps would you like to start plotting? [0.." << values-1 << "] ";
     std::getline(std::cin, lowBoundS);
@@ -35,6 +48,7 @@ void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, 
     highBound = std::stoi(highBoundS);
 
 
+    //These are self explanatory.
     std::string gname;
     std::cout << "Enter a title for the plot: ";
     std::getline(std::cin, gname);
@@ -51,6 +65,7 @@ void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, 
     char legendIn;
     bool isLegend = false;
     
+    //Asks if the user wants to draw a legend with the plot.
     while(!valid) {
         std::cout << "Would you like to draw a legend (y/n)? ";
         std::string legendString;
@@ -69,23 +84,25 @@ void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, 
         }
     }
     
+    //Uses Cern Root for the actual plotting.
     TCanvas * c1 = new TCanvas("c1","Canvas",200,10,1200,800);
     TMultiGraph * multiGraph = new TMultiGraph();
     
+    //A "TGraph" is created for each plot, which are then all combined into a "TMultiGraph"
     TGraph **graphs = new TGraph * [numSeries];
     for(int i = 0; i < numSeries; i++) {
         int numValues = highBound - lowBound + 1;
         double xArray[numValues];
         double yArray[numValues];
         for(int j = lowBound; j <= highBound; j++) {
-            
+            //The TGraph object takes two arrays as its input.
             xArray[j-lowBound] = j;
             yArray[j-lowBound] = data[i][observable][j];
-            
+            //If the low bound is not the first data point, things are shifted.
             
         }
         
-        
+        //Creates the "TGraph" object with the data points.
         graphs[i] = new TGraph(numValues, xArray, yArray);
         std::string name = "gr";
         std::string title = "Graph ";
@@ -94,6 +111,7 @@ void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, 
         title += num;
         graphs[i]->SetName(name.c_str());
         graphs[i]->SetTitle(name.c_str());
+        //Hopefully we never run out of colors.
         graphs[i]->SetMarkerColor(i+1);
         graphs[i]->SetMarkerStyle(8);
         graphs[i]->SetMarkerSize(0.5);
@@ -113,7 +131,7 @@ void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, 
         }
     }
     
-    multiGraph->Draw("AP");
+    multiGraph->Draw("AP"); //"AP" means the axis are drawn and the points are not conencted by a line.
     if(isLegend) {
         legend->Draw();
         
@@ -121,7 +139,7 @@ void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, 
     multiGraph->GetXaxis()->SetTitle(xname.c_str());
     multiGraph->GetYaxis()->SetTitle(yname.c_str());
 
-    c1->Print(fileName.c_str());
+    c1->Print(fileName.c_str()); //Saves it to file. 
     delete multiGraph;
     delete [] graphs;
     delete c1;

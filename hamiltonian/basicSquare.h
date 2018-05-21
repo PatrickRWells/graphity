@@ -12,6 +12,8 @@
 #include "absHamiltonian.h"
 #include <cmath>
 
+double SOURCE = 0;
+
 void basicSquareHam(hGraph &host);
 class basicSquare : public absHamiltonian {
     
@@ -21,7 +23,7 @@ private:
     std::vector<int> nodeA;
     std::vector<int> nodeB;
     int numEdges = 0;
-    double source;
+    double sourceT;
     bool isPartial = false;
 public:
     basicSquare();
@@ -41,7 +43,7 @@ basicSquare::basicSquare() : _result(0.0) {
 basicSquare::basicSquare(std::vector<int> node1, std::vector<int> node2) : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
     //std::cout << "Input value of source term: ";
     //std::cin >> source;
-    source = -0.1;
+    sourceT = SOURCE;
     nodeA = node1;
     nodeB = node2;
     numEdges = node1.size();
@@ -65,14 +67,14 @@ void basicSquare::calculate(hGraph &host) { //This is where all the main calcula
             }
         }
         
-        if(source != 0) {
+        if(sourceT != 0) {
             int sum = 0;
             for(int i = 0; i < size; i++) {
                 sum += host.getDegree(i);
             
             }
             sum /= 2;
-            sum *= source;
+            sum *= sourceT;
             _result += sum;
         }
     }
