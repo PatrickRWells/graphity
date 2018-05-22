@@ -133,7 +133,7 @@ public:
 
 //Forward declaration of needed resource functions
 
-hGraph * readGraphFile(int &num);
+void readGraphFile(hGraph *** graphs, int &num);
 
 void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove);
 void removeRow(Eigen::MatrixXi& matrix, unsigned int rowToRemove);

@@ -934,7 +934,7 @@ hGraph zeroGraph(int size) {
 
 
 
-hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer to an array of hGraphs and sets variable num to the number of graphs read from the file.
+void readGraphFile(hGraph *** graphs, int &num) { //reads graphs from a CSV, returns a pointer to an array of hGraphs and sets variable num to the number of graphs read from the file.
                                    //See documentation for how to output graphs to CSV.
     int size;
     char cSize;
@@ -957,14 +957,13 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
     std::string line;
     getline(input, line);
     size = stoi(line);
-    hGraph * graphData;
     int numRead = 0;
 
     
     int data[size*size];        //creates array that will temporarily hold adjacency matrix data;
     
     
-    int numLines = size + 2;
+    int numLines = size + 3;
     int count = 0;
     while(true) {
         getline(input,line); //gets the next line of the CSV file
@@ -982,12 +981,12 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
     input.clear();
     input.seekg(0, std::ios::beg);
     getline(input, line);
-    graphData = new hGraph[numRead];
+    *graphs = new hGraph * [numRead];
     
     std::cout << "Reading in graph data..." << std::endl;
     for(int i = 0; i < numRead; i++) {
         MatrixXi adjMatrix = MatrixXi::Zero(size, size);
-        for(int j = 0; j < numLines - 2; j ++) {
+        for(int j = 0; j < numLines - 3; j ++) {
             getline(input,line); //gets the next line of the CSV file
             for(int k = 0; k < 2*size; k+= 2) {
                 
@@ -998,7 +997,7 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
             
         }
         
-        graphData[i].setMatrix(size, adjMatrix);
+        (*graphs)[i] = new hGraph(size, adjMatrix);
         getline(input, line);
         getline(input, line);
         getline(input, line);
@@ -1009,8 +1008,6 @@ hGraph * readGraphFile(int &num) { //reads graphs from a CSV, returns a pointer 
     input.close();
     num = numRead;
     std::cout << "Number of graphs read: " << numRead << std::endl;
-    return graphData;
-
 }
 
 //---------------------------END I/O UTILITY FUNCTIONS---------------------------//

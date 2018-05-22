@@ -13,7 +13,7 @@ double TINV = .1;
 
 int main() {
     
-    SOURCE = -1;
+    SOURCE = 10;
     
     int numRead;
     hGraph ** graphs;
