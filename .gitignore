@@ -12,7 +12,6 @@ doc/Emergent dimensions in Background Independent Quantum Gravity.log
 doc/Emergent dimensions in Background Independent Quantum Gravity.synctex.gz
 Simulate/Monte-Carlo/parameters.txt
 <<<<<<< HEAD
-resource/Expectation Values/expectationVals.cpp
-resource/Expectation Values/expectationVals.cpp
+
 =======
 >>>>>>> parent of 6fc5670... Memory allocation fix
