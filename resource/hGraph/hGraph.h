@@ -66,6 +66,7 @@ public:
     void calcDimension(); //Multithreaded version
     void calcSpectralDimen();
     void calcEulerChar();
+    double avgDegree();
     void accept(absHamiltonian &ham);
     void flipEdge(int nodeA, int nodeB);
     void flipEdge(std::vector<int> nodeA, std::vector<int> nodeB);

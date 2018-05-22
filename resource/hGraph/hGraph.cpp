@@ -294,6 +294,14 @@ MatrixXi hGraph::getShortestPaths() {
     
 }
 
+double hGraph::avgDegree() {
+    double avg = 0;
+    for(int i = 0; i < NUM_NODES; i++) {
+        avg += getDegree(i);
+    }
+    return avg/NUM_NODES;
+}
+
 void hGraph::calcDimension() { //Calculates dimensionality recursively. See Knill, "On the dimensionanity and Euler Characteristic of Random Graphs"
     int kEdges = ((NUM_NODES)*(NUM_NODES - 1))/2;
     int kSum = 0;

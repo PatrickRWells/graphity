@@ -56,14 +56,14 @@ double basicSquare::result() { //just leave the function iteslf as-is
 }
 
 void basicSquare::calculate(hGraph &host) { //This is where all the main calculation takes place
+    
     if(!isPartial) {
         int size = host.getSize();
         for(int i = 0; i < size; i++) {
             for(int j = i+1; j < size; j++) {
-                if(host.isConnected(i,j)) {
-                    double diff = host.getDegree(i) - host.getDegree(j);
-                    _result += (diff*diff)*0.1;
-                }
+                double diff = host.getDegree(i) - host.getDegree(j);
+                _result += (diff*diff);
+            
             }
         }
         
