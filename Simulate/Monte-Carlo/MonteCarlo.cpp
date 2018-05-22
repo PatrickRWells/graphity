@@ -51,12 +51,9 @@ int main() {
     int numGraphs = 0;
     
     if(observables[USER_IN]) { //reads in the graph file if the user chooses to use one.
-        hGraph * temp = readGraphFile(numGraphs);
-        graphs = new hGraph *[numGraphs];
-        for(int i = 0; i < numGraphs; i++) {
-            graphs[i] = new hGraph;
-            *graphs[i] =temp[i];
-        }
+        
+        readGraphFile(&graphs, numGraphs);
+
        
         SIZE = graphs[0]->getSize();
         std::cout << "Graph size detected to be " << SIZE << std::endl;
@@ -71,7 +68,7 @@ int main() {
     std::cout << "How large of a graph would you like to use? ";
     std::cin >> SIZE;
     }
-    std::cout << "Input the source term.";
+    std::cout << "Input the source term: ";
     std::cin >> SOURCE;
     std::cout << "Input the inverse temperature: ";
     std::cin >> TINV;
