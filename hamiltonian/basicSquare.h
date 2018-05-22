@@ -23,7 +23,7 @@ private:
     std::vector<int> nodeA;
     std::vector<int> nodeB;
     int numEdges = 0;
-    double sourceT;
+    double sourceT = 10;
     bool isPartial = false;
 public:
     basicSquare();
@@ -37,17 +37,18 @@ public:
 };
 
 basicSquare::basicSquare() : _result(0.0) {
-    
+    sourceT = SOURCE;
 }
 
 basicSquare::basicSquare(std::vector<int> node1, std::vector<int> node2) : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
     //std::cout << "Input value of source term: ";
     //std::cin >> source;
-    sourceT = SOURCE;
     nodeA = node1;
     nodeB = node2;
     numEdges = node1.size();
     isPartial = true;
+    sourceT = SOURCE;
+
     
 }
 
@@ -78,6 +79,9 @@ void basicSquare::calculate(hGraph &host) { //This is where all the main calcula
             _result += sum;
         }
     }
+    
+    
+    
     else {
         hGraph temp(host.getSize());
         temp = host;

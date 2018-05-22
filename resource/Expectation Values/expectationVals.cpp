@@ -5,7 +5,7 @@
 //  Created by Patrick on 5/21/18.
 //
 
-double TINV = .1;
+double TINV = 1;
 #include <stdio.h>
 #include <cmath>
 #include "hGraph/hGraph.h"
@@ -13,7 +13,8 @@ double TINV = .1;
 
 int main() {
     
-    SOURCE = 10;
+    SOURCE = -10;
+    
     
     int numRead;
     hGraph ** graphs;
