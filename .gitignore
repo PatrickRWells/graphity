@@ -11,4 +11,5 @@ doc/Emergent dimensions in Background Independent Quantum Gravity.aux
 doc/Emergent dimensions in Background Independent Quantum Gravity.log
 doc/Emergent dimensions in Background Independent Quantum Gravity.synctex.gz
 Simulate/Monte-Carlo/parameters.txt
-resource/Expectation Values/expectationVals
+resource/Expectation Values/expectationVals.cpp
+resource/Expectation Values/expectationVals.cpp
