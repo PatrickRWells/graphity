@@ -56,8 +56,17 @@ Abstract goes here.
 \end{titlepage}
 
 \section{Introduction}
+Background-independent models of spacetime geometry are increasingly common in the search for a quantum theory of gravity. If General Relativity is only an effective theory,  
+
 Introduction \cite{Konopka:2008hp}, \cite{Chen:2012ui}, \cite{Konopka:2008ds}.
 \section{Section 1}
+\subsection{Evolution of the Model} 
+Given an undirected, loopless graph $G$ with vertices $V(G) = \{ 1...N\}$ and edges $E(G)$, a Hamiltonian $H$ can be defined on the graph as follows:
+\begin{equation}
+H = J\sum_{i,j\in V(G), i\neq j}(d_i - d_j)^2 + K\sum_{v\in V(G)}d_v
+\end{equation}
+Where $J$ and $K$ are weighting constants, and $d_i$ simply represents the degree (number of connected edges) of a given node. The first of the sum forces the graph to be regular in the low-temperature limit, while the second sum pushes the graph to be more or less connected depending on the value of $K$. As $K$ goes to infinity, the expectation value of the average node degree drops to zero. Conversely, as $K$ tends towards negative infinity, the expectation value of the average node degree should go to $N-1$.
+A set of seed graphs are evolved according to this Hamiltonian using a Monte-Carlo simulation with a Metropolis algorithm. 
 \section{Section 2}
 \section{Conclusion}  
 \begin{thebibliography}{99}

@@ -36,6 +36,7 @@
     -Graph generators
     -I/O  utility functions
     -Matrix mutation functions
+    -Other Calculations
  
  */
 
@@ -409,6 +410,7 @@ double hGraph::dimension(int a, int b, bool multi) { //This function is NOT call
     }
 }
 
+
 void hGraph::calcSpectralDimen() {
     Eigen::Matrix<unsigned long long int, Eigen::Dynamic, Eigen::Dynamic> walkMatrix;
     walkMatrix.resize(NUM_NODES, NUM_NODES);
@@ -470,6 +472,29 @@ void hGraph::calculateHausDimen() {
 }
 
 
+std::vector<double> hGraph::autoGroupSize() {
+    int m, n;
+    graph g[MAXN*MAXM];
+    int lab[MAXN], ptn[MAXN], orbits[MAXN];
+    static DEFAULTOPTIONS_GRAPH(options);
+    statsblk stats;
+    n = NUM_NODES;
+    m = SETWORDSNEEDED(n);
+    EMPTYGRAPH(g, m, n);
+    for(int i = 0; i < n; i++) {
+        for(int j = i+1; j < n; j++) {
+            if(isConnected(i,j)) {
+                
+                ADDONEEDGE(g, i, j, m);
+            }
+        }
+    }
+    densenauty(g, lab, ptn, orbits, &options, &stats, m, n, NULL);
+    std::vector<double> temp;
+    temp.push_back(stats.grpsize1);
+    temp.push_back(stats.grpsize2);
+    return temp;
+}
 
 
 hGraph hGraph::unitSphere(int node) { //outputs the unit sphere around a given. Node the united sphere contains
@@ -946,6 +971,7 @@ void readGraphFile(hGraph *** graphs, int &num) { //reads graphs from a CSV, ret
         std::getline(std::cin, filename);
         input.open(filename);
         if(input.good()) {                  //makes sure file exists
+            std::cout << "File found." << std::endl;
             break;
         }
         else {
@@ -1039,6 +1065,70 @@ void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove)
 }
 
 //---------------------------END MATRIX MUTATION FUNCTIONS---------------------------//
+
+//---------------------------OTHER CALCULATION FUNCTIONS---------------------------//
+
+bool isIsomorphic(hGraph graph1, hGraph graph2) {
+    
+    
+    graph g1[MAXN*MAXM];
+    graph g1b[MAXN*MAXM];
+    graph g2[MAXN*MAXM];
+    graph g2b[MAXN*MAXM];
+    int lab[MAXN],ptn[MAXN],orbits[MAXN];
+    static DEFAULTOPTIONS_GRAPH(options);
+    statsblk stats;
+    int n,m;
+    options.writeautoms = FALSE;
+    options.getcanon = TRUE;
+    if(graph1.getSize() != graph2.getSize()) {
+        return false;
+    }
+
+    n = graph1.getSize();
+    m = SETWORDSNEEDED(n);
+    EMPTYGRAPH(g1,m,n);
+    EMPTYGRAPH(g1b,m,n);
+
+    for (int i = 0; i < n; i++) {
+        for(int j = i+1; j < n; j++) {
+            if(graph1.isConnected(i,j)) {
+                ADDONEEDGE(g1,i,j,m);
+            }
+        }
+    }
+    densenauty(g1,lab,ptn,orbits,&options,&stats,m,n,g1b);
+    
+    EMPTYGRAPH(g2,m,n);
+    EMPTYGRAPH(g2b,m,n);
+    for (int i = 0; i < n; i++) {
+        for(int j = i+1; j < n; j++) {
+            if(graph2.isConnected(i,j)) {
+                ADDONEEDGE(g2,i,j,m);
+            }
+        }
+    }
+    densenauty(g2,lab,ptn,orbits,&options,&stats,m,n,g2b);
+    
+    int k;
+    for(k = 0; k < m*(size_t)n; k++) {
+        if(g1b[k] != g2b[k]) {
+            break;
+        }
+    }
+    
+    if(k == m*(size_t)n) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+
+
+
+//---------------------------END OTHER CALCULATION FUNCTIONS---------------------------//
 
 /////-------------------------END OTHER RESOURCE FUNCTIONS-------------------------/////
 

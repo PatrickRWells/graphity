@@ -8,8 +8,10 @@
 #include <thread>
 
 void monteCarlo(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor);
+
 bool getTF();
 
+bool WOLFF = false;
 int NUM_CORES = 4; //Number of cores in the CPU
 double TINV;    //Beta
 int SIZE;       //Number of nodes in the graphs
@@ -22,8 +24,9 @@ std::function<double(hGraph&,std::vector<int>,std::vector<int>)> simPartial;
 //All these variables are declared to be global so that they can be used by multiple threads.
 
 
-
 int main() {
+    
+    
     
     std::vector<bool> observables (NUM_OBSERVABLES, false); // true/false. Tells the program which data to save.
     std::vector<bool> plot(NUM_OBSERVABLES, false);
@@ -36,7 +39,7 @@ int main() {
     std::ofstream engCorrOut;
     std::ofstream avgDegOut;
     std::ofstream allOut;
-    
+    std::ofstream avgDegCorrOut;
     
     //Sets simulation functions
     simFunction = basicSquareHam;
@@ -95,6 +98,8 @@ int main() {
     std::cout << "Would you like to calculate the average node degree? (y/n) ";
     observables[AVG_DEGREE] = getTF();
 
+    std::cout << "Would you like to calculate the correlation function for the average node degree? (y/n) ";
+    observables[AVG_DEGREE_CORR] = getTF();
     
     
     
@@ -185,6 +190,14 @@ int main() {
         std::cout << "Energy correlation function calculation complete" << std::endl;
     }
     
+    if(observables[AVG_DEGREE_CORR]) {
+        std::cout << "Calculating average degree correlation function..." << std::endl;
+        for(int i = 0; i < numGraphs; i++) {
+            correlationFn(data, i , AVG_DEGREE, AVG_DEGREE_CORR);
+        }
+        std::cout << "Average degree correlation function calculation complete" << std::endl;
+    }
+    
     
     
     if(observables[DIMEN_CORR]) { //Outputs dimensionality correlation function to a CSV file
@@ -235,7 +248,7 @@ int main() {
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][AVG_DEGREE].size(); j++) {
                 avgDegOut << data[i][AVG_DEGREE][j];
-                if(j != data[i][ENERGY_CORR].size()-1) {
+                if(j != data[i][AVG_DEGREE].size()-1) {
                     avgDegOut << ',';
                 }
             }
@@ -243,6 +256,21 @@ int main() {
         }
         avgDegOut.close();
     }
+    
+    if(observables[AVG_DEGREE_CORR]) {
+        avgDegCorrOut.open("averageDegreeCorrelation.csv");
+        for (int i = 0; i < numGraphs; i++) {
+            for(int j = 0; j < data[i][AVG_DEGREE_CORR].size(); j++) {
+                avgDegCorrOut << data[i][AVG_DEGREE_CORR][j];
+                if(j != data[i][AVG_DEGREE_CORR].size()-1) {
+                    avgDegCorrOut << ',';
+                }
+            }
+            avgDegCorrOut << '\n';
+        }
+        avgDegCorrOut.close();
+    }
+
     
     
     
@@ -285,10 +313,20 @@ int main() {
     }
     
     if(observables[AVG_DEGREE]) {
-        std::cout << " Would you like to graph the average node degree?? (y/n) ";
+        std::cout << " Would you like to graph the average node degree? (y/n) ";
         if(getTF()) {
-            std::cout << "Graph average node degree" << std::endl; //plots dimensionality correlation function
+            std::cout << "Graph average node degree" << std::endl; //
             drawMultiGraph(data, numGraphs, AVG_DEGREE);
+            
+        }
+        
+    }
+    
+    if(observables[AVG_DEGREE_CORR]) {
+        std::cout << " Would you like to graph the average node degree correlation function? (y/n) ";
+        if(getTF()) {
+            std::cout << "Graph average node degree correlation function" << std::endl; //plots dimensionality correlation function
+            drawMultiGraph(data, numGraphs, AVG_DEGREE_CORR);
             
         }
         
@@ -309,6 +347,7 @@ int main() {
 }
 
 void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor) {
+    int selected = 0;
     graph->setThreads(NUM_CORES);
     std::random_device rd; //c++11 random number generator
     std::mt19937 gen(rd());
@@ -381,36 +420,66 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
             nodeA = 0;
             nodeB = 0;
         }
+        bool select = false;
+        hGraph temp(graph->getSize());
+        temp = *graph;
+        temp.flipEdge(xVals, yVals);
+        
+        //If two graphs are isomorphic, it's like it never happened.
+        //If they are not isomorphic, Calculate the automorphism group sizes. If the size of new is greater than size of old, just select the new graph
+        //If the size of old is greater than size of the new, generate a random number. If that number is less than (new group size)/(old group size)
+
+        
+        if (isIsomorphic(*graph, temp)) {
+            continue;
+        }
+        
+        
+        else {
+            std::vector<double> aGrp1 = graph->autoGroupSize();
+            std::vector<double> aGrp2 = temp.autoGroupSize();
+            double randAuto = (aGrp2[0]/aGrp1[0])*pow(10, aGrp2[1] - aGrp1[1]);
+            //std::cout << aGrp2[0]*pow(10, aGrp2[1]) << ", " << aGrp1[0]*pow(10, aGrp1[1]) << ", " << randAuto << std::endl;
+
+            
+            if(randAuto >= 1.0) {
+                selected++;
+                select = true;
+            }
+            else {
+                
+                //std::cout << randAuto << std::endl;
+                if(probDis(gen) <= randAuto) {
+                    selected++;
+                    select = true;
+                }
+            }
+            
+        }
         
 
-        int multiSwap = 0;
-        double hamInitial = graph->getHam();
-        double hamDiff = simPartial(*graph, xVals, yVals); //gets the change in energy if edge between nodeA and nodeB is flipped
-        if(hamDiff <= 0) {  //Accepts change if it decreases energy.
-            graph->flipEdge(xVals,yVals);
-            graph->acceptPartial(hamDiff);
-            swaps++;
-            if(xVals.size() > 1) {
-                multiSwap++;
-            }
-        }
-        else { //If swap increases energy, the change is accepted given a particular probability.
-            
-            double prob = exp(TINV*(-hamDiff));
-            
-            if(probDis(gen) <= prob) {
+        if(select) {
+            double hamInitial = graph->getHam();
+            double hamDiff = simPartial(*graph, xVals, yVals); //gets the change in energy if edge between nodeA and nodeB is flipped
+            if(hamDiff <= 0) {  //Accepts change if it decreases energy.
                 graph->flipEdge(xVals,yVals);
                 graph->acceptPartial(hamDiff);
-                increases++;
                 swaps++;
-                if(xVals.size() > 1) {
-                    multiSwap++;
-                }
-
             }
-            
-            
+            else { //If swap increases energy, the change is accepted given a particular probability.
+                
+                double prob = exp(TINV*(-hamDiff));
+                
+                if(probDis(gen) <= prob) {
+                    graph->flipEdge(xVals,yVals);
+                    graph->acceptPartial(hamDiff);
+                    increases++;
+                    swaps++;
+                }
+            }
         }
+        
+        
         xVals.clear();
         yVals.clear();
         nodeA = 0;
@@ -452,6 +521,7 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
         
     }
     std::cout << "Simulation on graph " << descriptor << " complete" << std::endl;
+    std::cout << selected << " selected." << std::endl;
     descriptor += ".csv";
     std::ofstream output(descriptor);
     output << graph->getSize() << std::endl;
@@ -463,6 +533,7 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
     
     
 }
+
 
 bool getTF() {
     while(true) {

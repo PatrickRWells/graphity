@@ -1,10 +1,10 @@
 CXX = g++
 CXXFLAGS = -std=c++11
-OBJS = depend/hGraph.o depend/graphingUtil.o
+OBJS = depend/hGraph.o depend/graphingUtil.o ../lib/nauty/nauty.a
 HGRAPH = ../resource/hGraph/
 MAIN = funcTest
 
-INCLUDES = -I ../resource -I ../hamiltonian -I $(HOME)/root/include
+INCLUDES = -I ../resource -I ../hamiltonian -I ../lib/nauty -I $(HOME)/root/include
 
 default: funcTest
 

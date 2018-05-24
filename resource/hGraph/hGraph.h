@@ -16,6 +16,10 @@
 #include <thread>
 #include <future>
 #include <limits>
+#include <cmath>
+
+#define MAXN 500
+#include "nauty.h"
 
 
 #include "../lib/eigen/Eigen/Dense"
@@ -74,6 +78,7 @@ public:
     void setThreads(int threads);
     std::vector<int> getEccentricity();
     int getDiameter();
+    std::vector<double> autoGroupSize();
     MatrixXi _paths;
 
 
@@ -137,6 +142,7 @@ void readGraphFile(hGraph *** graphs, int &num);
 
 void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove);
 void removeRow(Eigen::MatrixXi& matrix, unsigned int rowToRemove);
+bool isIsomorphic(hGraph graph1, hGraph graph2);
 hGraph randomGraph(int size);
 hGraph compGraph(int size);
 hGraph zeroGraph(int size);

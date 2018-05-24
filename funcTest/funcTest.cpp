@@ -20,10 +20,12 @@ using namespace std;
 
 
 int main() {
-    int numRead = 0;
-    hGraph * test = readGraphFile(numRead);
-    for(int i = 0; i < numRead; i++) {
-        std::cout << test[i] << std::endl;
-        
-    }
+    hGraph test(10);
+    test = randomGraph(10);
+    SOURCE = 0;
+
+    //test.flipEdge(xVals, yVals);
+    basicSquareHam(test);
+    std::cout << test << std::endl;
+    
 }

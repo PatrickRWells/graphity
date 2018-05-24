@@ -12,14 +12,14 @@
 #include "absHamiltonian.h"
 #include <cmath>
 
-double SOURCE = 0;
+double SOURCE = 0.0;
 
 void basicSquareHam(hGraph &host);
 class basicSquare : public absHamiltonian {
     
 private:
-    int _result; //Result of the computation. Should not be changed.
-    int _partial;
+    double _result; //Result of the computation. Should not be changed.
+    double _partial;
     std::vector<int> nodeA;
     std::vector<int> nodeB;
     int numEdges = 0;
@@ -67,14 +67,14 @@ void basicSquare::calculate(hGraph &host) { //This is where all the main calcula
             
             }
         }
+        _result /= (2*host.getSize());
         
         if(sourceT != 0) {
-            int sum = 0;
+            double sum = 0;
             for(int i = 0; i < size; i++) {
                 sum += host.getDegree(i);
             
             }
-            sum /= 2;
             sum *= sourceT;
             _result += sum;
         }
