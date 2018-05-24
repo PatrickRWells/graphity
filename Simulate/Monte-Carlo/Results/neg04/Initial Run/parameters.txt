@@ -1,4 +1,0 @@
-Graph size: 8
-Inverse Temperature: 2.1
-Sweeps performed: 20000
-Source term: -0.4
