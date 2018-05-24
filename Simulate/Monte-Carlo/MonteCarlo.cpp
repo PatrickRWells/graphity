@@ -40,6 +40,7 @@ int main() {
     std::ofstream avgDegOut;
     std::ofstream allOut;
     std::ofstream avgDegCorrOut;
+    std::ofstream eulerCharOut;
     
     //Sets simulation functions
     simFunction = basicSquareHam;
@@ -101,6 +102,8 @@ int main() {
     std::cout << "Would you like to calculate the correlation function for the average node degree? (y/n) ";
     observables[AVG_DEGREE_CORR] = getTF();
     
+    std::cout << "Would you like to calculate the Euler Characteristic for the graph? (y/n)" << std::endl;
+    observables[EULER_CHAR] = getTF();
     
     
     paramOut << "Graph size: " << SIZE << std::endl;
@@ -271,6 +274,19 @@ int main() {
         avgDegCorrOut.close();
     }
 
+    if(observables[EULER_CHAR]) {
+        eulerCharOut.open("eulerChar.csv");
+        for (int i = 0; i < numGraphs; i++) {
+            for(int j = 0; j < data[i][EULER_CHAR].size(); j++) {
+                eulerCharOut << data[i][EULER_CHAR][j];
+                if(j != data[i][EULER_CHAR].size()-1) {
+                    eulerCharOut << ',';
+                }
+            }
+            eulerCharOut << '\n';
+        }
+        eulerCharOut.close();
+    }
     
     
     
@@ -280,7 +296,7 @@ int main() {
     
     std::cin.clear();
     
-    std::cout << "Would you like to graph the energy? (y/n) ";
+    std::cout << "Would you like to plot the energy? (y/n) ";
     
     if(getTF()) {
         std::cout << "Graphing energy..." << std::endl; //plots energy
@@ -288,7 +304,7 @@ int main() {
     }
     
     if(observables[ENERGY_CORR]) {
-        std::cout << "Would you like to graph the energy correlation function? (y/n) ";
+        std::cout << "Would you like to plot the energy correlation function? (y/n) ";
         if(getTF()) {
             std::cout << "Graphing energy correlation function... " << std::endl; //plots energy correlation function
             drawMultiGraph(data, numGraphs, ENERGY_CORR);
@@ -297,7 +313,7 @@ int main() {
     }
 
     if(observables[DIMEN]) {
-        std::cout << " Would you like to graph the dimensionality? (y/n) ";
+        std::cout << "Would you like to plot the dimensionality? (y/n) ";
         if(getTF() ){
             std::cout << "Graphing dimensionality... " << std::endl; //plots dimensionality.
             drawMultiGraph(data, numGraphs, DIMEN);
@@ -305,7 +321,7 @@ int main() {
     }
     
     if(observables[DIMEN_CORR]) {
-        std::cout << " Would you like to graph the dimensionality correlation function? (y/n) ";
+        std::cout << "Would you like to plot the dimensionality correlation function? (y/n) ";
         if(getTF()) {
             std::cout << "Graph dimensionality correlation function... " << std::endl; //plots dimensionality correlation function
             drawMultiGraph(data, numGraphs, DIMEN_CORR);
@@ -313,7 +329,7 @@ int main() {
     }
     
     if(observables[AVG_DEGREE]) {
-        std::cout << " Would you like to graph the average node degree? (y/n) ";
+        std::cout << "Would you like to plot the average node degree? (y/n) ";
         if(getTF()) {
             std::cout << "Graph average node degree" << std::endl; //
             drawMultiGraph(data, numGraphs, AVG_DEGREE);
@@ -323,12 +339,22 @@ int main() {
     }
     
     if(observables[AVG_DEGREE_CORR]) {
-        std::cout << " Would you like to graph the average node degree correlation function? (y/n) ";
+        std::cout << "Would you like to plot the average node degree correlation function? (y/n) ";
         if(getTF()) {
             std::cout << "Graph average node degree correlation function" << std::endl; //plots dimensionality correlation function
             drawMultiGraph(data, numGraphs, AVG_DEGREE_CORR);
             
         }
+        
+    }
+    
+    if(observables[EULER_CHAR]) {
+        std::cout << "Would you like to plot the Euler characteristic? (y/n) ";
+        if(getTF()) {
+            std::cout << "Graphing Euler Characteristic" << std::endl;
+            drawMultiGraph(data, numGraphs, EULER_CHAR);
+        }
+        
         
     }
     
@@ -503,6 +529,11 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
                     sum += graph->getDegree(i);
                 }
                 data[simNum][AVG_DEGREE].push_back(double(sum)/SIZE);
+            }
+            
+            if(observe[EULER_CHAR]) {
+                data[simNum][EULER_CHAR].push_back(graph->getEulerChar());
+                
             }
             
             if((maxSweeps >= 100 ) && (progress == true) && (((sweeps % (maxSweeps/100)) == 0))) {

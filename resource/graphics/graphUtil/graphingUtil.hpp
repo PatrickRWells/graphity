@@ -11,7 +11,7 @@
 #include "TLegend.h"
 #include "TAxis.h"
 
-const int NUM_OBSERVABLES = 7;
+const int NUM_OBSERVABLES = 8;
 /*
  This is a very special constant. This is the only file that is referenced by all the
  individual pieces responsible for collecting, managing, and plotting Monte-Carlo Data
@@ -26,6 +26,7 @@ const int USER_IN = 3;
 const int ENERGY = 4;
 const int AVG_DEGREE = 5;
 const int AVG_DEGREE_CORR = 6;
+const int EULER_CHAR = 7;
 
 
 void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, int observable);
