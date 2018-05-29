@@ -63,6 +63,7 @@ public:
     hGraph(int size);
     hGraph();
     ~hGraph();
+    hGraph compliment();
     void print(); //depricated
     void setMatrix(int size, MatrixXi data);
     void setHamiltonian(double val);

@@ -96,7 +96,7 @@ hGraph::~hGraph() { //Since the hGraph class does not include any pointers, ther
 
 //---------------------------GETTERS---------------------------//
 
-double hGraph::getDimension() { //simple getter function
+double hGraph::getDimension() { //simple getter function    
     if(_dimension == 0) {
         calcDimension();
     }
@@ -254,10 +254,10 @@ void hGraph::calcEulerChar() { //Based on the definition by Oliver Knills. Requi
     int sum = 0;
     for(int i = 0; i < _numCliques.size(); i++) { //See Knill, "On the Dimensionality and Euler Characteristic of Random Graphs"
         if((i+1) % 2 == 1) {                      //for information regarding this algorithm.
-            sum -= _numCliques[i];
+            sum += _numCliques[i];
         }
         else {
-            sum += _numCliques[i];
+            sum -= _numCliques[i];
         }
     }
     _eulerChar = sum;
@@ -291,6 +291,19 @@ MatrixXi hGraph::getShortestPaths() {
         }
     }
     return pathMatrix;
+    
+    
+}
+
+hGraph hGraph::compliment() {
+    hGraph temp(NUM_NODES, _adjMatrix);
+    for(int i = 0; i < NUM_NODES; i++) {
+        for(int j = i+1; j < NUM_NODES; j++) {
+            temp.flipEdge(i, j);
+        }
+    }
+
+    return temp;
     
     
 }

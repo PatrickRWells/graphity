@@ -20,12 +20,20 @@ using namespace std;
 
 
 int main() {
-    hGraph test(10);
-    test = randomGraph(10);
-    SOURCE = 0;
+    int size = 8;
+    hGraph test(size);
+    test = compGraph(size);
+    test.flipEdge(0,1);
+    test.flipEdge(0,2);
+    test.flipEdge(0,3);
+
+    test.flipEdge(4,5);
+    test.flipEdge(4,6);
+    test.flipEdge(1,5);
+    std::cout << test.getDimension() << std::endl;
+
+    
 
     //test.flipEdge(xVals, yVals);
-    basicSquareHam(test);
-    std::cout << test << std::endl;
     
 }
