@@ -8,6 +8,8 @@
 #include <thread>
 
 void monteCarlo(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor);
+void wolffAlgorithm(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor);
+
 
 bool getTF();
 
@@ -16,7 +18,9 @@ int NUM_CORES = 4; //Number of cores in the CPU
 double TINV;    //Beta
 int SIZE;       //Number of nodes in the graphs
 int maxSweeps;  //Number of sweeps that will be performed
-int sweepCollect;
+int collectionTime = 1;
+bool correlationCollect = false;
+
 
 //------Simulation Functions------//
 std::function<void(hGraph&)> simFunction;
@@ -25,7 +29,6 @@ std::function<double(hGraph&,std::vector<int>,std::vector<int>)> simPartial;
 
 
 int main() {
-    
     
     
     std::vector<bool> observables (NUM_OBSERVABLES, false); // true/false. Tells the program which data to save.
@@ -58,7 +61,14 @@ int main() {
         readGraphFile(&graphs, numGraphs);
         SIZE = graphs[0]->getSize();
         std::cout << "Graph size detected to be " << SIZE << std::endl;
-        
+        std::cout << "Would you like to manually set how often to collect data? (y/n)";
+        correlationCollect = getTF();
+        if(correlationCollect) {
+            std::string temp;
+            std::cout << "Input how often you would like to collect data (in sweeps): ";
+            std::cin >> temp;
+            collectionTime = std::stoi(temp);
+        }
     }
        
     else {
@@ -371,6 +381,83 @@ int main() {
     std::cout << "Be sure to move all result files to a different folder to ensure they are not overwritten." << std::endl;
     
 }
+void wolffAlgorithm(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor) {
+    std::cout << *graph << std::endl;
+    int selected = 0;
+    graph->setThreads(NUM_CORES);
+    std::random_device rd; //c++11 random number generator
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> randNode(0, SIZE - 1);
+    std::uniform_real_distribution<> probDis(0.0, 1.0);
+    
+    bool run = true;
+    int sweeps = 0;
+    int sweepNUM = ((SIZE)*(SIZE-1))/2;//Number of edge flips in a single sweep;
+    int n = 0;
+    int increases = 0;  //number of times an increase in energy is accepted
+    int swaps = 0;      //number of times an edge flip is accepted.
+    
+    simFunction(*graph); //calculates inital graph energy;
+    data[simNum][ENERGY].push_back(graph->getHam());
+
+    if(observe[DIMEN]) {
+        graph->calcDimension();
+        data[simNum][DIMEN].push_back(graph->getDimension());
+    }
+    
+    if(observe[AVG_DEGREE]) {
+        double sum = 0;
+        for(int i = 0; i < SIZE; i++) {
+            sum += graph->getDegree(i);
+        }
+        data[simNum][AVG_DEGREE].push_back(sum/SIZE);
+    }
+    
+    while(run) {
+        int nodeA = 0;
+        int nodeB = 0;
+
+        int nonAccept = 0;
+        std::vector<int> xVals;
+        std::vector<int> yVals;
+        
+        std::vector<int> xAttempted;
+        std::vector<int> yAttempted;
+        
+        bool on;
+        while(nodeA == nodeB) {
+            nodeA = randNode(gen);
+            nodeB = randNode(gen);
+            
+        }
+        std::cout << nodeA << ", " << nodeB << std::endl;
+        on = graph->isConnected(nodeA, nodeB);
+        xVals.push_back(nodeA);
+        yVals.push_back(nodeB);
+        xAttempted.push_back(nodeA);
+        yAttempted.push_back(nodeB);
+        for(int i = 0; i < xVals.size(); i ++) {
+            int node1 = xVals[i];
+            int node2 = yVals[i];
+            for(int j = 0; j < graph->getSize(); j++) {
+                if(j != node1) {
+                    for(int k = 0; k < xAttempted.size(); i++) {
+                        
+                    }
+                    
+                    
+                    
+                }
+                
+            }
+        }
+        std::cout << nonAccept << std::endl;
+        for(int i = 0; i < xVals.size(); i++) {
+            std::cout << xVals[i] << ", " << yVals[i] << std::endl;
+        }
+        run = false;
+    }
+}
 
 void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor) {
     int selected = 0;
@@ -514,31 +601,34 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
         if(n >= sweepNUM) { //Counts number of sweeps that have been made.
             n = 0;
             sweeps++;
-            data[simNum][ENERGY].push_back(graph->getHam());
             
-            if(observe[DIMEN]) {
-                graph->setThreads(NUM_CORES);
-                graph->calcDimension();
-                data[simNum][DIMEN].push_back(graph->getDimension());
+            if((sweeps % collectionTime) == 0) {
+                data[simNum][ENERGY].push_back(graph->getHam());
                 
-            }
-            
-            if(observe[AVG_DEGREE]) {
-                double sum = 0;
-                for(int i = 0; i < SIZE; i++) {
-                    sum += graph->getDegree(i);
+                if(observe[DIMEN]) {
+                    graph->setThreads(NUM_CORES);
+                    graph->calcDimension();
+                    data[simNum][DIMEN].push_back(graph->getDimension());
+                    
                 }
-                data[simNum][AVG_DEGREE].push_back(double(sum)/SIZE);
-            }
-            
-            if(observe[EULER_CHAR]) {
-                data[simNum][EULER_CHAR].push_back(graph->getEulerChar());
                 
+                if(observe[AVG_DEGREE]) {
+                    double sum = 0;
+                    for(int i = 0; i < SIZE; i++) {
+                        sum += graph->getDegree(i);
+                    }
+                    data[simNum][AVG_DEGREE].push_back(double(sum)/SIZE);
+                }
+                
+                if(observe[EULER_CHAR]) {
+                    data[simNum][EULER_CHAR].push_back(graph->getEulerChar());
+                    
+                }
             }
-            
             if((maxSweeps >= 100 ) && (progress == true) && (((sweeps % (maxSweeps/100)) == 0))) {
                 std::cout << descriptor << ": " << sweeps << " sweeps completed." << std::endl;
             }
+                
 
             
         }
@@ -560,6 +650,7 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
     output.close();
     std::cout << std::endl;
 
+        
     
     
     

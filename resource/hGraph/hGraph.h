@@ -69,6 +69,7 @@ public:
     void setHamiltonian(double val);
     hGraph unitSphere(int node);
     void calcDimension(); //Multithreaded version
+    std::vector<int> fractionalDimen();
     void calcSpectralDimen();
     void calcEulerChar();
     double avgDegree();
@@ -147,7 +148,9 @@ bool isIsomorphic(hGraph graph1, hGraph graph2);
 hGraph randomGraph(int size);
 hGraph compGraph(int size);
 hGraph zeroGraph(int size);
-
+std::vector<int> fractionAdd(std::vector<int> fractA, std::vector<int> fractB);
+void fractReduce(std::vector<int> &frac);
+int gcd(int numA, int numB);
 
 
 

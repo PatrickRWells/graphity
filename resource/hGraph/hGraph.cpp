@@ -1,4 +1,4 @@
-//
+    //
 //  hGraph.cpp
 //  
 //
@@ -328,7 +328,7 @@ void hGraph::calcDimension() { //Calculates dimensionality recursively. See Knil
     
     kSum /= 2;
     
-    if(NUM_NODES == 0) {         //for information regarding this algorithm.
+    if(NUM_NODES == 0) {
         _dimension =  -1;
     }
     else if(kSum == kEdges) {
@@ -423,6 +423,25 @@ double hGraph::dimension(int a, int b, bool multi) { //This function is NOT call
     }
 }
 
+std::vector<int> hGraph::fractionalDimen() {
+    std::vector<int> values = {0, 1};
+    if(NUM_NODES == 0) {
+        values[0] = -1;
+        return values;
+    }
+    else {
+        for(int i = 0; i < NUM_NODES; i++) {
+            std::vector<int> temp = unitSphere(i).fractionalDimen();
+            values = fractionAdd(values, temp);
+        }
+        values[1] *= NUM_NODES;
+        values = fractionAdd(values, {1,1});
+        return values;
+        
+    }
+    
+    
+}
 
 void hGraph::calcSpectralDimen() {
     Eigen::Matrix<unsigned long long int, Eigen::Dynamic, Eigen::Dynamic> walkMatrix;
@@ -1138,6 +1157,47 @@ bool isIsomorphic(hGraph graph1, hGraph graph2) {
     }
 }
 
+std::vector<int> fractionAdd(std::vector<int> fractA, std::vector<int> fractB) {
+    
+    int LCD = fractA[1]*fractB[1]/gcd(fractA[1], fractB[1]);
+    int NUM = fractA[0]*(LCD/fractA[1]) + fractB[0]*(LCD/fractB[1]);
+    std::vector<int> result = {NUM, LCD};
+    return result;
+    
+}
+
+void fractReduce(std::vector<int> &frac) {
+    if(frac.size() != 2) {
+        std::cout << "Error: vector passed is not a fraction " << std::endl;
+        exit(1);
+    }
+    int GCD = gcd(abs(frac[0]), frac[1]);
+    frac[0] /= GCD;
+    frac[1] /= GCD;
+    
+}
+
+
+int gcd(int numA, int numB) {
+    int num1;
+    int num2;
+    if(numA > numB) {
+        num1 = numA;
+        num2 = numB;
+    }
+    else {
+        num1 = numB;
+        num2 = numA;
+    }
+    while((num1 % num2) != 0) {
+        int temp = num1 % num2;
+        num1 = num2;
+        num2 = temp;
+        
+    }
+
+    return num2;
+}
 
 
 
