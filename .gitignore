@@ -11,8 +11,5 @@ doc/Emergent dimensions in Background Independent Quantum Gravity.aux
 doc/Emergent dimensions in Background Independent Quantum Gravity.log
 doc/Emergent dimensions in Background Independent Quantum Gravity.synctex.gz
 Simulate/Monte-Carlo/parameters.txt
-<<<<<<< HEAD
-
-=======
->>>>>>> parent of 6fc5670... Memory allocation fix
 Simulate/Monte-Carlo/Results_secondary.zip
+lib/nauty/
