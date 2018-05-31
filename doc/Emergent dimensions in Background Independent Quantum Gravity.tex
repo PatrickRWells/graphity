@@ -67,7 +67,8 @@ H = J\sum_{i,j\in V(G), i\neq j}(d_i - d_j)^2 + K\sum_{v\in V(G)}d_v
 \end{equation}
 Where $J$ and $K$ are weighting constants, and $d_i$ simply represents the degree (number of connected edges) of a given node. The first of the sum forces the graph to be regular in the low-temperature limit, while the second sum pushes the graph to be more or less connected depending on the value of $K$. As $K$ goes to infinity, the expectation value of the average node degree drops to zero. Conversely, as $K$ tends towards negative infinity, the expectation value of the average node degree should go to $N-1$.
 A set of seed graphs are evolved according to this Hamiltonian using a Monte-Carlo simulation with a Metropolis algorithm. 
-\section{Section 2}
+\section{Geometrical Properties of Graphs}
+Geometrical properties of the graphs considered are defined as in \cite{Knill:2011}. This definition of dimensionality is computationally problematic, not due to the complexity of the algorithm but rather due to its fundamentally recursive nature. Calculating the dimensionality of a complete graph $K_N$  on $N$ nodes requires $N!$ recursive calls, which quickly becomes computationally intractable as N increases. Of course, $K_N$ is just an N-1-dimensional simplex, but no such simplification exists for highly dense graphs close to $K_N$. While the graphs considered in the simulation were in general not so dense as to require such a high number of recursive calls, they were still complex enough to impose an upper limit on the size of the graphs considered.
 \section{Conclusion}  
 \begin{thebibliography}{99}
   
@@ -113,6 +114,13 @@ A set of seed graphs are evolved according to this Hamiltonian using a Monte-Car
   [arXiv:1009.3195 [gr-qc]].
   %%CITATION = doi:10.1007/s10955-011-0135-9;%%
   %7 citations counted in INSPIRE as of 09 May 2018
+  
+  \bibitem{Knill:2011}
+   O.~Knill
+   %``On the Dimensionality and Euler Characteristic of Random Graphs``
+   [arXiv:1112.5749 [math.PR]]
+  
+  
  
 \end{thebibliography}
 

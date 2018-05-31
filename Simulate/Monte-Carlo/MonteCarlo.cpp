@@ -6,9 +6,11 @@
 #include <cmath>
 #include <vector>
 #include <thread>
+#include <mutex>
 
-void monteCarlo(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor);
+void monteCarlo(hGraph * graph, std::vector<bool> observe, std::vector<double> ** data, int simNum, bool progress, std::string descriptor);
 void wolffAlgorithm(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor);
+std::mutex mut;
 
 
 bool getTF();
@@ -22,6 +24,8 @@ int collectionTime = 1;
 bool correlationCollect = false;
 
 
+
+
 //------Simulation Functions------//
 std::function<void(hGraph&)> simFunction;
 std::function<double(hGraph&,std::vector<int>,std::vector<int>)> simPartial;
@@ -29,6 +33,7 @@ std::function<double(hGraph&,std::vector<int>,std::vector<int>)> simPartial;
 
 
 int main() {
+    
     
     
     std::vector<bool> observables (NUM_OBSERVABLES, false); // true/false. Tells the program which data to save.
@@ -74,7 +79,11 @@ int main() {
     else {
         numGraphs = 3;
     }
-    std::vector<double> data[numGraphs][NUM_OBSERVABLES];
+    std::vector<double> ** data = new std::vector<double> * [numGraphs];
+    for(int i = 0; i < numGraphs; i++) {
+        data[i] = new std::vector<double> [NUM_OBSERVABLES];
+        
+    }
     
     //sets parameters for the simulation.
     if(!observables[USER_IN]) {
@@ -112,7 +121,7 @@ int main() {
     std::cout << "Would you like to calculate the correlation function for the average node degree? (y/n) ";
     observables[AVG_DEGREE_CORR] = getTF();
     
-    std::cout << "Would you like to calculate the Euler Characteristic for the graph? (y/n)" << std::endl;
+    std::cout << "Would you like to calculate the Euler Characteristic for the graph? (y/n) ";
     observables[EULER_CHAR] = getTF();
     
     
@@ -149,14 +158,16 @@ int main() {
         *graphs[1] = randomGraph(SIZE);
         graphs[2] = new hGraph(SIZE);
         *graphs[2] = zeroGraph(SIZE);
-        numGraphs = 3;
         description[0] = "Random Graph 1";
         description[1] = "Random Graph 2";
         description[2] = "Empty Graph";
 
-        monteCarlo(graphs[0], observables, data, 0, true, description[0]);    //As the only truly multithreaded calculation is the dimensionality, it is a more efficient use of
-        monteCarlo(graphs[1], observables, data, 1, true, description[1]);   //processing power to do the individual simulations in series to avoid threads being underutilized.
+        
+        std::thread threadA(monteCarlo, graphs[0], observables, data, 0, true, description[0]);   //processing power to do the individual simulations in series to avoid threads being underutilized.
+        std::thread threadB(monteCarlo, graphs[1], observables, data, 1, true, description[1]);   //processing power to do the individual simulations in series to avoid threads being underutilized.
         monteCarlo(graphs[2], observables, data, 2, true, description[2]);
+        threadA.join();
+        threadB.join();
     }
     
     
@@ -377,7 +388,7 @@ int main() {
     }
 
     
-    
+    delete [] data;
     std::cout << "Be sure to move all result files to a different folder to ensure they are not overwritten." << std::endl;
     
 }
@@ -418,48 +429,86 @@ void wolffAlgorithm(hGraph * graph, std::vector<bool> observe, std::vector<doubl
         int nodeB = 0;
 
         int nonAccept = 0;
-        std::vector<int> xVals;
-        std::vector<int> yVals;
-        
-        std::vector<int> xAttempted;
-        std::vector<int> yAttempted;
-        
+        std::vector<intPair> values;
+        std::vector<intPair> attempted;
         bool on;
         while(nodeA == nodeB) {
             nodeA = randNode(gen);
             nodeB = randNode(gen);
-            
         }
-        std::cout << nodeA << ", " << nodeB << std::endl;
         on = graph->isConnected(nodeA, nodeB);
-        xVals.push_back(nodeA);
-        yVals.push_back(nodeB);
-        xAttempted.push_back(nodeA);
-        yAttempted.push_back(nodeB);
-        for(int i = 0; i < xVals.size(); i ++) {
-            int node1 = xVals[i];
-            int node2 = yVals[i];
-            for(int j = 0; j < graph->getSize(); j++) {
-                if(j != node1) {
-                    for(int k = 0; k < xAttempted.size(); i++) {
+        intPair tempPair(nodeA, nodeB);
+        values.push_back(tempPair);
+        attempted.push_back(tempPair);
+        std::cout << values.size() << std::endl;
+
+        intPair tempA;
+        intPair tempB;
+        double prob = 1 - exp(-TINV);
+        std::cout << prob << std::endl;
+        for(int a = 0; a < values.size(); a++) {
+            for(int j = 0; j < SIZE; j++) {
+                nodeA = values[a].getPair()[0];
+                nodeB = values[a].getPair()[1];
+                tempA = intPair(nodeA, j);
+                tempB = intPair(nodeB, j);
+                if(nodeA != j && (graph->isConnected(nodeA, j) == on)) {
+                    bool tested = true;
+                    for(int t = 0; t < attempted.size(); t++) {
+                        if(attempted[t].equals(tempA)) {
+                            break;
+                        }
+                        if(t == (attempted.size() - 1)) {
+                            tested = false;
+                        }
                         
                     }
-                    
-                    
-                    
+                    if(!tested) {
+                        attempted.push_back(tempA);
+                        if(probDis(gen) <= prob) {
+                            values.push_back(tempA);
+                        }
+                    }
                 }
+                if(nodeB != j && (graph->isConnected(nodeB, j) == on)) {
+                    bool tested = true;
+                    for(int t = 0; t < attempted.size(); t++) {
+                        if(attempted[t].equals(tempB)) {
+                            break;
+                        }
+                        if(t == (attempted.size() - 1)) {
+                            tested = false;
+                        }
+                        
+                    }
+                    if(!tested) {
+                        attempted.push_back(tempB);
+                        if(probDis(gen) <= prob) {
+                            values.push_back(tempB);
+                        }
+                    }
+                }
+                
                 
             }
         }
-        std::cout << nonAccept << std::endl;
-        for(int i = 0; i < xVals.size(); i++) {
-            std::cout << xVals[i] << ", " << yVals[i] << std::endl;
+        
+        for(int i = 0; i < attempted.size(); i++) {
+            attempted[i].print();
+            std::cout << std::endl;
+        }
+        
+        std::cout << std::endl;
+        
+        for(int i = 0; i < values.size(); i++) {
+            values[i].print();
+            std::cout << std::endl;
         }
         run = false;
     }
 }
 
-void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor) {
+void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> ** data, int simNum, bool progress, std::string descriptor) {
     int selected = 0;
     graph->setThreads(NUM_CORES);
     std::random_device rd; //c++11 random number generator
@@ -476,7 +525,6 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
     int n = 0;
     int increases = 0;  //number of times an increase in energy is accepted
     int swaps = 0;      //number of times an edge flip is accepted.
-    
     simFunction(*graph); //calculates inital graph energy;
     data[simNum][ENERGY].push_back(graph->getHam());
 
@@ -533,7 +581,7 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
             nodeA = 0;
             nodeB = 0;
         }
-        bool select = false;
+        bool select = true;
         hGraph temp(graph->getSize());
         temp = *graph;
         temp.flipEdge(xVals, yVals);
@@ -542,15 +590,20 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
         //If they are not isomorphic, Calculate the automorphism group sizes. If the size of new is greater than size of old, just select the new graph
         //If the size of old is greater than size of the new, generate a random number. If that number is less than (new group size)/(old group size)
 
-        
-        if (isIsomorphic(*graph, temp)) {
+        mut.lock();
+        bool iso = isIsomorphic(*graph, temp);
+        mut.unlock();
+
+        if (iso) {
             continue;
         }
         
-        
+    
         else {
+            mut.lock();
             std::vector<double> aGrp1 = graph->autoGroupSize();
             std::vector<double> aGrp2 = temp.autoGroupSize();
+            mut.unlock();
             double randAuto = (aGrp2[0]/aGrp1[0])*pow(10, aGrp2[1] - aGrp1[1]);
             //std::cout << aGrp2[0]*pow(10, aGrp2[1]) << ", " << aGrp1[0]*pow(10, aGrp1[1]) << ", " << randAuto << std::endl;
 

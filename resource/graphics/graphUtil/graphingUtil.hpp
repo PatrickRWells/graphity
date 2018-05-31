@@ -21,7 +21,7 @@ const int NUM_OBSERVABLES = 8;
 
 const int DIMEN = 0;
 const int DIMEN_CORR = 1; //These constants determine which vector from the array
-const int ENERGY_CORR = 2; //declared below to look at when looking for a particular data set
+const int ENERGY_CORR = 2; //declared below to look at when looking for a part`icular data set
 const int USER_IN = 3;
 const int ENERGY = 4;
 const int AVG_DEGREE = 5;
@@ -29,8 +29,8 @@ const int AVG_DEGREE_CORR = 6;
 const int EULER_CHAR = 7;
 
 
-void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, int observable);
-void correlationFn(std::vector<double> data[][NUM_OBSERVABLES], int run, int inData, int outData);
+void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable);
+void correlationFn(std::vector<double> **data, int run, int inData, int outData);
 
 
 #ifndef graphingUtil_hpp

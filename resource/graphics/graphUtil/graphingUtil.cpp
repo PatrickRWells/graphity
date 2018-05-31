@@ -15,7 +15,7 @@
 
 
 
-void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, int observable) {
+void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable) {
     /*
      Takes in three parameters. A double array with all the data. An integer indicating the number
      of data series (typically the number of graphs simulated over in the Monte-Carlo simulation,
@@ -149,7 +149,7 @@ void drawMultiGraph(std::vector<double> data[][NUM_OBSERVABLES], int numSeries, 
     
 }
 
-void correlationFn(std::vector<double> data[][NUM_OBSERVABLES], int run, int inData, int outData) {
+void correlationFn(std::vector<double> **data, int run, int inData, int outData) {
     //Calculates the autocorrelation function when passed a vector with data and a vector to place results
     //(pointers). See Monte Carlo Methods in Statistical Physics - 3.21
     int tMax = data[run][inData].size();

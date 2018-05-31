@@ -137,6 +137,19 @@ public:
     void toFile(std::ofstream &fs) const;
 };
 
+class intPair {
+private:
+    int a;
+    int b;
+public:
+    intPair(int pointA, int pointB);
+    intPair();
+    std::vector<int> getPair();
+    
+    void print();
+    bool equals(intPair other);
+};
+
 
 //Forward declaration of needed resource functions
 

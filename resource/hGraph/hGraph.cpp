@@ -906,7 +906,46 @@ void hNode::toFile(std::ofstream &fs) const { //Outputs hNode data to files. Use
 
 /////-------------------------END HNODE CLASS IMPLEMENTATION-------------------------/////
 
+////------------------------BEGIN INTPAIR CLASS IMPLEMENTATION------------------/
 
+intPair::intPair(int pointA, int pointB) {
+    a = pointA;
+    b = pointB;
+}
+
+intPair::intPair() {
+    a = -1;
+    b = -1;
+    
+}
+
+void intPair::print() {
+    std::cout << "(" << a << ", " << b << ")";
+    
+}
+
+std::vector<int> intPair::getPair() {
+    std::vector<int> temp;
+    temp.push_back(a);
+    temp.push_back(b);
+    return temp;
+    
+}
+
+bool intPair::equals(intPair other) {
+    std::vector<int> otherVector = other.getPair();
+    if((otherVector[0] == a) && (otherVector[1] == b)) {
+        return true;
+    }
+    else if((otherVector[0] == b) && (otherVector[1] == a)) {
+        return true;
+    }
+    
+    else
+        return false;
+    
+    
+}
 
 /////-------------------------OTHER RESOURCE FUNCTIONS-------------------------/////
 
