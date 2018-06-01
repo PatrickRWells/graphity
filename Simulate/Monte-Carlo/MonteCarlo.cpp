@@ -527,7 +527,7 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
     int swaps = 0;      //number of times an edge flip is accepted.
     simFunction(*graph); //calculates inital graph energy;
     data[simNum][ENERGY].push_back(graph->getHam());
-
+    
     if(observe[DIMEN]) {
         graph->calcDimension();
         data[simNum][DIMEN].push_back(graph->getDimension());

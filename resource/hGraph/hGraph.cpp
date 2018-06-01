@@ -6,6 +6,7 @@
 //
 //
 
+#include <algorithm>
 #include "hGraph.h"
 #include "absHamiltonian.h"
 /*
@@ -316,7 +317,133 @@ double hGraph::avgDegree() {
     return avg/NUM_NODES;
 }
 
-void hGraph::calcDimension() { //Calculates dimensionality recursively. See Knill, "On the dimensionanity and Euler Characteristic of Random Graphs"
+
+void hGraph::calcDimension() {
+    int num = 0;
+    int * numAvoided = new int[NUM_NODES];
+    int maxEdges = NUM_NODES*(NUM_NODES-1) / 2;
+    int edges = 0;
+    for(int i = 0; i < NUM_NODES; i++) {
+        edges += getDegree(i);
+    }
+    edges /= 2;
+    if(edges == maxEdges) {
+        
+        std::cout << NUM_NODES - 1 << std::endl;
+        return;
+    }
+    
+    for(int i = 0; i < NUM_NODES; i++) {
+        numAvoided[i] = 0;
+    }
+    double *** values;
+    values = new double ** [NUM_NODES];
+    for(int i = 0; i < NUM_NODES; i++) {
+        values[i] = new double * [NUM_NODES];
+        for(int j = 0; j < NUM_NODES; j++) {
+            values[i][j] = new double[NUM_NODES];
+            for(int k = 0; k < NUM_NODES; k++) {
+                values[i][j][k] = -2.0;
+            }
+        }
+    }
+
+    double val = 0.0;
+    for(int i = 0; i < NUM_NODES; i++) {
+        val += dimension(::unitSphere(_adjMatrix, i), values, numAvoided);
+        
+    }
+    val = val/NUM_NODES;
+    val++;
+    std::cout << val << std::endl;
+    //_dimension = val;
+    /*for(int i = 0; i < NUM_NODES; i++) {
+        
+        std::cout << numAvoided[i] << " recursive calls avoided at level " << i << std::endl;
+
+    }*/
+}
+
+double hGraph::dimension(MatrixXi amat, double *** data, int  * numAvoided)  {
+    double retVal = 0;
+    int recDepth = 0;
+    int numNodes = 0;
+    int numEdges = 0;
+    std::vector<int> nodesChecked;
+    for(int i = 0; i < NUM_NODES; i++) {
+        if(amat(i, 0) == -2) {
+            recDepth++;
+            nodesChecked.push_back(i);
+        }
+        else if(amat(i, 0) != -1 ) {
+            numNodes++;
+            for(int j = 0; j < NUM_NODES; j++) {
+                if((amat(j, 0) >= 0) && (amat(j, i) == 1))
+                numEdges ++;
+                
+            }
+        }
+    }
+    numEdges /= 2;
+    if(numEdges == (numNodes*(numNodes -1))/2) {
+        return numNodes - 1;
+    }
+    
+    for(int i = recDepth; i < 3; i++) {
+        nodesChecked.push_back(nodesChecked[recDepth-1]);
+    }
+    int nodes[3];
+
+    if(recDepth <= 3) {
+        double val = data[nodesChecked[0]][nodesChecked[1]][nodesChecked[2]];
+        if(val != -2) {
+            numAvoided[numNodes]++;
+            return val;
+        }
+        else {
+            for(int i = 0; i < 3; i++) {
+                nodes[i] = nodesChecked[i];
+            }
+            std::sort(nodes, nodes + 3);
+        }
+    }
+
+    if(numNodes == 0) {
+        retVal = -1;
+    }
+    
+    else if (numNodes > 1) {
+        if(numNodes == 3) {
+            
+        }
+        for(int i = 0; i < NUM_NODES; i++) {
+            if(amat(0, i) >= 0) {
+                retVal += dimension(::unitSphere(amat, i), data, numAvoided);
+            }
+        }
+    }
+    
+    if(numNodes > 1 ) {
+        retVal = 1 + (retVal/numNodes);
+    }
+    if(recDepth <= 3) {
+        do {
+            
+            data[nodes[0]][nodes[1]][nodes[2]] = retVal;
+            
+        } while(std::next_permutation(nodes, nodes+3));
+        
+    }
+    
+    
+    return retVal;
+    
+    
+    
+}
+
+void hGraph::oldCalcDimension() { //Calculates dimensionality recursively. See Knill, "On the dimensionanity and Euler Characteristic of Random Graphs"
+
     int kEdges = ((NUM_NODES)*(NUM_NODES - 1))/2;
     int kSum = 0;
     for(int i = 0; i < NUM_NODES; i++) {
@@ -333,13 +460,14 @@ void hGraph::calcDimension() { //Calculates dimensionality recursively. See Knil
     }
     else if(kSum == kEdges) {
         
-        _dimension = NUM_NODES - 1;
-        
+        //_dimension = NUM_NODES - 1;
+        std::cout << NUM_NODES - 1 << std::endl;
+        return;
     }
     else if (_numThreads == 1) {
         double dimen = 0.0;
         for(int i = 0; i < NUM_NODES; i++ ) {
-            dimen += unitSphere(i).dimension(0, unitSphere(i).getSize(), false);
+            dimen += unitSphere(i).oldDimension(0, unitSphere(i).getSize(), false);
         }
         dimen = dimen/(static_cast<double>(NUM_NODES));
         _dimension = (dimen + 1);
@@ -352,7 +480,6 @@ void hGraph::calcDimension() { //Calculates dimensionality recursively. See Knil
         if(NUM_NODES < _numThreads) {
             num = 1;
             _numThreads = NUM_NODES;
-            std::cout << "Warning: Too many threads for dimension calculation. Thread count has been set to " << _numThreads << std::endl;
             extra = 0;
         }
         else {
@@ -366,27 +493,27 @@ void hGraph::calcDimension() { //Calculates dimensionality recursively. See Knil
             if(extra != 0) {
                 distributed++;
                 extra--;//If there are extra nodes, they are distributed to the various threads as they are called until there are no extra ones left.
-                futures.push_back(std::async(std::launch::async, &hGraph::dimension, this, num*i + distributed-1, num*(i+1) + distributed, true) );
+                futures.push_back(std::async(std::launch::async, &hGraph::oldDimension, this, num*i + distributed-1, num*(i+1) + distributed, true) );
             }
             else {
-                futures.push_back(std::async(std::launch::async, &hGraph::dimension, this, num*i + distributed, num*(i+1) + distributed, true) );
+                futures.push_back(std::async(std::launch::async, &hGraph::oldDimension, this, num*i + distributed, num*(i+1) + distributed, true) );
 
             }
         }
-        double sum = dimension(num*(_numThreads-1) + distributed, NUM_NODES, true); //The main thread does some work as well.
+        double sum = oldDimension(num*(_numThreads-1) + distributed, NUM_NODES, true); //The main thread does some work as well.
         for(int i = 0; i <_numThreads -1; i++) {
             sum += futures[i].get();
         }
         double dimen = sum/(static_cast<double>(NUM_NODES));
-        _dimension = dimen + 1;
-        
+        //_dimension = dimen + 1;
+        std::cout << dimen + 1 << std::endl;
     }
     
     
     
 }
 
-double hGraph::dimension(int a, int b, bool multi) { //This function is NOT called by the user. It is used by the public function.
+double hGraph::oldDimension(int a, int b, bool multi) { //This function is NOT called by the user. It is used by the public function.
     int kEdges = ((NUM_NODES)*(NUM_NODES - 1))/2;   //Allows the function to be multithreaded with an arbitrary number of threads.
     int kSum = 0;
     for(int i = 0; i < NUM_NODES; i++) {
@@ -409,7 +536,7 @@ double hGraph::dimension(int a, int b, bool multi) { //This function is NOT call
         for(int i = a; i < b; i++ ) {
             hGraph unit = unitSphere(i);
             int size = unit.getSize();
-            dimen += unitSphere(i).dimension(0, size, false);
+            dimen += unitSphere(i).oldDimension(0, size, false);
         }
         
         if(!multi) {
@@ -1133,6 +1260,23 @@ void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove)
         matrix.block(0,colToRemove,numRows,numCols-colToRemove) = matrix.block(0,colToRemove+1,numRows,numCols-colToRemove);
     
     matrix.conservativeResize(numRows,numCols);
+}
+
+MatrixXi unitSphere(MatrixXi matrix, int node) {
+
+    for (int i = 0; i < matrix.rows(); i++) {
+        
+        if(matrix(i, node) == 0) {      //Basic algorithm. Simply removes the row and column for a node from the adajecny matrix
+            matrix(0, i) = -1;
+            matrix(i, 0) = -1;
+        }
+        
+    }
+
+    matrix(node, 0) = -2;
+    matrix(0, node) = -2;
+    return matrix;
+    
 }
 
 //---------------------------END MATRIX MUTATION FUNCTIONS---------------------------//

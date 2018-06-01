@@ -1,4 +1,4 @@
-  //
+   //
 //   hGraph.h
 //   MULTITHREADED VERSION
 //
@@ -51,7 +51,8 @@ private:
     
     void toStream(std::ostream &os) const;
     void toFile(std::ofstream &fs) const;
-    double dimension(int a, int b, bool multi);     //Single threaded version for recursive calls
+    double oldDimension(int a, int b, bool multi);     //Single threaded version for recursive calls
+    double dimension(MatrixXi amat, double *** data, int * numAvoided);
     void calculateEccen();
     void calculateHausDimen();
 
@@ -68,7 +69,8 @@ public:
     void setMatrix(int size, MatrixXi data);
     void setHamiltonian(double val);
     hGraph unitSphere(int node);
-    void calcDimension(); //Multithreaded version
+    void calcDimension();
+    void oldCalcDimension(); //Multithreaded version
     std::vector<int> fractionalDimen();
     void calcSpectralDimen();
     void calcEulerChar();
@@ -155,6 +157,7 @@ public:
 
 void readGraphFile(hGraph *** graphs, int &num);
 
+MatrixXi unitSphere(MatrixXi matrix, int node);
 void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove);
 void removeRow(Eigen::MatrixXi& matrix, unsigned int rowToRemove);
 bool isIsomorphic(hGraph graph1, hGraph graph2);

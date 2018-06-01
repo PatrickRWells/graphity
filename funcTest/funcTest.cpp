@@ -15,41 +15,72 @@
 #include <chrono>
 #include <string>
 #include <iomanip>
+#include <chrono>
+
+#define TIMING
+
+#ifdef TIMING
+#define INIT_TIMER auto start = std::chrono::high_resolution_clock::now();
+#define START_TIMER  start = std::chrono::high_resolution_clock::now();
+#define STOP_TIMER(name)  std::cout << "RUNTIME of " << name << ": " << \
+std::chrono::duration_cast<std::chrono::milliseconds>( \
+std::chrono::high_resolution_clock::now()-start \
+).count() << " ms " << std::endl;
+#else
+#define INIT_TIMER
+#define START_TIMER
+#define STOP_TIMER(name)
+#endif
+
 
 using namespace std;
 
+bool getTF() {
+    while(true) {
+        char c = getchar();
+        if (toupper(c) == 'Y') {
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            return true;
+            
+        }
+        else if(toupper(c) == 'N') {
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            return false;
+            
+        }
+        else {
+            std::cout << "Invalid input." << std::endl;
+            std::cout << "Please enter a 'y' or an 'n': ";
+            std::cin.clear();
+            std::cin.ignore(100, '\n');
+            
+        }
+    }
+}
 
 int main() {
+    INIT_TIMER;
+    int size = 40;
+    hGraph test(size);
+    test = randomGraph(size);
+    test.setThreads(4);
     
-    int size = 8;
+    std::cout << "Old dimension calculation: ";
+    START_TIMER
+    test.oldCalcDimension();
+    STOP_TIMER("Old dimension calculation")
     
-    hGraph graph(size);
-    graph = zeroGraph(size);
-    //graph = compGraph(size);
+    std::cout << "New dimension calculation: ";
+    START_TIMER
+    test.calcDimension();
+    STOP_TIMER("New dimension calculation")
 
-    std::cout << graph;
-
-    while(true) {
-        std::vector<int> initialDimen = graph.fractionalDimen();
-        char nodeA;
-        char nodeB;
-        std::cin >> nodeA;
-        std::cin >> nodeB;
-        graph.flipEdge(nodeA - '0', nodeB - '0');
-        std::vector<int> finalDimen = graph.fractionalDimen();
-        fractReduce(finalDimen);
-
-        initialDimen[0] *= -1;
-        std::cout << graph;
-        std::cout << "Fractional dimensionality: " << finalDimen[0] << "/" << finalDimen[1] << std::endl;
-        initialDimen = fractionAdd(initialDimen, finalDimen);
-        std::cout << "Fractional change in dimensionality: " << initialDimen[0] << "/" << initialDimen[1] << std::endl;
-        
+    std::cout << "Woud you like to output the graph? (y/n) ";
+    if(getTF()) {
+        cout << test;
     }
-    std::vector<int> temp = graph.fractionalDimen();
-    fractReduce(temp);
-    std::cout << temp[0] << "/" << temp[1] << std::endl;
-
     //test.flipEdge(xVals, yVals);
     
 }
