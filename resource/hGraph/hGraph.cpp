@@ -312,11 +312,10 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
         edges += getDegree(i);
     }
     edges /= 2;
-    if(edges == maxEdges) {
-        
-        std::cout << NUM_NODES - 1 << std::endl;
+    /*if(edges == maxEdges) {
+        _dimension = NUM_NODES -1;
         return;
-    }
+    }*/
 
     
     std::vector<int> * trip;
@@ -349,9 +348,8 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
             }
         }
     }
-    
     if(_numThreads == 1) {
-        dimension(_adjMatrix, values, trip, 0, trip[0].size() - 1, true); //function calculates the values of the depth-3 sphere
+        dimension(_adjMatrix, values, trip, 0, trip[0].size(), true); //function calculates the values of the depth-3 sphere
     }
     
     else {
@@ -368,7 +366,7 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
         std::vector<std::future<double>> futures;
         
         for(int i = 0; i < _numThreads -1; i++) { //Distributes the depth-3 spheres calculations across all of the available threads.
-
+                                                  //If the number of depth-3 spheres does not divide evenly into the number of threads, the extras are distributed
             if(extra > 0) {
                 distributed++;
                 extra--;
@@ -387,36 +385,18 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
             
  
         }
-        dimension(_adjMatrix, values, trip, num*(_numThreads-1) + distributed, tripSize, true);
+        dimension(_adjMatrix, values, trip, num*(_numThreads-1) + distributed, tripSize, true); //the main thread also does osme work
         
                 
     }
+    delete [] trip; //The triples are no longer actually needed, so the pointer is deleted
     
-    delete [] trip;
-    
-    double sphSum1 = 0;
-    for(int i = 0; i < NUM_NODES; i++) {
-    
-        int numNodes2 = 0;
-        double dimenSph1;
-        for(int k = 0; k < NUM_NODES; k++) {
-            if(isConnected(i, k)) {
-                numNodes2++;
-            }
-        }
-        
-        if(numNodes2 == 0) {
-            dimenSph1 = -1;
-            sphSum1 += dimenSph1;
-            continue;
-        }
-        else if(numNodes2 == 1) {
-            continue;
-        }
-        
-        double sphSum2 = 0;
+    //This value will hold the sum of all the spheres of depth 1, and will be updated as they are calculated.
+    for(int i = 0; i < NUM_NODES; i++) { //This loop calculates all the depth-2 spheres that will go into the individual depth-1
 
-        for(int j = 0; j < NUM_NODES; j++) {
+        for(int j = i+1; j < NUM_NODES; j++) {
+            
+            
             double sph2dimen = 0;
             if(i == j || !isConnected(i, j) ) {
                 continue;
@@ -445,20 +425,49 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
                     }
                     int spheres[3] = {i, j, k};
                     std::sort(spheres, spheres + 3);
-                   sumA += values[spheres[0]][spheres[1] - spheres[0]][spheres[2] - spheres[1]];
+                    double val = values[spheres[0]][spheres[1] - spheres[0]][spheres[2] - spheres[1]];
+                    sumA += values[spheres[0]][spheres[1] - spheres[0]][spheres[2] - spheres[1]];
                 }
                 sph2dimen = 1 + (sumA/numNodes);
                 
             }
-            
-            sphSum2 += sph2dimen;
+            values[i][j-i][0] = sph2dimen;
         
         }
-        sphSum1 += 1 + (sphSum2/numNodes2);
     
     }
+    
+    double sphSum1 = 0;
+    for(int i = 0; i < NUM_NODES; i++) {
+        double sphSum2 = 0;
+        int numNodes = 0;
 
+        for(int j = 0; j < NUM_NODES; j++) {
+            if(!isConnected(i, j)) {
+                continue;
+            }
+            else {
+                numNodes++;
+                int tempPair[2] = {i , j};
+                std::sort(tempPair, tempPair + 2);
+                double val = values[tempPair[0]][tempPair[1] - tempPair[0]][0];
+                sphSum2 += values[tempPair[0]][tempPair[1] - tempPair[0]][0];
+            }
+        }
+        if(numNodes == 0) {
+            sphSum1 += -1;
+        }
+        else if (numNodes == 1) {
+            
+        }
+        else {
+            double dimen1 = 1 + sphSum2/numNodes;
+            sphSum1 += 1+ (sphSum2/numNodes);
+        }
+        
+    }
     _dimension = 1 + sphSum1/NUM_NODES;
+    
     
     for(int i = 0; i < NUM_NODES; i++) {
         
@@ -553,8 +562,7 @@ void hGraph::oldCalcDimension() { //Calculates dimensionality recursively. See K
     }
     else if(kSum == kEdges) {
         
-        //_dimension = NUM_NODES - 1;
-        //std::cout << NUM_NODES - 1 << std::endl;
+        _dimension = NUM_NODES - 1;
         return;
     }
     else if (_numThreads == 1) {
@@ -563,8 +571,8 @@ void hGraph::oldCalcDimension() { //Calculates dimensionality recursively. See K
             dimen += unitSphere(i).oldDimension(0, unitSphere(i).getSize(), false);
         }
         dimen = dimen/(static_cast<double>(NUM_NODES));
-        //std::cout << "OLD DIMENSION: " << (dimen + 1) << std::endl;
-        
+        _dimension = 1 + dimen;
+
     }
     
     else {

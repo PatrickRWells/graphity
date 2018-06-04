@@ -31,14 +31,19 @@ int main() {
 
     int size = 50;
     hGraph test(size);
-    test = randomGraph(size, 0);
+    test = randomGraph(size, 0.3);
     test.setThreads(4);
+
     auto start = std::chrono::high_resolution_clock::now();
-    start = std::chrono::high_resolution_clock::now();
     test.calcDimension();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-start);
+    std::cout << "New: " << test.getDimension() << ", time " << duration.count() << std::endl;
     
-    std::cout << test.getDimension() << std::endl;
+    start = std::chrono::high_resolution_clock::now();
+    test.oldCalcDimension();
+     duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-start);
+    std::cout << "Old: " << test.getDimension() << ", time " << duration.count() << std::endl;
+
 
 
 
