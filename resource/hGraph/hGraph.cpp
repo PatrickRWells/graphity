@@ -320,7 +320,6 @@ double hGraph::avgDegree() {
 
 void hGraph::calcDimension() {
     int num = 0;
-    int * numAvoided = new int[NUM_NODES];
     int maxEdges = NUM_NODES*(NUM_NODES-1) / 2;
     int edges = 0;
     for(int i = 0; i < NUM_NODES; i++) {
@@ -332,118 +331,204 @@ void hGraph::calcDimension() {
         std::cout << NUM_NODES - 1 << std::endl;
         return;
     }
+
     
-    for(int i = 0; i < NUM_NODES; i++) {
-        numAvoided[i] = 0;
-    }
+    std::vector<int> * trip;
+    trip = new std::vector<int>[3];
+
     double *** values;
     values = new double ** [NUM_NODES];
+    int triples = 0;
+    
+
     for(int i = 0; i < NUM_NODES; i++) {
-        values[i] = new double * [NUM_NODES];
-        for(int j = 0; j < NUM_NODES; j++) {
-            values[i][j] = new double[NUM_NODES];
-            for(int k = 0; k < NUM_NODES; k++) {
+
+        values[i] = new double * [NUM_NODES-i];
+
+        for(int j = 0; j < NUM_NODES - i; j++) {
+
+            values[i][j] = new double[NUM_NODES-j];
+            for(int k = 0; k < NUM_NODES - j; k++) {
+                
                 values[i][j][k] = -2.0;
+                if(i < i + j && i + j < j + k) {
+                    if(isConnected(i, i+j) && isConnected(i + j, j + k)) {
+                        trip[0].push_back(i);
+                        trip[1].push_back(i + j);
+                        trip[2].push_back(j + k);
+                        triples++;
+                    }
+                    
+                }
             }
         }
     }
-
-    double val = 0.0;
-    for(int i = 0; i < NUM_NODES; i++) {
-        val += dimension(::unitSphere(_adjMatrix, i), values, numAvoided);
-        
+    
+    if(_numThreads == 1) {
+        dimension(_adjMatrix, values, trip, 0, trip[0].size() - 1, true);
     }
-    val = val/NUM_NODES;
-    val++;
-    std::cout << val << std::endl;
-    //_dimension = val;
-    /*for(int i = 0; i < NUM_NODES; i++) {
+    
+    else {
+        int tripSize = trip[0].size();
+        int extra = tripSize%_numThreads;
+        int num = tripSize/_numThreads;
+        int distributed = 0;
+        std::vector<std::future<double>> futures;
         
-        std::cout << numAvoided[i] << " recursive calls avoided at level " << i << std::endl;
+        for(int i = 0; i < _numThreads -1; i++) {
 
-    }*/
-}
+            if(extra > 0) {
+                distributed++;
+                extra--;
+                int low = i*num + distributed - 1;
+                int high = (i+1)*num + distributed;
+                futures.push_back(std::async(std::launch::async, &hGraph::dimension, this, _adjMatrix, values, trip, low, high, true));
+            }
+            
+            else {
+                int low = num*i + distributed;
+                int high = num*(i+1) + distributed;
 
-double hGraph::dimension(MatrixXi amat, double *** data, int  * numAvoided)  {
-    double retVal = 0;
-    int recDepth = 0;
-    int numNodes = 0;
-    int numEdges = 0;
-    std::vector<int> nodesChecked;
-    for(int i = 0; i < NUM_NODES; i++) {
-        if(amat(i, 0) == -2) {
-            recDepth++;
-            nodesChecked.push_back(i);
+                futures.push_back(std::async(std::launch::async, &hGraph::dimension, this, _adjMatrix, values, trip, low, high, true));
+
+            }
+            
+ 
         }
-        else if(amat(i, 0) != -1 ) {
-            numNodes++;
-            for(int j = 0; j < NUM_NODES; j++) {
-                if((amat(j, 0) >= 0) && (amat(j, i) == 1))
-                numEdges ++;
+        dimension(_adjMatrix, values, trip, num*(_numThreads-1) + distributed, tripSize, true);
+        
+                
+    }
+    
+    double sphSum1 = 0;
+    for(int i = 0; i < NUM_NODES; i++) {
+    
+        int numNodes2 = 0;
+        double dimenSph1;
+        for(int k = 0; k < NUM_NODES; k++) {
+            if(isConnected(i, k)) {
+                numNodes2++;
+            }
+        }
+        
+        if(numNodes2 == 0) {
+            dimenSph1 = -1;
+            sphSum1 += dimenSph1;
+            continue;
+        }
+        else if(numNodes2 == 1) {
+            continue;
+        }
+        
+        double sphSum2 = 0;
+
+        for(int j = 0; j < NUM_NODES; j++) {
+            double sph2dimen = 0;
+            if(i == j || !isConnected(i, j) ) {
+                continue;
+            }
+            double numNodes = 0;
+            
+            
+            for(int k = 0; k < NUM_NODES; k++) {
+                if(isConnected(i,k) && isConnected(j,k)) {
+                    numNodes++;
+                }
+            }
+            
+            if(numNodes == 0) {
+                sph2dimen = -1;
+            }
+            else if(numNodes == 1) {
+        
+            }
+
+            else {
+                double sumA = 0;
+                for(int k = 0; k < NUM_NODES; k++) {
+                    if(i == k || j == k ||  !isConnected(i, k) || !isConnected(j,k)) {
+                        continue;
+                    }
+                    int spheres[3] = {i, j, k};
+                    std::sort(spheres, spheres + 3);
+                   sumA += values[spheres[0]][spheres[1] - spheres[0]][spheres[2] - spheres[1]];
+                }
+                sph2dimen = 1 + (sumA/numNodes);
                 
             }
+            
+            sphSum2 += sph2dimen;
+        
         }
-    }
-    numEdges /= 2;
-    if(numEdges == (numNodes*(numNodes -1))/2) {
-        return numNodes - 1;
-    }
+        sphSum1 += 1 + (sphSum2/numNodes2);
     
-    for(int i = recDepth; i < 3; i++) {
-        nodesChecked.push_back(nodesChecked[recDepth-1]);
-    }
-    int nodes[3];
-
-    if(recDepth <= 3) {
-        double val = data[nodesChecked[0]][nodesChecked[1]][nodesChecked[2]];
-        if(val != -2) {
-            numAvoided[numNodes]++;
-            return val;
-        }
-        else {
-            for(int i = 0; i < 3; i++) {
-                nodes[i] = nodesChecked[i];
-            }
-            std::sort(nodes, nodes + 3);
-        }
     }
 
-    if(numNodes == 0) {
-        retVal = -1;
-    }
-    
-    else if (numNodes > 1) {
-        if(numNodes == 3) {
+    std::cout << "DIMENSION: " << 1 + sphSum1/NUM_NODES << std::endl;
+}
+
+double hGraph::dimension(MatrixXi amat, double *** data, std::vector<int> * trp, int lowerBound, int upperBound, bool init)  {
+    if(init) {
+        MatrixXi tempAmat(NUM_NODES, NUM_NODES);
+        
+        for(int i = lowerBound; i < upperBound; i++) {
+            tempAmat = ::unitSphere(amat, trp[0][i]);
+            tempAmat = ::unitSphere(tempAmat, trp[1][i]);
+            tempAmat = ::unitSphere(tempAmat, trp[2][i]);
+            double val = dimension(tempAmat, data, trp, 0, 0, false);
+            data[trp[0][i]][trp[1][i] - trp[0][i]][trp[2][i] - trp[1][i]] = val;
+            
             
         }
-        for(int i = 0; i < NUM_NODES; i++) {
-            if(amat(0, i) >= 0) {
-                retVal += dimension(::unitSphere(amat, i), data, numAvoided);
-            }
-        }
-    }
-    
-    if(numNodes > 1 ) {
-        retVal = 1 + (retVal/numNodes);
-    }
-    if(recDepth <= 3) {
-        do {
-            
-            data[nodes[0]][nodes[1]][nodes[2]] = retVal;
-            
-        } while(std::next_permutation(nodes, nodes+3));
+
+        return -2;
         
     }
     
     
-    return retVal;
-    
-    
-    
+    else {
+        int numNodes = 0;
+        int numEdges = 0;
+        for(int i = 0; i < NUM_NODES; i++) {
+            if(amat(0,i) >= 0) {
+                numNodes++;
+                for(int j = 0; j < NUM_NODES; j++) {
+                    if((amat(0,j) >= 0) && (amat(i,j) == 1)) {
+                        numEdges++;
+                    }
+                }
+            }
+        }
+        numEdges /= 2;
+        if(numNodes == 0) {
+            return - 1;
+        }
+        
+        else if(numNodes == 1 || numEdges == 0) {
+            return 0;
+        }
+        else if(numEdges == (numNodes*(numNodes -1))/2) {
+            
+            return numNodes -1;
+
+            
+        }
+        
+        else {
+            double sum = 0;
+            for (int i = 0; i < NUM_NODES; i++) {
+                if(amat(0, i) >= 0) {
+                    sum += dimension(::unitSphere(amat,i), data, trp, 0, 0, false);
+                }
+            }
+            return 1 + (sum/numNodes);
+        }
+    }
 }
 
 void hGraph::oldCalcDimension() { //Calculates dimensionality recursively. See Knill, "On the dimensionanity and Euler Characteristic of Random Graphs"
 
+    
     int kEdges = ((NUM_NODES)*(NUM_NODES - 1))/2;
     int kSum = 0;
     for(int i = 0; i < NUM_NODES; i++) {
@@ -461,7 +546,7 @@ void hGraph::oldCalcDimension() { //Calculates dimensionality recursively. See K
     else if(kSum == kEdges) {
         
         //_dimension = NUM_NODES - 1;
-        std::cout << NUM_NODES - 1 << std::endl;
+        //std::cout << NUM_NODES - 1 << std::endl;
         return;
     }
     else if (_numThreads == 1) {
@@ -470,7 +555,7 @@ void hGraph::oldCalcDimension() { //Calculates dimensionality recursively. See K
             dimen += unitSphere(i).oldDimension(0, unitSphere(i).getSize(), false);
         }
         dimen = dimen/(static_cast<double>(NUM_NODES));
-        _dimension = (dimen + 1);
+        //std::cout << "OLD DIMENSION: " << (dimen + 1) << std::endl;
         
     }
     
@@ -506,7 +591,7 @@ void hGraph::oldCalcDimension() { //Calculates dimensionality recursively. See K
         }
         double dimen = sum/(static_cast<double>(NUM_NODES));
         //_dimension = dimen + 1;
-        std::cout << dimen + 1 << std::endl;
+        std::cout << "OLD DIMENSION: " << dimen + 1 << std::endl;
     }
     
     
@@ -1097,7 +1182,7 @@ hGraph compGraph(int size) { //generates a complete graph of given size.
     
 }
 
-hGraph randomGraph(int size) { //generates a random graph of a given size.
+hGraph randomGraph(int size, double fillFrac) { //generates a random graph of a given size.
     
     
     unsigned int max = size*(size-1)/2; //maximum number of edges
@@ -1112,8 +1197,15 @@ hGraph randomGraph(int size) { //generates a random graph of a given size.
         fill[i] = 0;
     }
     unsigned int fillNum;
-    std::uniform_int_distribution<int> dist(max/4, (3*max)/4); //The graph will have at least 1/4th of the maximum number of possible edges
-    fillNum = dist(gen);                                 //Ensures graphs are dense enough to be useful.
+    if(fillFrac == 0) {
+        std::uniform_int_distribution<int> dist(max/4, (3*max)/4); //The graph will have at least 1/4th of the maximum number of possible edges
+        fillNum = dist(gen);                                 //Ensures graphs are dense enough to be useful.
+        
+    }
+    else {
+        fillNum = ceil(fillFrac*max);
+    }
+    
     std::uniform_int_distribution<int> dist2(0, max-1);  //random number generator that can pick a random edge connection.
     
     

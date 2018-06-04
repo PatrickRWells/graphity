@@ -6,6 +6,19 @@
 //
 //
 
+#define TIMING
+
+#ifdef TIMING
+#define INIT_TIMER auto start = std::chrono::high_resolution_clock::now();
+#define START_TIMER  start = std::chrono::high_resolution_clock::now();
+#define STOP_TIMER(name)  std::cout << "RUNTIME of " << name << ": " << \
+`).count() << " ms " << std::endl;
+#else
+#define INIT_TIMER
+#define START_TIMER
+#define STOP_TIMER(name)
+#endif
+
 #ifndef _hGraph_h
 #define _hGraph_h
 
@@ -17,6 +30,7 @@
 #include <future>
 #include <limits>
 #include <cmath>
+
 
 #define MAXN 500
 #include "nauty.h"
@@ -52,7 +66,7 @@ private:
     void toStream(std::ostream &os) const;
     void toFile(std::ofstream &fs) const;
     double oldDimension(int a, int b, bool multi);     //Single threaded version for recursive calls
-    double dimension(MatrixXi amat, double *** data, int * numAvoided);
+    double dimension(MatrixXi amat, double *** data, std::vector<int> * trp, int lowerBound, int upperBound, bool init);
     void calculateEccen();
     void calculateHausDimen();
 
@@ -161,7 +175,7 @@ MatrixXi unitSphere(MatrixXi matrix, int node);
 void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove);
 void removeRow(Eigen::MatrixXi& matrix, unsigned int rowToRemove);
 bool isIsomorphic(hGraph graph1, hGraph graph2);
-hGraph randomGraph(int size);
+hGraph randomGraph(int size, double fillFrac);
 hGraph compGraph(int size);
 hGraph zeroGraph(int size);
 std::vector<int> fractionAdd(std::vector<int> fractA, std::vector<int> fractB);
