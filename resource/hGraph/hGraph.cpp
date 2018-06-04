@@ -325,7 +325,7 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
     values = new double ** [NUM_NODES];
     int triples = 0;
     
-    //generates the list of 3-spheres that will
+    //generates the list of depth-3 spheres that will be calculated.
 
     for(int i = 0; i < NUM_NODES; i++) {
 
@@ -338,7 +338,7 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
                 
                 values[i][j][k] = -2.0;
                 if(i < i + j && i + j < j + k) {
-                    if(isConnected(i, i+j) && isConnected(i + j, j + k)) {
+                    if(isConnected(i, i+j) && isConnected(i + j, j + k)) { //ensures the depth-3 sphere in question actually exists
                         trip[0].push_back(i);
                         trip[1].push_back(i + j);
                         trip[2].push_back(j + k);
@@ -351,22 +351,23 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
     }
     
     if(_numThreads == 1) {
-        dimension(_adjMatrix, values, trip, 0, trip[0].size() - 1, true);
+        dimension(_adjMatrix, values, trip, 0, trip[0].size() - 1, true); //function calculates the values of the depth-3 sphere
     }
     
     else {
-        if(_numThreads > NUM_NODES) {
-            _numThreads = NUM_NODES;
-        }
 
         
         int tripSize = trip[0].size();
+        if(_numThreads > tripSize) { //Ensures that threads are not created if there's no work for them to do.
+            _numThreads = tripSize;
+        }
+
         int extra = tripSize%_numThreads;
         int num = tripSize/_numThreads;
         int distributed = 0;
         std::vector<std::future<double>> futures;
         
-        for(int i = 0; i < _numThreads -1; i++) {
+        for(int i = 0; i < _numThreads -1; i++) { //Distributes the depth-3 spheres calculations across all of the available threads.
 
             if(extra > 0) {
                 distributed++;
