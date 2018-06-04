@@ -153,9 +153,9 @@ int main() {
     else { //If the user did not input the graphs from a file, two random graphs and an empty graph are used as seeds.
         graphs = new hGraph * [3];
         graphs[0] = new hGraph(SIZE);
-        *graphs[0] = randomGraph(SIZE);
+        *graphs[0] = randomGraph(SIZE, 0);
         graphs[1] = new hGraph(SIZE);
-        *graphs[1] = randomGraph(SIZE);
+        *graphs[1] = randomGraph(SIZE, 0);
         graphs[2] = new hGraph(SIZE);
         *graphs[2] = zeroGraph(SIZE);
         description[0] = "Random Graph 1";

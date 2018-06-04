@@ -29,23 +29,17 @@ bool getTF();
 
 int main() {
 
-    int size = 100;
+    int size = 50;
     hGraph test(size);
-    test = randomGraph(size, 0.4);
+    test = randomGraph(size, 0);
     test.setThreads(4);
     auto start = std::chrono::high_resolution_clock::now();
     start = std::chrono::high_resolution_clock::now();
     test.calcDimension();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-start);
     
-    std::cout << "New: " << duration.count() << std::endl;
-    
-    start = std::chrono::high_resolution_clock::now();
-    test.oldCalcDimension();
-    duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-start);
+    std::cout << test.getDimension() << std::endl;
 
-    std::cout << "Old: " << duration.count() << std::endl;
-    
 
 
 }

@@ -369,6 +369,11 @@ void hGraph::calcDimension() {
     }
     
     else {
+        if(_numThreads > NUM_NODES) {
+            _numThreads = NUM_NODES;
+        }
+
+        
         int tripSize = trip[0].size();
         int extra = tripSize%_numThreads;
         int num = tripSize/_numThreads;
@@ -464,7 +469,7 @@ void hGraph::calcDimension() {
     
     }
 
-    std::cout << "DIMENSION: " << 1 + sphSum1/NUM_NODES << std::endl;
+    _dimension = 1 + sphSum1/NUM_NODES;
 }
 
 double hGraph::dimension(MatrixXi amat, double *** data, std::vector<int> * trp, int lowerBound, int upperBound, bool init)  {
@@ -590,8 +595,7 @@ void hGraph::oldCalcDimension() { //Calculates dimensionality recursively. See K
             sum += futures[i].get();
         }
         double dimen = sum/(static_cast<double>(NUM_NODES));
-        //_dimension = dimen + 1;
-        std::cout << "OLD DIMENSION: " << dimen + 1 << std::endl;
+        _dimension = dimen + 1;
     }
     
     
