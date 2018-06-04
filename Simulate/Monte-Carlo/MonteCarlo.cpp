@@ -162,12 +162,26 @@ int main() {
         description[1] = "Random Graph 2";
         description[2] = "Empty Graph";
 
+        if(!observables[DIMEN]) {
+            std::thread threadA(monteCarlo, graphs[0], observables, data, 0, true, description[0]);   //processing power to do the individual simulations in series to avoid threads being underutilized.
+            std::thread threadB(monteCarlo, graphs[1], observables, data, 1, true, description[1]);   //processing power to do the individual simulations in series to avoid threads being underutilized.
+            monteCarlo(graphs[2], observables, data, 2, true, description[2]);
+
+            threadA.join();
+            threadB.join();
+
+            
+        }
         
-        std::thread threadA(monteCarlo, graphs[0], observables, data, 0, true, description[0]);   //processing power to do the individual simulations in series to avoid threads being underutilized.
-        std::thread threadB(monteCarlo, graphs[1], observables, data, 1, true, description[1]);   //processing power to do the individual simulations in series to avoid threads being underutilized.
-        monteCarlo(graphs[2], observables, data, 2, true, description[2]);
-        threadA.join();
-        threadB.join();
+        else {
+            monteCarlo(graphs[0], observables, data, 0, true, description[0]);
+            monteCarlo(graphs[1], observables, data, 1, true, description[1]);
+            monteCarlo(graphs[2], observables, data, 2, true, description[2]);
+
+            
+            
+            
+        }
     }
     
     

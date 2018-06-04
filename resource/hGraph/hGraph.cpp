@@ -65,7 +65,7 @@ hGraph::hGraph() {  //default constructor. Creates placeholder. Should not be us
 
 }
 
-hGraph::hGraph(int size, MatrixXi adjMatrix):NUM_NODES(size) { //Takes a size and a previously defined adjacency matrix and creates an hGraph object.
+hGraph::hGraph(int size, MatrixXi adjMatrix):NUM_NODES(size) { //Takes a size and a previously defined adjacency matrix and creates an hGraph object. Most often used of the constructors
     _adjMatrix = MatrixXi::Zero(size, size);
     _adjMatrix = adjMatrix;
     _degVector = Eigen::VectorXi::Zero(size);
@@ -89,7 +89,7 @@ hGraph::hGraph(int size, MatrixXi adjMatrix):NUM_NODES(size) { //Takes a size an
 //---------------------------DESTRUCTOR---------------------------//
 
 
-hGraph::~hGraph() { //Since the hGraph class does not include any pointers, there is no work for this constructor to do.
+hGraph::~hGraph() { //Since the hGraph class does not include any pointers, there is no work for this destructor to do.
     
 }
 
@@ -97,7 +97,7 @@ hGraph::~hGraph() { //Since the hGraph class does not include any pointers, ther
 
 //---------------------------GETTERS---------------------------//
 
-double hGraph::getDimension() { //simple getter function    
+double hGraph::getDimension() { //simple getter function. See below for the dimensionality algorithm.
     if(_dimension == 0) {
         calcDimension();
     }
@@ -105,7 +105,7 @@ double hGraph::getDimension() { //simple getter function
     
 }
 
-std::vector<double> hGraph::getSpectralDimen() {
+std::vector<double> hGraph::getSpectralDimen() { //simple getter function. See below for the spectral dimensionality algorithm
     if (_spectralDimen.size() == 0) {
         calcSpectralDimen();
     }
@@ -117,7 +117,7 @@ double hGraph::getHam() {  //simple getter function
     return _hamiltonian;
 }
 
-int hGraph::getEulerChar() { //simple getter function
+int hGraph::getEulerChar() { //simple getter function. See below for the euler characteristic agorithm.
     calcEulerChar();
     return _eulerChar;
 }
@@ -126,7 +126,7 @@ int hGraph:: getSize() { //simple getter function
     return NUM_NODES;
 }
 
-void hGraph::numCliques() { //simply outputs the number of cliques of any given size. The cliques are stored in an vector attribute called "_numCliques"
+void hGraph::numCliques() { //simply outputs the number of cliques (NOT maximal cliques) of any given size. The cliques are stored in an vector attribute called "_numCliques"
     for (int i = 0; i < NUM_NODES; i++) {
         std::cout << _numCliques.at(i);
     }
@@ -134,7 +134,7 @@ void hGraph::numCliques() { //simply outputs the number of cliques of any given 
 }
 
 int hGraph::getDegree(int node) { //simply gets the degree of a given node.
-    if(node < 0 || node >= NUM_NODES) {
+    if(node < 0 || node >= NUM_NODES) { //Recall that C++ is zero indexed, the nodes of a graph of size 10 will be labled 0...9
         std::cerr << "Critical error, only acceptable node values are between 0 and " << NUM_NODES - 1 << std::endl;
         exit(4);
     }
@@ -152,7 +152,7 @@ bool hGraph::isConnected(int row, int column) { //checks if two nodes are connec
     
 }
 
-std::vector<int> hGraph::getEccentricity() {
+std::vector<int> hGraph::getEccentricity() { //eccentricity of a node is how minimum number of walks that can get from one node to any other node
     if(_eccentricities[0] == 0 && _eccentricities[NUM_NODES/2] == 0) {
         calculateEccen();
     }
@@ -161,7 +161,7 @@ std::vector<int> hGraph::getEccentricity() {
 }
 
 int hGraph::getDiameter() {
-    std::vector<int> temp = getEccentricity();
+    std::vector<int> temp = getEccentricity(); //The dimater of the graph is the max ecentricity of one of its nodes.
     int val = 0;
     for(int i = 0; i < temp.size(); i++ ) {
         if(temp[i] > val) {
@@ -173,7 +173,7 @@ int hGraph::getDiameter() {
     
 }
 
-std::vector<double> hGraph::getHausdorffDimen() {
+std::vector<double> hGraph::getHausdorffDimen() { //getter function. See below for calculation of the hausdorff dimension
     
     if(_hausdorffDimen.size() == 0) {
         calculateHausDimen();
@@ -190,16 +190,16 @@ std::vector<double> hGraph::getHausdorffDimen() {
 
 //---------------------------SETTERS---------------------------//
 
-void hGraph::setHamiltonian(double val) { //sets the value of the hamoiltonian
+void hGraph::setHamiltonian(double val) { //sets the value of the hamiltonian.
     _hamiltonian = val;
 }
 
-void hGraph::setThreads(int threads) {
+void hGraph::setThreads(int threads) { //Note, this does NOT check to ensure that that number of threads can actually be used. That is done by multithreaded algorithms.
     _numThreads = threads;
 }
 
 void hGraph::flipEdge(int nodeA, int nodeB) {    
-    if(isConnected(nodeA, nodeB)) {
+    if(isConnected(nodeA, nodeB)) { //Turns on an edge if it doesn't exist, or turns it off if it does. Updates node degress accordingly.
         _adjMatrix(nodeA, nodeB) = 0;
         _adjMatrix(nodeB, nodeA) = 0;
         _degVector[nodeA]--;
@@ -213,29 +213,15 @@ void hGraph::flipEdge(int nodeA, int nodeB) {
         _degVector[nodeB]++;
     }
 
-    cliquesFound = false;
-    _dimension = 0;
+    cliquesFound = false; //In general, if an edge if flipped this information is lost.
+    _dimension = 0;       //There is no closed-form algorithm (that I am aware) that determines the new dimensionality if a single edge is removed.
     
 }
 
-void hGraph::flipEdge(std::vector<int> nodeA, std::vector<int> nodeB) {
-    for(int i = 0; i < nodeA.size(); i++) {
-        if(isConnected(nodeA[i], nodeB[i])) {
-            _adjMatrix(nodeA[i], nodeB[i]) = 0;
-            _adjMatrix(nodeB[i], nodeA[i]) = 0;
-            _degVector[nodeA[i]]--;
-            _degVector[nodeB[i]]--;
-        
-        }
-        else {
-            _adjMatrix(nodeA[i], nodeB[i]) = 1;
-            _adjMatrix(nodeB[i], nodeA[i]) = 1;
-            _degVector[nodeA[i]]++;
-            _degVector[nodeB[i]]++;
-        }
+void hGraph::flipEdge(std::vector<int> nodeA, std::vector<int> nodeB) { //Multiple nodes can be flipped at once. The two vectors correspond to pairs of nodes.
+    for(int i = 0; i < nodeA.size(); i++) {                             //This is used primarily in the monte-carlo algorithm.
+        flipEdge(nodeA[i], nodeB[i]);
     }
-    
-    
 }
 
 void hGraph::acceptPartial(double partial) {
@@ -266,13 +252,13 @@ void hGraph::calcEulerChar() { //Based on the definition by Oliver Knills. Requi
 }
 
 MatrixXi hGraph::getShortestPaths() {
-    MatrixXi pathMatrix(NUM_NODES, NUM_NODES);
-    pathMatrix = _adjMatrix;
+    MatrixXi pathMatrix(NUM_NODES, NUM_NODES); //uses the Floyd-Warshall algorithm to determine the shortest path between all nodes in a graph.
+    pathMatrix = _adjMatrix;                   //The entry i, j  of the resultant matrix will be the minimum number of walks from i to j
     for(int i = 0; i < NUM_NODES; i++) {
         for (int j = 0; j < NUM_NODES; j++ ) {
             
             if((i != j) && (pathMatrix(i,j) == 0)) {
-                pathMatrix(i,j) = 10000000;
+                pathMatrix(i,j) = 10000000; //A stand in for infinity. Two nodes that CANNOT be walked between will have this value (unless the nodes are the same node)
             }
             
         }
@@ -296,7 +282,7 @@ MatrixXi hGraph::getShortestPaths() {
     
 }
 
-hGraph hGraph::compliment() {
+hGraph hGraph::compliment() { //Returns an hGraph object where the adjacency matrix is the compliment of the original hGraph's adjacency matrix.
     hGraph temp(NUM_NODES, _adjMatrix);
     for(int i = 0; i < NUM_NODES; i++) {
         for(int j = i+1; j < NUM_NODES; j++) {
@@ -309,7 +295,7 @@ hGraph hGraph::compliment() {
     
 }
 
-double hGraph::avgDegree() {
+double hGraph::avgDegree() { //Gets the average degree of a node
     double avg = 0;
     for(int i = 0; i < NUM_NODES; i++) {
         avg += getDegree(i);
@@ -318,8 +304,8 @@ double hGraph::avgDegree() {
 }
 
 
-void hGraph::calcDimension() {
-    int num = 0;
+void hGraph::calcDimension() { //The base algorithm can be found in "On the Dimensionality and Euler Characteristic of Random Graphs" by O.Knill
+    int num = 0;               //A more detailed explanation of this particular implementation can be found in the users guide
     int maxEdges = NUM_NODES*(NUM_NODES-1) / 2;
     int edges = 0;
     for(int i = 0; i < NUM_NODES; i++) {
@@ -335,11 +321,11 @@ void hGraph::calcDimension() {
     
     std::vector<int> * trip;
     trip = new std::vector<int>[3];
-
     double *** values;
     values = new double ** [NUM_NODES];
     int triples = 0;
     
+    //generates the list of 3-spheres that will
 
     for(int i = 0; i < NUM_NODES; i++) {
 
@@ -404,6 +390,8 @@ void hGraph::calcDimension() {
         
                 
     }
+    
+    delete [] trip;
     
     double sphSum1 = 0;
     for(int i = 0; i < NUM_NODES; i++) {
@@ -470,6 +458,20 @@ void hGraph::calcDimension() {
     }
 
     _dimension = 1 + sphSum1/NUM_NODES;
+    
+    for(int i = 0; i < NUM_NODES; i++) {
+        
+        
+        for(int j = 0; j < NUM_NODES - i; j++) {
+            
+            delete [] values[i][j];
+        }
+        
+        delete [] values[i];
+
+    }
+    delete [] values;
+
 }
 
 double hGraph::dimension(MatrixXi amat, double *** data, std::vector<int> * trp, int lowerBound, int upperBound, bool init)  {
