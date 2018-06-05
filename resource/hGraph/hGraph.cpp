@@ -98,8 +98,9 @@ hGraph::~hGraph() { //Since the hGraph class does not include any pointers, ther
 //---------------------------GETTERS---------------------------//
 
 double hGraph::getDimension() { //simple getter function. See below for the dimensionality algorithm.
-    if(_dimension == 0) {
+    if(!dimensionFound) {
         calcDimension();
+        dimensionFound = true;
     }
     return _dimension;
     
@@ -214,7 +215,7 @@ void hGraph::flipEdge(int nodeA, int nodeB) {
     }
 
     cliquesFound = false; //In general, if an edge if flipped this information is lost.
-    _dimension = 0;       //There is no closed-form algorithm (that I am aware) that determines the new dimensionality if a single edge is removed.
+    dimensionFound = false;       //There is no closed-form algorithm (that I am aware) that determines the new dimensionality if a single edge is removed.
     
 }
 
@@ -277,6 +278,9 @@ MatrixXi hGraph::getShortestPaths() {
             }
         }
     }
+    
+
+    
     return pathMatrix;
     
     
@@ -295,7 +299,7 @@ hGraph hGraph::compliment() { //Returns an hGraph object where the adjacency mat
     
 }
 
-double hGraph::avgDegree() { //Gets the average degree of a node
+double hGraph::getAvgDegree() { //Gets the average degree of a node
     double avg = 0;
     for(int i = 0; i < NUM_NODES; i++) {
         avg += getDegree(i);
@@ -386,13 +390,15 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
  
         }
         dimension(_adjMatrix, values, trip, num*(_numThreads-1) + distributed, tripSize, true); //the main thread also does osme work
-        
+        for(int i = 0; i < _numThreads -1; i++) {
+            futures[i].get();
+        }
                 
     }
     delete [] trip; //The triples are no longer actually needed, so the pointer is deleted
     
     //This value will hold the sum of all the spheres of depth 1, and will be updated as they are calculated.
-    for(int i = 0; i < NUM_NODES; i++) { //This loop calculates all the depth-2 spheres that will go into the individual depth-1
+    for(int i = 0; i < NUM_NODES; i++) { //This loop calculates all the depth-2 spheres that will go into the individual depth-1 spheres
 
         for(int j = i+1; j < NUM_NODES; j++) {
             
@@ -438,7 +444,7 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
     }
     
     double sphSum1 = 0;
-    for(int i = 0; i < NUM_NODES; i++) {
+    for(int i = 0; i < NUM_NODES; i++) { //calculates the 1-spheres that will go into the finan dimensionality calculation
         double sphSum2 = 0;
         int numNodes = 0;
 
@@ -466,10 +472,10 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
         }
         
     }
-    _dimension = 1 + sphSum1/NUM_NODES;
+    _dimension = 1 + sphSum1/NUM_NODES; //final result
     
     
-    for(int i = 0; i < NUM_NODES; i++) {
+    for(int i = 0; i < NUM_NODES; i++) { //deletes pointers
         
         
         for(int j = 0; j < NUM_NODES - i; j++) {
@@ -484,8 +490,8 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
 
 }
 
-double hGraph::dimension(MatrixXi amat, double *** data, std::vector<int> * trp, int lowerBound, int upperBound, bool init)  {
-    if(init) {
+double hGraph::dimension(MatrixXi amat, double *** data, std::vector<int> * trp, int lowerBound, int upperBound, bool init)  { //utility function used by main calcDimension function
+    if(init) { //calculates all 3-sphres needed
         MatrixXi tempAmat(NUM_NODES, NUM_NODES);
         
         for(int i = lowerBound; i < upperBound; i++) {
@@ -503,7 +509,7 @@ double hGraph::dimension(MatrixXi amat, double *** data, std::vector<int> * trp,
     }
     
     
-    else {
+    else { //This is uesd for recursive calls below the 3-sphree level
         int numNodes = 0;
         int numEdges = 0;
         for(int i = 0; i < NUM_NODES; i++) {
@@ -544,7 +550,7 @@ double hGraph::dimension(MatrixXi amat, double *** data, std::vector<int> * trp,
 }
 
 void hGraph::oldCalcDimension() { //Calculates dimensionality recursively. See Knill, "On the dimensionanity and Euler Characteristic of Random Graphs"
-
+                                  //This algorithm is no longer in used, but is left here in case it comes up
     
     int kEdges = ((NUM_NODES)*(NUM_NODES - 1))/2;
     int kSum = 0;
@@ -650,7 +656,7 @@ double hGraph::oldDimension(int a, int b, bool multi) { //This function is NOT c
     }
 }
 
-std::vector<int> hGraph::fractionalDimen() {
+std::vector<int> hGraph::getFractionalDimen() { //Single-threaded function that outputs result as a fraction. The first item in the vector is the numerator, second is denomenator
     std::vector<int> values = {0, 1};
     if(NUM_NODES == 0) {
         values[0] = -1;
@@ -658,7 +664,7 @@ std::vector<int> hGraph::fractionalDimen() {
     }
     else {
         for(int i = 0; i < NUM_NODES; i++) {
-            std::vector<int> temp = unitSphere(i).fractionalDimen();
+            std::vector<int> temp = unitSphere(i).getFractionalDimen();
             values = fractionAdd(values, temp);
         }
         values[1] *= NUM_NODES;
@@ -673,7 +679,7 @@ std::vector<int> hGraph::fractionalDimen() {
 void hGraph::calcSpectralDimen() {
     Eigen::Matrix<unsigned long long int, Eigen::Dynamic, Eigen::Dynamic> walkMatrix;
     walkMatrix.resize(NUM_NODES, NUM_NODES);
-    walkMatrix = _adjMatrix.cast <unsigned long long int> ();
+    walkMatrix = _adjMatrix.cast <unsigned long long int> (); //spectral dimension creates very large values in the matrix
     std::vector<double> temp;
     for(int i = 0; i < 500; i++) {
         double sum = 0;
@@ -688,7 +694,7 @@ void hGraph::calcSpectralDimen() {
             sum += partial;
         }
         sum /= NUM_NODES;
-        if(sum <= 0) {
+        if(sum <= 0) { //Indicates that the numbers have become too big
             break;
         }
         temp.push_back(log(sum));
@@ -696,7 +702,7 @@ void hGraph::calcSpectralDimen() {
     for(int i = 0; i < temp.size(); i++) {
         //double temp1 = temp[i] - temp[i-1];
         //double temp2 = log(i+2) - log(i+1);
-        _spectralDimen.push_back(-2.0*(temp[i]/log(i+2)));
+        _spectralDimen.push_back(-2.0*(temp[i]/log(i+2))); //this is a vector for different walk lengths. In theory, the spectral dimension is the value when i -> infinity
         
     }
     
@@ -724,14 +730,12 @@ void hGraph::calculateHausDimen() {
         i++;
     }
     
-    
-
-    
-    
 }
 
 
 std::vector<double> hGraph::autoGroupSize() {
+    //Calculates the size of the automorphism group using the Nauty/Traces library. See user guide.
+    
     int m, n;
     graph g[MAXN*MAXM];
     int lab[MAXN], ptn[MAXN], orbits[MAXN];
@@ -739,10 +743,10 @@ std::vector<double> hGraph::autoGroupSize() {
     statsblk stats;
     n = NUM_NODES;
     m = SETWORDSNEEDED(n);
-    EMPTYGRAPH(g, m, n);
+    EMPTYGRAPH(g, m, n); //Container for use in Nauty
     for(int i = 0; i < n; i++) {
         for(int j = i+1; j < n; j++) {
-            if(isConnected(i,j)) {
+            if(isConnected(i,j)) { //copies the graph into Nauty's container.
                 
                 ADDONEEDGE(g, i, j, m);
             }
@@ -750,8 +754,8 @@ std::vector<double> hGraph::autoGroupSize() {
     }
     densenauty(g, lab, ptn, orbits, &options, &stats, m, n, NULL);
     std::vector<double> temp;
-    temp.push_back(stats.grpsize1);
-    temp.push_back(stats.grpsize2);
+    temp.push_back(stats.grpsize1); //Returns the value of the automorphism group size as a vector in scientific notation
+    temp.push_back(stats.grpsize2); //First item is the base, second item is the exponent of the 10
     return temp;
 }
 
@@ -781,7 +785,7 @@ hGraph hGraph::unitSphere(int node) { //outputs the unit sphere around a given. 
     
 }
 
-void hGraph::countCliques() { //Declares necessary objects for initial call of cliqueSearch, then counts all cliques.
+void hGraph::countCliques() { //Declares necessary objects for initial call of cliqueSearch, then counts all cliques. Uses a moified version of the Bron-Kerbosch algorithm
     std::vector<int> vectorR(0);
     std::vector<int> vectorP(NUM_NODES);
     for(int i = 0; i < NUM_NODES; i++) {
@@ -789,11 +793,7 @@ void hGraph::countCliques() { //Declares necessary objects for initial call of c
     }
     
     cliqueSearch(vectorR, vectorP);
-    /*std::cout << "Number of cliques of each size" << std::endl;
-    for(int i = 0; i < NUM_NODES; i++) {
-        std::cout << i+1 << ": " << _numCliques[i] << std::endl;
-        
-    }*/
+
     cliquesFound = true;
 }
 
@@ -828,13 +828,13 @@ void hGraph::cliqueSearch(std::vector<int> R, std::vector<int> P) { //Uses a mod
     }
 }
 
-void hGraph::calculateEccen() {
+void hGraph::calculateEccen() { //Calculates the eccentricity (distances to farthest node) for every node in the graph.
     Eigen::Matrix<long unsigned int, Eigen::Dynamic, Eigen::Dynamic> walkMatrix;
     walkMatrix.resize(NUM_NODES, NUM_NODES);
     walkMatrix = _adjMatrix.cast<long unsigned int>();
     int length = 1;
     int numFound = 0;
-    while(true) {
+    while(true) { //Simply raises the matrix to a new power and then checks if each node has an entry for every other node
         for(int i = 0; i < NUM_NODES; i++) {
             
             if(_eccentricities[i] != 0) {
@@ -861,21 +861,6 @@ void hGraph::calculateEccen() {
 }
 
 
-/*int hGraph::pathL(int length, int a, int b) { //determines the number of paths of given length that connect vertices a and b. See arXiv:0801.0861 [hep-th], page 4
-    int sum = 0;
-    int prod = 0;
-    for(int i = 0; i < NUM_NODES; i++) {
-        prod = _adjMatrix(a,i) * _adjMatrix(i,b);
-        sum += prod;
-        
-    }
-    
-    
-    
-    
-}*/
-
-
 //---------------------------END CALCULATIONS---------------------------//
 
 
@@ -883,7 +868,7 @@ void hGraph::calculateEccen() {
 
 void hGraph::toFile(std::ofstream &fs) const { //outputs hGraphs to a file in a CSV format. See documentation for information on formatting and usage.
     for(int i = 0; i < NUM_NODES; i++) {
-        for(int j = 0; j < NUM_NODES; j++) {
+        for(int j = 0; j < NUM_NODES; j++) { //outputs adjacency matrix
             int temp = _adjMatrix(i,j);
             fs << temp << ",";
             
@@ -892,12 +877,12 @@ void hGraph::toFile(std::ofstream &fs) const { //outputs hGraphs to a file in a 
     }
     fs << "\n";
     for(int i = 0; i < NUM_NODES; i++) {
-        fs << _degVector[i] << ",";
+        fs << _degVector[i] << ","; //outputs node degrees
     }
     
     fs << "\n";
     
-    fs << _eulerChar << "," << _hamiltonian << std::endl;
+    fs << _eulerChar << "," << _hamiltonian << std::endl; //outputs hamiltonian
 }
 
 std::ofstream &operator << (std::ofstream &fs, const hGraph &rhs)  { //allows use of << operator to output hGraphs to files.
@@ -922,13 +907,6 @@ std::ostream &operator << (std::ostream &os, const hGraph &rhs)  { //Allows use 
 }
 
 
-void hGraph::print() { //No longer used.
-    
-    std::cout << "Adjacency Matrix: " << std::endl << _adjMatrix << std::endl;
-    std::cout << "Node Degrees: " << std::endl << _degVector << std::endl;
-    
-    
-}
 
 //---------------------------END I/O FUNCTIONS---------------------------//
 
@@ -979,6 +957,8 @@ void hGraph::accept(absHamiltonian &ham) { //Used in visitor design pattern.
 
 
 /////-------------------------BEGIN HLIST CLASS IMPLEMENTATION-------------------------/////
+
+//This class was used for the simulation that looks at all graphs of a given size, and is not used for the monte-carlo simulation//
 
 //---------------------------CONSTRUCTOR---------------------------//
 
@@ -1070,7 +1050,10 @@ void hList::toFile(std::ofstream &fs) const { //outputs items in the list to a f
 /////-------------------------END HLIST CLASS IMPLEMENTATION-------------------------/////
 
 
-/////-------------------------BEGIN NODE CLASS IMPLEMENTATION-------------------------/////
+/////-------------------------BEGIN HNODE CLASS IMPLEMENTATION-------------------------/////
+
+//This class was used for the simulation that looks at all graphs of a given size, and is not used for the monte-carlo simulation//
+
 
 //---------------------------CONSTRUCTOR---------------------------//
 
@@ -1133,7 +1116,9 @@ void hNode::toFile(std::ofstream &fs) const { //Outputs hNode data to files. Use
 
 /////-------------------------END HNODE CLASS IMPLEMENTATION-------------------------/////
 
-////------------------------BEGIN INTPAIR CLASS IMPLEMENTATION------------------/
+////------------------------BEGIN INTPAIR CLASS IMPLEMENTATION------------------////
+
+//This was used during some testing
 
 intPair::intPair(int pointA, int pointB) {
     a = pointA;
@@ -1197,8 +1182,8 @@ hGraph compGraph(int size) { //generates a complete graph of given size.
     
 }
 
-hGraph randomGraph(int size, double fillFrac) { //generates a random graph of a given size.
-    
+hGraph randomGraph(int size, double fillFrac) { //generates a random graph of a given size. First argument gives number of nodes. Second gives filling fraction
+                                                //If the second argument is zero, the filling fraction is also determined randomly.
     
     unsigned int max = size*(size-1)/2; //maximum number of edges
     
@@ -1212,8 +1197,8 @@ hGraph randomGraph(int size, double fillFrac) { //generates a random graph of a 
         fill[i] = 0;
     }
     unsigned int fillNum;
-    if(fillFrac == 0) {
-        std::uniform_int_distribution<int> dist(max/4, (3*max)/4); //The graph will have at least 1/4th of the maximum number of possible edges
+    if(fillFrac == 0) { //Initialize filling fraction randomly if not provided by user.
+        std::uniform_int_distribution<int> dist(max/4, (3*max)/4); //The graph will have at least 1/4th of the maximum number of possible edges, and at most 3/4ths
         fillNum = dist(gen);                                 //Ensures graphs are dense enough to be useful.
         
     }
@@ -1249,7 +1234,7 @@ hGraph randomGraph(int size, double fillFrac) { //generates a random graph of a 
     return randGraph;
 }
 
-hGraph zeroGraph(int size) {
+hGraph zeroGraph(int size) { //generates a graph with no edges.
     MatrixXi adjMatrix = MatrixXi::Zero(size, size);
     hGraph graph(size, adjMatrix);
     return graph;
@@ -1262,12 +1247,11 @@ hGraph zeroGraph(int size) {
 
 //---------------------------I/O UTILITY FUNCTIONS---------------------------//
 
+//the triple pointer is a C++ requirement regarding memory management in external functions
 
-
-void readGraphFile(hGraph *** graphs, int &num) { //reads graphs from a CSV, returns a pointer to an array of hGraphs and sets variable num to the number of graphs read from the file.
-                                   //See documentation for how to output graphs to CSV.
-    int size;
-    char cSize;
+void readGraphFile(hGraph *** graphs, int &num) { //Taktes in a double (NOT TRIPLE) pointer to an hGraph, as well as an integer variable.
+    int size;                                     //After function runs, graphs will be an array of pointers to graphs
+    char cSize;                                   //variable num will contain the number of graphs read.
     std::string filename;
     std::ifstream input;
     std::cin.clear();
@@ -1370,6 +1354,9 @@ void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove)
 }
 
 MatrixXi unitSphere(MatrixXi matrix, int node) {
+    
+    //This function is used by the newer version of the dimensionality algorithm.
+    //a -1 in the header indicates the node is not in the sphere, a -2 denotes the node the sphere was taken around.
 
     for (int i = 0; i < matrix.rows(); i++) {
         
@@ -1390,10 +1377,9 @@ MatrixXi unitSphere(MatrixXi matrix, int node) {
 
 //---------------------------OTHER CALCULATION FUNCTIONS---------------------------//
 
-bool isIsomorphic(hGraph graph1, hGraph graph2) {
-    
-    
-    graph g1[MAXN*MAXM];
+bool isIsomorphic(hGraph graph1, hGraph graph2) { //Takes in two graphs and determines if they are isomorphic
+                                                  //using the Nauty/Traces library
+    graph g1[MAXN*MAXM];                          //Spcific logic is not important
     graph g1b[MAXN*MAXM];
     graph g2[MAXN*MAXM];
     graph g2b[MAXN*MAXM];
@@ -1446,6 +1432,8 @@ bool isIsomorphic(hGraph graph1, hGraph graph2) {
         return false;
     }
 }
+
+//These last three functions were used for testing purposes. Does operations on fractions passed as vectors. 
 
 std::vector<int> fractionAdd(std::vector<int> fractA, std::vector<int> fractB) {
     

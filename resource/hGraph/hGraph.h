@@ -47,28 +47,42 @@ class hNode;
 class hGraph {
     
 private:
-    int _numThreads = 1;
+    
     int NUM_NODES;
+    MatrixXi _adjMatrix;
+    int _numThreads = 1;
+    double _hamiltonian;
+    Eigen::VectorXi _degVector;
+    MatrixXi _paths;
+
+
+
     int _eulerChar = 0;
     double _dimension;
     std::vector<double> _spectralDimen;
     std::vector<double> _hausdorffDimen;
-    double _hamiltonian;
-    bool cliquesFound = false;
-    
     std::vector<int> _eccentricities;
-
-
-    MatrixXi _adjMatrix;
-    Eigen::VectorXi _degVector;
     std::vector <int> _numCliques;
+
+    
+    bool cliquesFound = false;
+    bool dimensionFound = false;
+    
     
     void toStream(std::ostream &os) const;
     void toFile(std::ofstream &fs) const;
+    void calcDimension();
+    void oldCalcDimension(); //Multithreaded version
     double oldDimension(int a, int b, bool multi);     //Single threaded version for recursive calls
     double dimension(MatrixXi amat, double *** data, std::vector<int> * trp, int lowerBound, int upperBound, bool init);
     void calculateEccen();
     void calculateHausDimen();
+    
+    void calcEulerChar();
+    void calcSpectralDimen();
+
+    void countCliques();
+    void cliqueSearch(std::vector<int> R, std::vector<int> P);
 
 
 
@@ -78,42 +92,36 @@ public:
     hGraph(int size);
     hGraph();
     ~hGraph();
-    hGraph compliment();
-    void print(); //depricated
+    
     void setMatrix(int size, MatrixXi data);
     void setHamiltonian(double val);
-    hGraph unitSphere(int node);
-    void calcDimension();
-    void oldCalcDimension(); //Multithreaded version
-    std::vector<int> fractionalDimen();
-    void calcSpectralDimen();
-    void calcEulerChar();
-    double avgDegree();
     void accept(absHamiltonian &ham);
-    void flipEdge(int nodeA, int nodeB);
-    void flipEdge(std::vector<int> nodeA, std::vector<int> nodeB);
     void acceptPartial(double partial);
     void setThreads(int threads);
+    hGraph compliment();
+    hGraph unitSphere(int node);
+    void flipEdge(int nodeA, int nodeB);
+    void flipEdge(std::vector<int> nodeA, std::vector<int> nodeB);
+
+
+    
+    std::vector<int> getFractionalDimen();
+    double getAvgDegree();
     std::vector<int> getEccentricity();
     int getDiameter();
     std::vector<double> autoGroupSize();
-    MatrixXi _paths;
-
-
-    void numCliques();
     MatrixXi getShortestPaths();
-
     double getDimension();
     std::vector<double> getSpectralDimen();
     std::vector<double> getHausdorffDimen();
-    
     int getDegree(int node);
     int getSize();
     int getEulerChar();
-    bool isConnected(int row, int column);
-    void countCliques();
-    void cliqueSearch(std::vector<int> R, std::vector<int> P);
     double getHam();
+
+    bool isConnected(int row, int column);
+    void numCliques();
+
     friend std::ostream &operator << (std::ostream &os, const hGraph &rhs);
     friend std::ofstream &operator <<(std::ofstream &fs, const hGraph &rhs);
 };

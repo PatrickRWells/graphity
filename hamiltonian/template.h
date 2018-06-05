@@ -53,11 +53,13 @@ double Template::result() { //There should be no reason to edit this function;
 void Template::calculate(hGraph &host) { //This is where all the main calculation takes place.
     int size = host.getSize();           //see hGraph documentation for available commands.
     
-    if(isPartial) {                     //This function can take care of both full and partial calculations.
-        hGraph temp(host.getSize()) = host;                               //It is determined by the isPartial attribute, which is set automatically if the second constructor is used.
+    if(isPartial) {                                //This function can take care of both full and partial calculations.
+        hGraph temp(host.getSize()) = host;        //It is determined by the isPartial attribute, which is set  matically if the second constructor is used.
         for(int i = 0; i < numEdges; i++) {
             temp.flipEdge(nodeA[i], nodeB[i])'
         }
+        _partial = 10;
+
     }
     else {
         for(int i = 0; i < size; i++) {
@@ -75,7 +77,11 @@ void TemplateHam(hGraph &host) { //do not edit this function except to change in
     
 }
 //Note the difference between the partial hamiltonian and the full one. The full one sets the value in the graph object, the partial just returns a value
-double TemplatePartial(hGraph &host, int nodeA, int nodeB) {    //Do not edit this function except to change instance of the word "Template"
+double TemplatePartial(hGraph &host, std::vector<int> nodeA, std::vector<int> nodeB) {    //Do not edit this function except to change instance of the word "Template"
+    if(nodeA.size() != nodeB.size()) {
+        std::cout << "Fatal error: vectors passed to a partial hamiltonian must contain the same number of elements" << std::endl;
+        exit(2);
+    }
     Template Ham(nodeA, nodeB);
     host.accept(Ham);
     return Ham.getDifference();

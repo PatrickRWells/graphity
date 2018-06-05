@@ -85,10 +85,8 @@ void basicSquare::calculate(hGraph &host) { //This is where all the main calcula
     else {
         hGraph temp(host.getSize());
         temp = host;
-        for(int i = 0; i < numEdges; i++) {
-            temp.flipEdge(nodeA[i],nodeB[i]);
+        temp.flipEdge(nodeA,nodeB);
 
-        }
         basicSquareHam(temp);
         double diff = temp.getHam() - host.getHam();
         _partial = diff;

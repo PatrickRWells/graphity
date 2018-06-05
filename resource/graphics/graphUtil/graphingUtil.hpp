@@ -15,7 +15,7 @@ const int NUM_OBSERVABLES = 8;
 /*
  This is a very special constant. This is the only file that is referenced by all the
  individual pieces responsible for collecting, managing, and plotting Monte-Carlo Data
- This number tells the compiler how big to make some arrays. Just change it if you wish to add more
+ This number tells the compiler how big to make some arrays. Just increase it it if you wish to add more
  And then add onto the list of constants below. 
  */
 
