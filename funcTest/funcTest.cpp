@@ -2,7 +2,7 @@
 //  funcTest.cpp
 //  
 //
-//  Allows the user to test out functions. The makefile links everything that other modules in this project might use, including Root and Eigen.
+//  Allows the user to test out functions. The makefile links everything that other modules in this project might use.
 //
 //
 
@@ -29,12 +29,13 @@ bool getTF();
 
 int main() {
 
-    int size = 50;
+    int size = 20;
     hGraph test(size);
-    test = randomGraph(size, 0.3);
+    test = compGraph(size);
     test.setThreads(4);
 
-    std::cout << test.getDimension() << std::endl;
+    std::cout << test.getEulerChar() << std::endl;
+    test.numCliques();
 
 
 

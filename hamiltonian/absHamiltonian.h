@@ -12,10 +12,13 @@
 #include "hGraph/hGraph.h"
 
 class absHamiltonian {
+protected:
+    static double sourceT;
 public:
-    virtual void calculate(hGraph &host) = 0;    
+    virtual void calculate(hGraph &host) = 0;
 };
 
+double absHamiltonian::sourceT = 0;
 
 #endif /* absHamiltonian_h */
 

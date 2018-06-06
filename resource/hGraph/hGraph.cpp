@@ -129,7 +129,7 @@ int hGraph:: getSize() { //simple getter function
 
 void hGraph::numCliques() { //simply outputs the number of cliques (NOT maximal cliques) of any given size. The cliques are stored in an vector attribute called "_numCliques"
     for (int i = 0; i < NUM_NODES; i++) {
-        std::cout << _numCliques.at(i);
+        std::cout << i+1 << ": " << _numCliques.at(i) << std::endl;
     }
     std::cout << std::endl;
 }
