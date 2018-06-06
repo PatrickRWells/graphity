@@ -18,12 +18,13 @@ class EulerChar : public absHamiltonian {
 private:
     double _result; //Result of the computation.
     int _partial;
-    int nodeA;
-    int nodeB;
+    std::vector<int> nodeA;
+    std::vector<int> nodeB;
     bool isPartial = false;
+    double sourceT = 0;
 public:
     EulerChar();
-    EulerChar(int node1, int node2);
+    EulerChar(std::vector<int> node1, std::vector<int> node2);
     double result();
     void calculate(hGraph &host); //Don't mess with these
     double getDifference() {
@@ -34,10 +35,10 @@ public:
 };
 
 EulerChar::EulerChar() : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
-    
+    sourceT = SOURCE;
 }
 
-EulerChar::EulerChar(int node1, int node2) : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
+EulerChar::EulerChar(std::vector<int> node1, std::vector<int> node2) : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
     nodeA = node1;
     nodeB = node2;
     isPartial = true;
@@ -50,7 +51,13 @@ double EulerChar::result() { //There should be no reason to edit this function;
 
 void EulerChar::calculate(hGraph &host) { //This is where all the main calculation takes place.
     if(!isPartial) {
-       _result = host.getEulerChar();   //
+        _result = host.getEulerChar();
+        double sum = 0;
+        for(int i = 0; i < host.getSize(); i++) {
+            sum += host.getDegree(i);
+            
+        }
+        _result += sum*sourceT;
     }
     else {
         hGraph temp(host.getSize());
@@ -72,7 +79,7 @@ void EulerCharHam(hGraph &host) { //do not edit this function except to change i
     
 }
 
-double EulerCharPartial(hGraph &host, int nodeA, int nodeB) {
+double EulerCharPartial(hGraph &host, std::vector<int> nodeA, std::vector<int> nodeB) {
     EulerChar Ham(nodeA, nodeB);
     host.accept(Ham);
     return Ham.getDifference();

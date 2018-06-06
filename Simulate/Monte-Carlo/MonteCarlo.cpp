@@ -49,8 +49,8 @@ int main() {
     std::ofstream eulerCharOut;
     
     //Sets simulation functions. This is the section that is edited by the python script. Can also be set manually
-	simFunction = basicSquareHam;
-	simPartial = basicSquarePartial;
+	simFunction = EulerCharHam;
+	simPartial = EulerCharPartial;
     //
 
     std::cout << "Would you like to input a graph from a file? (y/n) "; //Checks if the user would like to input a graph from a file (vs. using randomly initialized graphs);

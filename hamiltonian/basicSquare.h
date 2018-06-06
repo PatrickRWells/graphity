@@ -12,7 +12,6 @@
 #include "absHamiltonian.h"
 #include <cmath>
 
-double SOURCE = 0.0;
 
 void basicSquareHam(hGraph &host);
 class basicSquare : public absHamiltonian {
