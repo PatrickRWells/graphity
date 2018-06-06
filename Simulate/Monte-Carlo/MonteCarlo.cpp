@@ -21,13 +21,12 @@ double TINV;    //Beta
 int SIZE;       //Number of nodes in the graphs
 int maxSweeps;  //Number of sweeps that will be performed
 int collectionTime = 1;
-double SOURCE_TERM;
 
 /////////--------------It is high recommended that you read the user guide entry for the monte-carlo simulation prior to editing this file----------//////////
 
 
 //------Simulation Functions------//
-std::function<void(hGraph&, double )> simFunction;
+std::function<void(hGraph&)> simFunction;
 std::function<double(hGraph&,std::vector<int>,std::vector<int>)> simPartial;
 //All these variables are declared to be global so that they can be used by multiple threads.
 
@@ -93,7 +92,7 @@ int main() {
         std::cin >> SIZE;
     }
     std::cout << "Input the source term: ";
-    std::cin >> SOURCE_TERM;
+    std::cin >> SOURCE;
     std::cout << "Input the inverse temperature: ";
     std::cin >> TINV;
     std::cout << "How many sweeps would you like to perform? ";
@@ -130,7 +129,7 @@ int main() {
     paramOut << "Graph size: " << SIZE << std::endl;
     paramOut << "Inverse Temperature: " << TINV << std::endl;
     paramOut << "Sweeps performed: " << maxSweeps << std::endl;
-    paramOut << "Source term: " << SOURCE_TERM << std::endl;
+    paramOut << "Source term: " << SOURCE << std::endl;
     paramOut.close(); //This file contians all the simulation's parameters for future reference.
     
     
@@ -434,7 +433,7 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
     int sweeps = 0;
     int sweepNUM = ((SIZE)*(SIZE-1))/2;//Number of edge flips in a single sweep;
     int n = 0;
-    simFunction(*graph, SOURCE_TERM); //calculates inital graph energy;
+    simFunction(*graph); //calculates inital graph energy;
     data[simNum][ENERGY].push_back(graph->getHam());
     
     if(observe[DIMEN]) { //Calculates initial dimensionality (if requested)
@@ -650,7 +649,7 @@ void wolffAlgorithm(hGraph * graph, std::vector<bool> observe, std::vector<doubl
     int n = 0;
     int swaps = 0;      //number of times an edge flip is accepted.
     
-    simFunction(*graph, SOURCE_TERM); //calculates inital graph energy;
+    simFunction(*graph); //calculates inital graph energy;
     data[simNum][ENERGY].push_back(graph->getHam());
     
     if(observe[DIMEN]) {

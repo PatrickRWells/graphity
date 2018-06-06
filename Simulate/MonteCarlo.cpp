@@ -49,8 +49,8 @@ int main() {
     std::ofstream eulerCharOut;
     
     //Sets simulation functions. This is the section that is edited by the python script. Can also be set manually
-	simFunction = basicSquareHam;
-	simPartial = basicSquarePartial;
+    simFunction = basicSquareHam;
+    simPartial = basicSquarePartial;
     //
 
     std::cout << "Would you like to input a graph from a file? (y/n) "; //Checks if the user would like to input a graph from a file (vs. using randomly initialized graphs);
@@ -82,7 +82,7 @@ int main() {
     }
     std::vector<double> ** data = new std::vector<double> * [numGraphs];
     for(int i = 0; i < numGraphs; i++) {
-        data[i] = new std::vector<double> [NUM_OBSERVABLES]; //Creates a 2-d array of vectors that contain storage for all observables for all graphs
+        data[i] = new std::vector<double> [NUM_OBSERVABLES]; //Creates a 2-d array of vectors that contain storrage for all observables for all graphs
         
     }
     
@@ -405,14 +405,8 @@ int main() {
     }
 
     for(int i = 0; i < numGraphs; i++) {
-        delete graphs[i];
+        delete data[i];
     }
-    delete [] graphs;
-
-    for(int i = 0; i < numGraphs; i++) {
-        delete [] data[i];
-    }
-
     delete [] data;
     std::cout << "Be sure to move all result files to a different folder to ensure they are not overwritten." << std::endl;
     
@@ -437,6 +431,7 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
     data[simNum][ENERGY].push_back(graph->getHam());
     
     if(observe[DIMEN]) { //Calculates initial dimensionality (if requested)
+        graph->calcDimension();
         data[simNum][DIMEN].push_back(graph->getDimension());
     }
     
@@ -565,12 +560,17 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
                 
                 if(observe[DIMEN]) { //Calculates and stores dimension if requested
                     graph->setThreads(NUM_CORES);
+                    graph->calcDimension();
                     data[simNum][DIMEN].push_back(graph->getDimension());
                     
                 }
                 
                 if(observe[AVG_DEGREE]) { //Calculates and stores average degree if requested
-                    data[simNum][AVG_DEGREE].push_back(graph->getAvgDegree());
+                    double sum = 0;
+                    for(int i = 0; i < SIZE; i++) {
+                        sum += graph->getDegree(i);
+                    }
+                    data[simNum][AVG_DEGREE].push_back(double(sum)/SIZE);
                 }
                 
                 if(observe[EULER_CHAR]) { //Calculats and stores Euler Characteristic if requested
@@ -653,11 +653,16 @@ void wolffAlgorithm(hGraph * graph, std::vector<bool> observe, std::vector<doubl
     data[simNum][ENERGY].push_back(graph->getHam());
     
     if(observe[DIMEN]) {
+        graph->calcDimension();
         data[simNum][DIMEN].push_back(graph->getDimension());
     }
     
     if(observe[AVG_DEGREE]) {
-        data[simNum][AVG_DEGREE].push_back(graph->getAvgDegree());
+        double sum = 0;
+        for(int i = 0; i < SIZE; i++) {
+            sum += graph->getDegree(i);
+        }
+        data[simNum][AVG_DEGREE].push_back(sum/SIZE);
     }
     
     while(run) {

@@ -12,18 +12,18 @@
 #include "absHamiltonian.h"
 #include <cmath>
 
-void EulerCharHam(hGraph &host, double source);
+void EulerCharHam(hGraph &host);
 class EulerChar : public absHamiltonian {
     
 private:
     double _result; //Result of the computation.
     int _partial;
-    std::vector<int> nodeA;
-    std::vector<int> nodeB;
+    int nodeA;
+    int nodeB;
     bool isPartial = false;
 public:
-    EulerChar(double source);
-    EulerChar(std::vector<int> nodeA, std::vector<int> nodeB);
+    EulerChar();
+    EulerChar(int node1, int node2);
     double result();
     void calculate(hGraph &host); //Don't mess with these
     double getDifference() {
@@ -33,12 +33,11 @@ public:
     
 };
 
-EulerChar::EulerChar(double source) : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
-    sourceT = source;
+EulerChar::EulerChar() : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
     
 }
 
-EulerChar::EulerChar(std::vector<int> node1, std::vector<int> node2) : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
+EulerChar::EulerChar(int node1, int node2) : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
     nodeA = node1;
     nodeB = node2;
     isPartial = true;
@@ -57,7 +56,7 @@ void EulerChar::calculate(hGraph &host) { //This is where all the main calculati
         hGraph temp(host.getSize());
         temp = host;
         temp.flipEdge(nodeA,nodeB);
-        EulerCharHam(temp, sourceT);
+        EulerCharHam(temp);
         double diff = temp.getHam() - host.getHam();
         _partial = diff;
     }
@@ -65,15 +64,15 @@ void EulerChar::calculate(hGraph &host) { //This is where all the main calculati
     
 }
 
-void EulerCharHam(hGraph &host, double source) { //do not edit this function except to change instances of the word "EulerChar"
+void EulerCharHam(hGraph &host) { //do not edit this function except to change instances of the word "EulerChar"
                                  //For example, if your hamiltonian is named "basic" this function should be titled "basicHam"
-    EulerChar Ham(source);
+    EulerChar Ham;
     host.accept(Ham);
     host.setHamiltonian(Ham.result());
     
 }
 
-double EulerCharPartial(hGraph &host, std::vector<int> nodeA, std::vector<int> nodeB) {
+double EulerCharPartial(hGraph &host, int nodeA, int nodeB) {
     EulerChar Ham(nodeA, nodeB);
     host.accept(Ham);
     return Ham.getDifference();

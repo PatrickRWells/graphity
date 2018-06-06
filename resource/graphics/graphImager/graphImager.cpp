@@ -1,4 +1,4 @@
-//
+    //
 //  graphImager.cpp
 //  Creates an image of a graph for your viewing pleasure. Uses the cairo graphing library.
 //
@@ -137,9 +137,9 @@ void graphImage(hGraph graph) {
     cairo_stroke(cr);
     
     //I wanted it to look pretty so set the nodes to be a nice shade of blue. Fight me.
-    double r = 0;
-    double g = 64;
-    double b = 255;
+    double r = 19;
+    double g = 26;
+    double b = 196;
     
     cairo_set_source_rgb(cr, r/255, g/255, b/255); //Cairo uses decimal RGB values.
     for(int i = 0; i < graphSize; i++) {
