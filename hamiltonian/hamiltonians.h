@@ -10,4 +10,5 @@ double SOURCE = 0.0;
 #include "basicSquare.h"
 
 #include "EulerChar.h"
+#include "curveDiff.h"
 #endif /* hamiltonians_h */

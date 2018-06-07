@@ -13,6 +13,7 @@ void wolffAlgorithm(hGraph * graph, std::vector<bool> observe, std::vector<doubl
 std::mutex mut;
 
 
+
 bool getTF(); //Utility function. Returns true if user types 'y' and false if user types 'n'
 
 bool WOLFF = false;
@@ -49,8 +50,8 @@ int main() {
     std::ofstream eulerCharOut;
     
     //Sets simulation functions. This is the section that is edited by the python script. Can also be set manually
-	simFunction = EulerCharHam;
-	simPartial = EulerCharPartial;
+	simFunction = curveDiffHam;
+	simPartial = curveDiffPartial;
     //
 
     std::cout << "Would you like to input a graph from a file? (y/n) "; //Checks if the user would like to input a graph from a file (vs. using randomly initialized graphs);
@@ -76,7 +77,8 @@ int main() {
             std::cout << "Data will be collected every sweep." << std::endl;
         }
     }
-       
+    
+    
     else {
         numGraphs = 3;
     }
@@ -133,6 +135,7 @@ int main() {
     paramOut.close(); //This file contians all the simulation's parameters for future reference.
     
     
+    
 
     std::cin.clear();
     
@@ -184,18 +187,18 @@ int main() {
             
             
             
+            
         }
     }
-    
-    
-    
     
     
     allOut.open("allOut.csv");
     allOut << SIZE << std::endl;
     for(int i = 0; i < numGraphs; i++) {
-        allOut << *(graphs[0]); //Outputs all the graphs to a single file. Graphs are also outputted to individual files in the monte-carlo simulation.
+        allOut << *(graphs[i]); //Outputs all the graphs to a single file. Graphs are also outputted to individual files in the monte-carlo simulation.
     }
+    
+                           
     allOut.close();
     
     for (int i = 0; i < numGraphs; i++) { //Outputs energy to a CSV file
@@ -413,10 +416,12 @@ int main() {
         delete [] data[i];
     }
 
+                           
     delete [] data;
     std::cout << "Be sure to move all result files to a different folder to ensure they are not overwritten." << std::endl;
     
 }
+                           
 
 void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> ** data, int simNum, bool progress, std::string descriptor) {
     int selected = 0;
@@ -563,6 +568,7 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
             if((sweeps % collectionTime) == 0) {
                 data[simNum][ENERGY].push_back(graph->getHam());
                 
+                           
                 if(observe[DIMEN]) { //Calculates and stores dimension if requested
                     graph->setThreads(NUM_CORES);
                     data[simNum][DIMEN].push_back(graph->getDimension());
@@ -595,7 +601,6 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
         
     }
     std::cout << "Simulation on graph " << descriptor << " complete" << std::endl;
-    std::cout << selected << " selected." << std::endl;
     descriptor += ".csv";
     std::ofstream output(descriptor);
     output << graph->getSize() << std::endl;

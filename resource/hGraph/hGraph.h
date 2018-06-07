@@ -117,10 +117,11 @@ public:
     int getDegree(int node);
     int getSize();
     int getEulerChar();
+    double curvatureAt(int node);
     double getHam();
 
     bool isConnected(int row, int column);
-    void numCliques();
+    std::vector<int> numCliques();
 
     friend std::ostream &operator << (std::ostream &os, const hGraph &rhs);
     friend std::ofstream &operator <<(std::ofstream &fs, const hGraph &rhs);

@@ -127,11 +127,16 @@ int hGraph:: getSize() { //simple getter function
     return NUM_NODES;
 }
 
-void hGraph::numCliques() { //simply outputs the number of cliques (NOT maximal cliques) of any given size. The cliques are stored in an vector attribute called "_numCliques"
-    for (int i = 0; i < NUM_NODES; i++) {
-        std::cout << i+1 << ": " _numCliques.at(i) << std::endl;
+std::vector<int> hGraph::numCliques() { //simply outputs the number of cliques (NOT maximal cliques) of any given size. The cliques are stored in an vector attribute called "
+    if(!cliquesFound) {
+        _numCliques = std::vector<int> (NUM_NODES, 0);
+        countCliques();
+
     }
-    std::cout << std::endl;
+    _numCliques = std::vector<int> (NUM_NODES, 0);
+    countCliques();
+    return _numCliques;
+
 }
 
 int hGraph::getDegree(int node) { //simply gets the degree of a given node.
@@ -237,6 +242,7 @@ void hGraph::acceptPartial(double partial) { //Adds the value passed to the func
 
 void hGraph::calcEulerChar() { //Based on the definition by Oliver Knills. Requires counting of all cliques in the graph.
     if(!cliquesFound) {         //checks to make sure the cliques have been counted, does so if they have not.
+        _numCliques = std::vector <int> (NUM_NODES, 0);
         countCliques();
     }
     int sum = 0;
@@ -251,6 +257,29 @@ void hGraph::calcEulerChar() { //Based on the definition by Oliver Knills. Requi
     _eulerChar = sum;
     
 }
+
+double hGraph::curvatureAt(int node) {
+    hGraph temp = unitSphere(node);
+    if(temp.getSize() == 0) {
+        return 1;
+    }
+    std::vector <int> tempVector = temp.numCliques();
+    double sum = 0;
+    for(int i = 0; i < temp.getSize(); i++) {
+        double val = double(tempVector[i])/(i+2);
+        if(i%2 == 0) {
+            sum -= val;
+        }
+        else {
+            sum += val;
+
+        }
+    }
+    return sum + 1;
+    
+    
+}
+
 
 MatrixXi hGraph::getShortestPaths() {
     MatrixXi pathMatrix(NUM_NODES, NUM_NODES); //uses the Floyd-Warshall algorithm to determine the shortest path between all nodes in a graph.
@@ -309,17 +338,20 @@ double hGraph::getAvgDegree() { //Gets the average degree of a node
 
 
 void hGraph::calcDimension() { //The base algorithm can be found in "On the Dimensionality and Euler Characteristic of Random Graphs" by O.Knill
+
     int num = 0;               //A more detailed explanation of this particular implementation can be found in the users guide
     int maxEdges = NUM_NODES*(NUM_NODES-1) / 2;
     int edges = 0;
     for(int i = 0; i < NUM_NODES; i++) {
-        edges += getDegree(i);
+        std::cout << getDegree(i) << std::endl;
     }
     edges /= 2;
-    /*if(edges == maxEdges) {
+    std::cout << edges << std::endl;
+    if(edges == maxEdges) {
+        std::cout << NUM_NODES -1;
         _dimension = NUM_NODES -1;
         return;
-    }*/
+    }
 
     
     std::vector<int> * trip;
@@ -328,7 +360,6 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
     values = new double ** [NUM_NODES];
     int triples = 0;
     
-    //generates the list of depth-3 spheres that will be calculated.
 
     for(int i = 0; i < NUM_NODES; i++) {
 
