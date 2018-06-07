@@ -1,9 +1,10 @@
 {\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf400
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;}
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;\f2\fnil\fcharset0 Menlo-Italic;
+\f3\fnil\fcharset0 Menlo-BoldItalic;}
 {\colortbl;\red255\green255\blue255;\red9\green80\blue208;\red0\green0\blue0;\red255\green255\blue255;
-\red0\green0\blue0;\red255\green255\blue255;\red255\green255\blue255;}
+\red0\green0\blue0;\red255\green255\blue255;}
 {\*\expandedcolortbl;;\cssrgb\c0\c41176\c85098;\cssrgb\c0\c0\c0;\cssrgb\c100000\c100000\c100000;
-\csgray\c0\c0;\csgray\c100000;\cssrgb\c100000\c100000\c100000;}
+\csgray\c0\c0;\csgray\c100000;}
 \margl1440\margr1440\vieww22100\viewh8400\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
@@ -20,6 +21,7 @@
 \fs22 2. Hamiltonians\
 3. The hGraph class\
 4. Graphics\
+5. Some Useful Programming Tricks\
 \
 
 \b\fs28 0. Necessary Dependencies\
@@ -230,7 +232,7 @@ Note that at the bottom of the header there are two functions, one of which is a
 
 \b \cf3 Hamiltonians with variable parameters\
 
-\b0 In some cases, it may be desirable to write a hamiltonian that contains some sort of variable parameter that can be set dynamically by the user at the time of simulation. In this case, the variable parameter should be declared as a global variable in hamiltonian header file (in other words, it should be declared ABOVE the class declaration), and then used like any other variable in the calculation function. The Monte Carlo simulation will have to be edited to prompt the user for the value of the parameter. 
+\b0 In some cases, it may be desirable to write a hamiltonian that contains some sort of variable parameter that can be set dynamically by the user at the time of simulation. In this case, the variable parameter should be declared as a global variable in hamiltonians.h header file and then used like any other variable in the calculation function of the appropriate hamiltonian. This is the only case in which the hamiltonians.h header file should be manually edited. The Monte Carlo simulation will have to be edited to prompt the user for the value of the parameter. 
 \b Currently, the simulation is using the Basic Square Hamiltonian, which includes a variable called \'93SOURCE.\'94 
 \b0 If future hamiltonians only contain one variable parameter, it may be best to just call them \'93SOURCE\'94 in order to avoid having to edit the Monte Carlo Simulation. However if in the future hamiltonians are used that have no source term, or have multiple source terms, the Monte Carlo simulation will have to be edited to set those variable accordingly.\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
@@ -254,7 +256,7 @@ In the Monte-Carlo simulation itself, the simulation functions are referred to a
 \b\fs28 \cf0 \CocoaLigature1 4. The hGraph class\
 \
 
-\b0\fs22 The hGraph class is the central piece of the entire graphity project. It contains all the necessary functions for creating, manipulating, and getting values from the graphs used in this project. An hGraph object consists of a number of attributes that contain information about the graph.\
+\b0\fs22 The hGraph class is the central piece of the entire graphity project. It contains all the necessary functions for creating, manipulating, and getting values from the graphs used in this project. An hGraph object consists of a number of attributes that contain information about the graph. An important thing to note is that since C++ is zero-indexed, the hGraph class is also zero-indexed, meaning that in a graph of 10 nodes the nodes themselves will be labeled (0\'859).\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
@@ -506,7 +508,7 @@ The graph imaging function can be found in the resource/grapics/graphImager/ fol
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1 \cf0 \cb7 void graphImage(hGraph graph);\
+\f1 \cf0 \cb4 void graphImage(hGraph graph);\
 \
 
 \f0 As should be clear from the prototype, it simply takes in a graph object (NOT a pointer to a graph object. It then prompts the user for important information (such as image size in pixels) and then outputs the graph to a file. In order to determine where to place the nodes on the graph, the various nodes are initialized at random places in the canvas, and a \'93hamiltonian\'94 is defined over them. A Monte Carlo simulation is then run on the nodes until a \'93low energy\'94 state is reached. This method is adapted from the one discussed in Section IV of arXiv:1210.3372 [gr-qc].\
@@ -515,7 +517,52 @@ In addition to these, there is a standalone module, called GraphCSV, that does t
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \fs24 \cf0 \
+
+\b\fs28 5. Some Useful Programming Tips\
+
+\b0\fs24 \
+
+\fs22 The following are just a few tricks that are useful to keep in mind when programming new algorithms.\
+\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs22 \cf0 \
-}
+\b \cf0 Looping over all pairs of nodes\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b0 \cf0 There is a simple way to loop over all pairs of nodes (aka all edges) in a graph without repeating any edges. One might initially approach the problem by creating two for loops like this:\
+\
+\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
+
+\f1 \cf3 \cb5 for(int i = 0; i < NUM_NODES; i++) \{\
+	for(int j = 0; j < NUM_NODES; j++) \{\
+		
+\f2\i do some procedure;\
+	
+\f1\i0 \}
+\f2\i \
+
+\f1\i0 \}\
+\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
+
+\f0\b \cf0 \cb1 \
+
+\b0 However this will double count all the edges (as the edge represented by i = 1, j = 2, is the same as the edge represented by i = 2, j = 1) and will also include instances where i is equal to j, which corresponds to an edge with both ends on the same node (which is prohibited in our graphs). One approach might be to include a conditional in the body of the loop that excludes such cases, but this requires unnecessary calculations that will slow the algorithm. There is a much simpler way to do it that avoids excess checks: \
+\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
+
+\f1 \cf3 \cb5 \
+for(int i = 0; i < NUM_NODES; i++) \{\
+	for(
+\f3\i\b int j = i+1
+\f1\i0\b0 ; j < NUM_NODES; j++) \{\
+		
+\f2\i do some procedure;\
+	
+\f1\i0 \}
+\f2\i \
+
+\f1\i0 \}
+\f0 \cf0 \cb1 \
+\
+Initializing j to be i+1 both ensures that i never equals j and also that no edge is double-counted. For example, i = 1, j = 2 is allowed, however i = 2, j = 1 is not allowed because j is 
+\i always 
+\i0 greater than i. An example of where the is used is in the compliment() algorithm, which returns a graph in which all edges flipped to the opposite state. }

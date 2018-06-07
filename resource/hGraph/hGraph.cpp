@@ -46,12 +46,12 @@
 
 //---------------------------CONSTRUCTORS---------------------------//
 
-hGraph::hGraph(int size):NUM_NODES(size) { //Basic constructor. Creates an graph of given size with no connections
+hGraph::hGraph(int size):NUM_NODES(size) { //Basic constructor. Creates an graph of given size with no connections. Most often used of the constructors
     _adjMatrix = MatrixXi::Zero(size, size);
     _degVector = Eigen::VectorXi::Zero(size);
     _numCliques = std::vector <int> (size, 0);
     for(int i = 0; i < size; i++) {
-        _eccentricities.push_back(0);
+        _eccentricities.push_back(0); //Initializes this vector with zeroes
         
     }
     
@@ -65,16 +65,16 @@ hGraph::hGraph() {  //default constructor. Creates placeholder. Should not be us
 
 }
 
-hGraph::hGraph(int size, MatrixXi adjMatrix):NUM_NODES(size) { //Takes a size and a previously defined adjacency matrix and creates an hGraph object. Most often used of the constructors
-    _adjMatrix = MatrixXi::Zero(size, size);
+hGraph::hGraph(int size, MatrixXi adjMatrix):NUM_NODES(size) { //Takes a size and a previously defined adjacency matrix and creates an hGraph object.
+    _adjMatrix = MatrixXi::Zero(size, size); //Matrix has to be created and assigned in seperate steps
     _adjMatrix = adjMatrix;
     _degVector = Eigen::VectorXi::Zero(size);
     _hamiltonian = 0.0;
-    _dimension = 0; //this is not initialized by default due to the high computing cost. ???Why is there a phase transition at 36 nodes???
+    _dimension = 0; //this is not initialized by default due to the high computing cost.
     _numCliques = std::vector<int> (size, 0);
     for(int i = 0; i < NUM_NODES; i++) {
         _eccentricities.push_back(0);
-        for(int j = 0; j < size; j++) {
+        for(int j = 0; j < NUM_NODES; j++) {
             _degVector[i] += _adjMatrix(i, j);
         }
     }
@@ -98,7 +98,7 @@ hGraph::~hGraph() { //Since the hGraph class does not include any pointers, ther
 //---------------------------GETTERS---------------------------//
 
 double hGraph::getDimension() { //simple getter function. See below for the dimensionality algorithm.
-    if(!dimensionFound) {
+    if(!dimensionFound) { //Checks if the dimenison has already been calculated
         calcDimension();
         dimensionFound = true;
     }
@@ -129,7 +129,7 @@ int hGraph:: getSize() { //simple getter function
 
 void hGraph::numCliques() { //simply outputs the number of cliques (NOT maximal cliques) of any given size. The cliques are stored in an vector attribute called "_numCliques"
     for (int i = 0; i < NUM_NODES; i++) {
-        std::cout << _numCliques.at(i);
+        std::cout << i+1 << ": " _numCliques.at(i) << std::endl;
     }
     std::cout << std::endl;
 }
@@ -215,17 +215,17 @@ void hGraph::flipEdge(int nodeA, int nodeB) {
     }
 
     cliquesFound = false; //In general, if an edge if flipped this information is lost.
-    dimensionFound = false;       //There is no closed-form algorithm (that I am aware) that determines the new dimensionality if a single edge is removed.
+    dimensionFound = false; //There is no closed-form algorithm (that I am aware) that determines the new dimensionality if a single edge is removed.
     
 }
 
-void hGraph::flipEdge(std::vector<int> nodeA, std::vector<int> nodeB) { //Multiple nodes can be flipped at once. The two vectors correspond to pairs of nodes.
+void hGraph::flipEdge(std::vector<int> nodeA, std::vector<int> nodeB) { //Multiple edges can be flipped at once. The two vectors correspond to pairs of nodes.
     for(int i = 0; i < nodeA.size(); i++) {                             //This is used primarily in the monte-carlo algorithm.
         flipEdge(nodeA[i], nodeB[i]);
     }
 }
 
-void hGraph::acceptPartial(double partial) {
+void hGraph::acceptPartial(double partial) { //Adds the value passed to the function to the value of the hamiltonian. Used primarily in the Monte Carlo simulation
     _hamiltonian += partial;
     
 }
@@ -260,13 +260,13 @@ MatrixXi hGraph::getShortestPaths() {
             
             if((i != j) && (pathMatrix(i,j) == 0)) {
                 pathMatrix(i,j) = 10000000; //A stand in for infinity. Two nodes that CANNOT be walked between will have this value (unless the nodes are the same node)
-            }
+            }                               //Both Eigen and C++ have infinity as a value, which was causing issues, so I just used a big number.
             
         }
     }
     
     
-    for(int k = 0; k < NUM_NODES; k++) {
+    for(int k = 0; k < NUM_NODES; k++) {    //Calculates the actual values
         for(int i = 0; i < NUM_NODES; i++) {
             for(int j = 0; j < NUM_NODES; j++) {
                 
@@ -289,7 +289,7 @@ MatrixXi hGraph::getShortestPaths() {
 hGraph hGraph::compliment() { //Returns an hGraph object where the adjacency matrix is the compliment of the original hGraph's adjacency matrix.
     hGraph temp(NUM_NODES, _adjMatrix);
     for(int i = 0; i < NUM_NODES; i++) {
-        for(int j = i+1; j < NUM_NODES; j++) {
+        for(int j = i+1; j < NUM_NODES; j++) { //Using nested loops where the inner loop 
             temp.flipEdge(i, j);
         }
     }
