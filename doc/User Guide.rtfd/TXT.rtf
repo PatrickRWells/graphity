@@ -15,14 +15,15 @@
 \
 
 \b0\fs24 0. Necessary dependencies\
-1. Using the Monte Carlo Simulation
+1. Using the Python Script\
+2. The Monte Carlo Simulation
 \fs28 \
 
-\fs22 2. Hamiltonians\
-3. The hGraph class\
-4. Graphics\
-5. Some Useful Programming Tricks\
-6. Extending with a new module\
+\fs22 3. Hamiltonians\
+4. The hGraph class\
+5. Graphics\
+6. Some Useful Programming Tricks\
+7. Extending with a new module\
 \
 
 \b\fs28 0. Necessary Dependencies\
@@ -88,23 +89,41 @@ Additionally, the script requires the module \'93pexpect\'94. The easiest way to
 \f1  pexpect\
 \
 
-\f0 Obviously if your default version of python is 3.6 or greater, the 3.6 in the command is unnecessary.\
+\f0 Obviously if your default version of python is 3.6 or greater, the 3.6 and probably the -m) in the command is unnecessary.\
+\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf0 \cb1 \
 
-\b\fs28 1. Using the Monte Carlo Simulation
+\b\fs28 \cf0 \cb1 1. The Python Script\
+
+\b0 \
+
+\fs22 The Python Script run.py in the main Graphity folder has been created to outsource as much of the necessary code modification as possible. This allows the user to run many different simulations with many different parameters (and even different hamiltonians) without ever modifying the underlying code base. For example: If the user creates a new hamiltonian and then tells the Python script to install it, the script modify the appropriate header file to include the hamiltonian (allowing it to be used by the simulation) and edits the hamiltonians.txt file, which is used as a reference. If the user then asks the python script to run the simulation with the new hamiltonian, the MonteCarlo.cpp file is edited so that the function objects reference the correct simulation function, and simulation is rebuilt using the makefile. 
+\i\b This is why the naming conventions outlined in the \'93Writing new Hamiltonians\'94  section must be followed exactly.
+\b0  
+\i0 The Python script does not dynamically determine the name of the simulation functions, but instead assumes them based on a template. If any naming conventions are not followed, it will prevent the simulations from compiling.\
+\
+For the most part, the script is self-explanatory. However it is important to note that when running modules from the python script, the working directory will be the main graphity directory (where the python script is located), rather than the directory where the module resides. The only place where this will really matter is in outputting files. For example, if the Monte Carlo simulation is called by the python script, and the folder it is told to place its output in is called \'93data,\'94 it will look for the folder graphity/data/. However if the Monte Carlo simulation is called directly form the command line, it will look at graphity/Simulate/Monte-Carlo/data/. 
+\b \cf3 \cb4 \
+
+\b0 \cf0 \cb1 \
+
+\b\fs28 2. The Monte Carlo Simulation
 \b0 \
 \
 
 \fs22 The Monte Carlo simulation is the main simulation in the project. It is almost entirely self contained, meaning the user should almost never have to edit the simulation code. The Monte Carlo simulation can be called either by the Python script or from the terminal. Note that if the user wishes to change the hamiltonian, they will need to call the simulation from the Python. The Python script edits the code to ensure the correct hamiltonian is being used. Once this change has been made once, using the python script is unnecessary until the user wishes to change the hamiltonian again.\
 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b \cf0 Note on placing the data in a separate folder: 
+\b0 The first prompt the user gets when running the Monte-Carlo simulation is in what folder they would like to place the data (relative to the current working directory). In the event that the folder does not exist, the Monte Carlo simulation will attempt to create it. However it can only create the final folder in the path. If, for example, you tell it to put data in data/basicHam/nofield/TINV-0.1 and any of the folders prior to TINV-0.1 does not exist, the folder creation will fail and the Monte Carlo simulation will automatically terminate\
+\
 The Monte Carlo simulation can be seeded with a graph of the user\'92s choosing. This graph should be stored in a CSV file that has been outputted either in a previous run of the simulation, or in another module of the project. See the hGraph class documentation for information on inputting and outputting graph files. If the user opts not to input a graph from file, three seed graphs will be generated. Two will be random graphs, and the third will be an empty graphs. The user will be prompted for all other data that is needed in order for the simulation to run. All files containing outputted data will be placed in the same folder as the simulation files themselves, and should be moved before rerunning the simulation to ensure no data is lost. \
 \
 The Monte Carlo simulation allows the user to change parameters, including what data to collect and how frequently, simply by answering the initial prompts. As such there should be no reason, in general, for the user to have to edit the code itself. However if the user wishes to add a new observable to the simulation then there are some fairly straightforward edits that need to be made. \
 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 How the Monte Carlo simulation stores data\
+\b How the Monte Carlo simulation stores data\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \b0 \cf0 \
@@ -179,7 +198,7 @@ Notice that the correlation function is an observable, and will need to be added
 \b0 The correlation function takes as an input the array of data (a pointer), the integer value associated with the graph, the unique identifier for the data to calculate the correlation function on, and the unique identifier corresponding to the correlation function for that data (so it knows where to put the calculated values). \
 \
 4. Outputting to CSVs\
-The data can be outputted to a CSV. I recommend just copying and pasting one of the already existing CSV output blocks and replacing the unique identifier and the output file stream. The output file streams are declared at the top of main, and a new one will need to be created to output a new observable\'92s data set.\
+The data can be outputted to a CSV. I recommend just copying and pasting one of the already existing CSV output blocks and replacing the unique identifier and the output file stream. The output file streams are declared at the top of main. A new one is automatically created when NUM_OBSERVABLES is increased, and can be referenced by outStreams[UNIQUE_ID] where UNIQUE_ID is the unique identifier of the observable (corresponding to an integer)\
 \
 5. Generating plots\
 The Monte Carlo simulation can automatically make data plots. This is done towards the bottom of main. I again recommend just copying and pasting,\
@@ -238,6 +257,11 @@ Note that at the bottom of the header there are two functions, one of which is a
 \b0 If future hamiltonians only contain one variable parameter, it may be best to just call them \'93SOURCE\'94 in order to avoid having to edit the Monte Carlo Simulation. However if in the future hamiltonians are used that have no source term, or have multiple source terms, the Monte Carlo simulation will have to be edited to set those variable accordingly.\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf3 \
+
+\b Installing hamiltonians\
+
+\b0 Once the hamiltonian has been written, it has to be installed. This can be done simply by running the Python script and selecting the corresponding options. All hamiltonian header files need to remain in the hamiltonian folder. If after installing a new hamiltonian you are unable to run the simulation, there is a high probability that there is an error in the hamiltonian itself. The compiler errors should give you an idea of what the problem is. \
+\
 
 \b How hamiltonians are utilized by the Monte Carlo simulation\
 
@@ -492,7 +516,7 @@ The hGraph class header file and implementation file also contains two other cla
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs28 \cf0 4. Graphics\
+\b\fs28 \cf0 5. Graphics\
 
 \b0 \
 
@@ -502,27 +526,37 @@ The plotting function is found in the resource/graphics/graphutil/ folder. It wa
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1\fs22 \cf3 \cb5 void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, std::string descriptors[]);\
+\f1\fs22 \cf3 \cb5 void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, std::string descriptors[], std::string folder);\
 \
 
-\f0 In keeping with the standard laid out in the Monte-Carlo simulation, the first index of the double array indicates the data series (the graph in the Monte Carlo simulation), while the second refers to the specific set of values to be plotted (the observable). In the Monte Carlo simulation, this is done by passing the data pointer, along with the numGraphs variable and the integer constant corresponding to the data being plotted. The fourth argument is an array of strings that will be used as legend entries (if the user chooses to draw a legend).\
+\f0 In keeping with the standard laid out in the Monte-Carlo simulation, the first index of the double array indicates the data series (the graph in the Monte Carlo simulation), while the second refers to the specific set of values to be plotted (the observable). In the Monte Carlo simulation, this is done by passing the data pointer, along with the numGraphs variable and the integer constant corresponding to the data being plotted. The fourth argument is an array of strings that will be used as legend entries (if the user chooses to draw a legend). The final argument is a string that contains the name of the folder that the  image will be placed in. See the note below.\
 \
 \
 The graph imaging function can be found in the resource/grapics/graphImager/ folder. The function has the following prototype: \
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1 \cf0 \cb4 void graphImage(hGraph graph);\
+\f1 \cf0 \cb4 void graphImage(hGraph graph, std::string folder);\
 \
 
 \f0 As should be clear from the prototype, it simply takes in a graph object (NOT a pointer to a graph object. It then prompts the user for important information (such as image size in pixels) and then outputs the graph to a file. In order to determine where to place the nodes on the graph, the various nodes are initialized at random places in the canvas, and a \'93hamiltonian\'94 is defined over them. A Monte Carlo simulation is then run on the nodes until a \'93low energy\'94 state is reached. This method is adapted from the one discussed in Section IV of arXiv:1210.3372 [gr-qc].\
+\
+
+\b Note on the \'93folder\'94 argument: 
+\b0 The folder argument in these two functions is used to instruct the functions which directory to place the outputted files 
+\i relative to the current working directory. 
+\i0 In the even that the empty string ( \'93\'94 ) is passed to the function, or the first character is a space, the resultant files will be placed in the current working directory. Folder strings should be formatted in the standard way (ex. the folder the \'93tests\'94 subfolder in the folder \'93data\'94 would be represented as data/tests/). This can include moving up the folder hierarchy by using .. (ex. if the current working directory is Monte-Carlo, and the parent directory contains the folder \'93Data\'94, that folder can be referenced with \'91../data\'92). Trailing slashes will be added when necessary. 
+\b It is the responsibility of the 
+\i calling program
+\i0  to ensure that the folder actually exists. 
+\b0 If the folder does not exist, image output will faill.\
 \
 In addition to these, there is a standalone module, called GraphCSV, that does the same thing as drawMultiGraph, but on data that has already been stored in a CSV file. It its pre-compiled and can be copied wherever it is needed.\cb1 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \fs24 \cf0 \
 
-\b\fs28 5. Some Useful Programming Tips\
+\b\fs28 6. Some Useful Programming Tips\
 
 \b0\fs24 \
 
@@ -573,7 +607,7 @@ Initializing j to be i+1 both ensures that i never equals j and also that no edg
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs28 \cf0 6. Extending with a New Module\
+\b\fs28 \cf0 7. Extending with a New Module\
 
 \b0\fs22 It may come to pass that at some point in the future a new module needs to be written with the resources (such as the hGraph class) that this project already has. In this case, there are two primary things that need to be considered: includes and makefiles.\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0

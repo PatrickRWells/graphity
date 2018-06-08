@@ -56,21 +56,25 @@ int main() {
     if(!engOut.is_open()) {
         std::string cmd = "mkdir " + folder;
         system(cmd.c_str());
-        std::cout << "The folder specified does not exist and has been automatically created" << std::endl;
         engOut.open(energyOutput);
+        if(!engOut.is_open()) {
+            std::cout << "Could not create files in the given folder... Terminating" << std::endl;
+            exit(3);
+            
+        }
+        std::cout << "The folder specified does not exist and has been automatically created" << std::endl;
         
     }
     
-    std::ofstream paramOut(folder + "parameters.txt");
 
-    std::ofstream dimenCorrOut;
-    std::ofstream dimenOut; //Forward declaration of output file streams. These may or may not be used depending on the data the user wishes to colelct
-    std::ofstream engCorrOut;
-    std::ofstream avgDegOut;
-    std::ofstream allOut;
-    std::ofstream avgDegCorrOut;
-    std::ofstream eulerCharOut;
     
+    
+    std::ofstream paramOut(folder + "parameters.txt");
+    std::ofstream allOut;
+
+
+    std::ofstream outStreams[NUM_OBSERVABLES]; //Forward declaration of output file streams for observables. These may or may not be used depending on the data the user wishes to collect
+
     //Sets simulation functions. This is the section that is edited by the python script. Can also be set manually
 	simFunction = curveDiffHam;
 	simPartial = curveDiffPartial;
@@ -281,88 +285,88 @@ int main() {
     //All data sets that were collected are now outputed to CSVs
     
     if(observables[DIMEN_CORR]) { //Outputs dimensionality correlation function to a CSV file
-        dimenCorrOut.open(folder + "dimenCorrelation.csv");
+        outStreams[DIMEN_CORR].open(folder + "dimenCorrelation.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][DIMEN_CORR].size(); j++) {
-                dimenCorrOut << data[i][DIMEN_CORR][j];
+                outStreams[DIMEN_CORR] << data[i][DIMEN_CORR][j];
                 if(j != data[i][DIMEN_CORR].size() - 1) {
-                    dimenCorrOut << ',';
+                    outStreams[DIMEN_CORR] << ',';
                 }
                 
             }
-            dimenCorrOut << '\n';
+            outStreams[DIMEN_CORR] << '\n';
         }
-        dimenCorrOut.close();
+        outStreams[DIMEN_CORR].close();
     }
 
     if(observables[DIMEN]) { //outputs dimensionality to a CSV file
-        dimenOut.open(folder + "dimensionality.csv");
+        outStreams[DIMEN].open(folder + "dimensionality.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][DIMEN].size(); j++) {
-                dimenOut << data[i][DIMEN][j];
+                outStreams[DIMEN] << data[i][DIMEN][j];
                 if(j != data[i][DIMEN].size()-1) {
-                    dimenOut << ',';
+                    outStreams[DIMEN] << ',';
                 }
             }
-            dimenOut << '\n';
+            outStreams[DIMEN] << '\n';
         }
-        dimenOut.close();
+        outStreams[DIMEN].close();
     }
     
     if(observables[ENERGY_CORR]) { //Outputs the energy correlation function to a CSV file
-        engCorrOut.open(folder + "energyCorrelation.csv");
+        outStreams[ENERGY_CORR].open(folder + "energyCorrelation.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][ENERGY_CORR].size(); j++) {
-                engCorrOut << data[i][ENERGY_CORR][j];
+                outStreams[ENERGY_CORR] << data[i][ENERGY_CORR][j];
                 if(j != data[i][ENERGY_CORR].size()-1) {
-                    engCorrOut << ',';
+                    outStreams[ENERGY_CORR] << ',';
                 }
             }
-            engCorrOut << '\n';
+            outStreams[ENERGY_CORR] << '\n';
         }
-        engCorrOut.close();
+        outStreams[ENERGY_CORR].close();
     }
     
     if(observables[AVG_DEGREE]) { //Outputs average node degree to a CSV file
-        avgDegOut.open(folder + "averageDegree.csv");
+        outStreams[AVG_DEGREE].open(folder + "averageDegree.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][AVG_DEGREE].size(); j++) {
-                avgDegOut << data[i][AVG_DEGREE][j];
+                outStreams[AVG_DEGREE] << data[i][AVG_DEGREE][j];
                 if(j != data[i][AVG_DEGREE].size()-1) {
-                    avgDegOut << ',';
+                    outStreams[AVG_DEGREE] << ',';
                 }
             }
-            avgDegOut << '\n';
+            outStreams[AVG_DEGREE] << '\n';
         }
-        avgDegOut.close();
+        outStreams[AVG_DEGREE].close();
     }
     
     if(observables[AVG_DEGREE_CORR]) { //Outputs average degree correlation function to CSV file
-        avgDegCorrOut.open(folder + "averageDegreeCorrelation.csv");
+        outStreams[AVG_DEGREE_CORR].open(folder + "averageDegreeCorrelation.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][AVG_DEGREE_CORR].size(); j++) {
-                avgDegCorrOut << data[i][AVG_DEGREE_CORR][j];
+                outStreams[AVG_DEGREE_CORR] << data[i][AVG_DEGREE_CORR][j];
                 if(j != data[i][AVG_DEGREE_CORR].size()-1) {
-                    avgDegCorrOut << ',';
+                    outStreams[AVG_DEGREE_CORR] << ',';
                 }
             }
-            avgDegCorrOut << '\n';
+            outStreams[AVG_DEGREE_CORR] << '\n';
         }
-        avgDegCorrOut.close();
+        outStreams[AVG_DEGREE_CORR].close();
     }
 
     if(observables[EULER_CHAR]) { //Outputs  euler characteristic to CSV file
-        eulerCharOut.open(folder + "eulerChar.csv");
+        outStreams[EULER_CHAR].open(folder + "eulerChar.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][EULER_CHAR].size(); j++) {
-                eulerCharOut << data[i][EULER_CHAR][j];
+                outStreams[EULER_CHAR] << data[i][EULER_CHAR][j];
                 if(j != data[i][EULER_CHAR].size()-1) {
-                    eulerCharOut << ',';
+                    outStreams[EULER_CHAR] << ',';
                 }
             }
-            eulerCharOut << '\n';
+            outStreams[EULER_CHAR] << '\n';
         }
-        eulerCharOut.close();
+        outStreams[EULER_CHAR].close();
     }
     
     

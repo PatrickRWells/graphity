@@ -9,6 +9,16 @@
 
 void graphImage(hGraph graph, std::string folder) {
     
+    if(folder.size() != 0 && folder[0] != ' ') {
+        if(folder[folder.size() -1] != '/') {
+            folder += '/';
+        }
+    }
+    
+    else {
+        folder = "";
+    }
+    
     double TINV = 2.5;
     int imageSize;
     std::string imageName;

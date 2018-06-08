@@ -24,7 +24,14 @@ void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, 
      */
     
 
-    
+    if(folder.size() != 0 && folder[0] != ' ') {
+        if(folder[folder.size() -1] != '/') {
+            folder += '/';
+        }
+    }
+    else {
+        folder = "";
+    }
     
     std::string fileName;
     std::cout << "Input a filename for the plot: ";
