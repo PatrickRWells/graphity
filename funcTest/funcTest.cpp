@@ -29,15 +29,10 @@ bool getTF();
 
 int main() {
 
-    int size = 50;
-    hGraph test(size);
-    test = randomGraph(size, 0.3);
-    test.setThreads(4);
-
-    std::cout << test.getDimension() << std::endl;
-
-
-
+    hGraph graph = zeroGraph(20);
+    std::cout << graph.getEulerChar() << std::endl;
+    curveDiffHam(graph);
+    
 }
 
 bool getTF() {

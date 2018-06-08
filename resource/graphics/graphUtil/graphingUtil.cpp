@@ -15,7 +15,7 @@
 
 
 
-void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable) {
+void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, std::string descriptors[]) {
     /*
      Takes in three parameters. A double array with all the data. An integer indicating the number
      of data series (typically the number of graphs simulated over in the Monte-Carlo simulation,
@@ -123,10 +123,7 @@ void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable) 
     legend->SetHeader("Legend", "C");
     if(isLegend) {
         for(int i = 0; i < numSeries; i++) {
-            std::string lname;
-            std::cout << "Input title of data series " << i << ": ";
-            std::getline(std::cin, lname);
-            legend->AddEntry(graphs[i], lname.c_str());
+            legend->AddEntry(graphs[i], descriptors[i].c_str());
             
         }
     }
@@ -152,6 +149,8 @@ void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable) 
 void correlationFn(std::vector<double> **data, int run, int inData, int outData) {
     //Calculates the autocorrelation function when passed a vector with data and a vector to place results
     //(pointers). See Monte Carlo Methods in Statistical Physics - 3.21
+    //The variables run and inData correspond to the indices of the double array "data" that the vector with the data.
+    //Run + outData corresponds to the vector that the data will be stored in.
     int tMax = data[run][inData].size();
     for(int t = 0; t < tMax; t++ ) {    //The algorithm uses the same variable names (with tp for t') as the algorithm in the book does.
         double sum = 0;                 //Calculates the function at all times.

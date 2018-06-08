@@ -37,9 +37,27 @@ int main() {
     
     
     std::vector<bool> observables (NUM_OBSERVABLES, false); // true/false. Tells the program which data to save.
+    std::string folder;
+    std::cout << "What folder would you like to place results in? Leave blank to place results in the current working directory. ";
+    std::getline(std::cin, folder);
+    if(folder.length() > 0 && folder[0] != ' ') {
+        if(folder[folder.length() -1] != '/') {
+            folder += '/';
+        }
+    }
+
+    std::string energyOutput = folder + "energy.csv";
     
-    std::ofstream engOut("energy.csv"); //Energy and simulation parameters will always be outputted
-    std::ofstream paramOut("parameters.txt");
+    std::ofstream engOut(energyOutput); //Energy and simulation parameters will always be outputted
+    if(!engOut.is_open()) {
+        std::string cmd = "mkdir " + folder;
+        system(cmd.c_str());
+        std::cout << "The folder specified does not exist and has been automatically created" << std::endl;
+        engOut.open(energyOutput);
+        
+    }
+    
+    std::ofstream paramOut(folder + "parameters.txt");
 
     std::ofstream dimenCorrOut;
     std::ofstream dimenOut; //Forward declaration of output file streams. These may or may not be used depending on the data the user wishes to colelct
@@ -121,8 +139,10 @@ int main() {
     std::cout << "Would you like to calculate the average node degree? (y/n) ";
     observables[AVG_DEGREE] = getTF();
 
-    std::cout << "Would you like to calculate the correlation function for the average node degree? (y/n) ";
-    observables[AVG_DEGREE_CORR] = getTF();
+    if(observables[AVG_DEGREE]) {
+        std::cout << "Would you like to calculate the correlation function for the average node degree? (y/n) ";
+        observables[AVG_DEGREE_CORR] = getTF();
+    }
     
     std::cout << "Would you like to calculate the Euler Characteristic for the graph? (y/n) ";
     observables[EULER_CHAR] = getTF();
@@ -179,7 +199,7 @@ int main() {
             
         }
         
-        else { //if dimensionality IS being measured, the simulations are run in series.
+        else { //if dimensionality IS being measured, the simulations are run in series. This is the most efficient way to use the processor.
             monteCarlo(graphs[0], observables, data, 0, true, description[0]);
             monteCarlo(graphs[1], observables, data, 1, true, description[1]);
             monteCarlo(graphs[2], observables, data, 2, true, description[2]);
@@ -192,10 +212,10 @@ int main() {
     }
     
     
-    allOut.open("allOut.csv");
+    allOut.open(folder + "allOut.csv");
     allOut << SIZE << std::endl;
     for(int i = 0; i < numGraphs; i++) {
-        allOut << *(graphs[i]); //Outputs all the graphs to a single file. Graphs are also outputted to individual files in the monte-carlo simulation.
+        allOut << *(graphs[i]); //Outputs all the graphs to a single file. Graphs are also outputted to individual files.
     }
     
                            
@@ -213,7 +233,7 @@ int main() {
         
     }
     engOut.close();
-    //Correlation functions are now calculated. Implementation of correlation function is below main.
+    //Correlation functions are now calculated. Implementation of correlation can be found in the graphUtil.cpp file in resources/graphics/graphUtil/
     if(observables[DIMEN_CORR]) {
         std::cout << "Calculating dimensionality corrrelation function..."  << std::endl;
         for(int i = 0; i < numGraphs; i++) {
@@ -245,7 +265,7 @@ int main() {
     //All data sets that were collected are now outputed to CSVs
     
     if(observables[DIMEN_CORR]) { //Outputs dimensionality correlation function to a CSV file
-        dimenCorrOut.open("dimenCorrelation.csv");
+        dimenCorrOut.open(folder + "dimenCorrelation.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][DIMEN_CORR].size(); j++) {
                 dimenCorrOut << data[i][DIMEN_CORR][j];
@@ -260,7 +280,7 @@ int main() {
     }
 
     if(observables[DIMEN]) { //outputs dimensionality to a CSV file
-        dimenOut.open("dimensionality.csv");
+        dimenOut.open(folder + "dimensionality.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][DIMEN].size(); j++) {
                 dimenOut << data[i][DIMEN][j];
@@ -274,7 +294,7 @@ int main() {
     }
     
     if(observables[ENERGY_CORR]) { //Outputs the energy correlation function to a CSV file
-        engCorrOut.open("energyCorrelation.csv");
+        engCorrOut.open(folder + "energyCorrelation.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][ENERGY_CORR].size(); j++) {
                 engCorrOut << data[i][ENERGY_CORR][j];
@@ -288,7 +308,7 @@ int main() {
     }
     
     if(observables[AVG_DEGREE]) { //Outputs average node degree to a CSV file
-        avgDegOut.open("averageDegree.csv");
+        avgDegOut.open(folder + "averageDegree.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][AVG_DEGREE].size(); j++) {
                 avgDegOut << data[i][AVG_DEGREE][j];
@@ -302,7 +322,7 @@ int main() {
     }
     
     if(observables[AVG_DEGREE_CORR]) { //Outputs average degree correlation function to CSV file
-        avgDegCorrOut.open("averageDegreeCorrelation.csv");
+        avgDegCorrOut.open(folder + "averageDegreeCorrelation.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][AVG_DEGREE_CORR].size(); j++) {
                 avgDegCorrOut << data[i][AVG_DEGREE_CORR][j];
@@ -316,7 +336,7 @@ int main() {
     }
 
     if(observables[EULER_CHAR]) { //Outputs  euler characteristic to CSV file
-        eulerCharOut.open("eulerChar.csv");
+        eulerCharOut.open(folder + "eulerChar.csv");
         for (int i = 0; i < numGraphs; i++) {
             for(int j = 0; j < data[i][EULER_CHAR].size(); j++) {
                 eulerCharOut << data[i][EULER_CHAR][j];
@@ -341,14 +361,14 @@ int main() {
     
     if(getTF()) {
         std::cout << "Plotting energy..." << std::endl; //plots energy
-        drawMultiGraph(data, numGraphs, ENERGY); //See the graphics folder in resources for information
+        drawMultiGraph(data, numGraphs, ENERGY, description); //See the graphics folder in resources for information, or the corresponding entry in the user guide
     }
     
     if(observables[ENERGY_CORR]) {
         std::cout << "Would you like to plot the energy correlation function? (y/n) ";
         if(getTF()) {
             std::cout << "Plotting energy correlation function... " << std::endl; //plots energy correlation function
-            drawMultiGraph(data, numGraphs, ENERGY_CORR);
+            drawMultiGraph(data, numGraphs, ENERGY_CORR, description);
         }
         
     }
@@ -357,7 +377,7 @@ int main() {
         std::cout << "Would you like to plot the dimensionality? (y/n) ";
         if(getTF() ){
             std::cout << "Plotting dimensionality... " << std::endl; //plots dimensionality.
-            drawMultiGraph(data, numGraphs, DIMEN);
+            drawMultiGraph(data, numGraphs, DIMEN, description);
         }
     }
     
@@ -365,7 +385,7 @@ int main() {
         std::cout << "Would you like to plot the dimensionality correlation function? (y/n) ";
         if(getTF()) {
             std::cout << "Plotting dimensionality correlation function... " << std::endl; //plots dimensionality correlation function
-            drawMultiGraph(data, numGraphs, DIMEN_CORR);
+            drawMultiGraph(data, numGraphs, DIMEN_CORR, description);
         }
     }
     
@@ -373,7 +393,7 @@ int main() {
         std::cout << "Would you like to plot the average node degree? (y/n) ";
         if(getTF()) {
             std::cout << "Plotting average node degree" << std::endl; //plots average node degree
-            drawMultiGraph(data, numGraphs, AVG_DEGREE);
+            drawMultiGraph(data, numGraphs, AVG_DEGREE, description);
             
         }
         
@@ -383,7 +403,7 @@ int main() {
         std::cout << "Would you like to plot the average node degree correlation function? (y/n) ";
         if(getTF()) {
             std::cout << "Graph average node degree correlation function" << std::endl; //plots dimensionality correlation function
-            drawMultiGraph(data, numGraphs, AVG_DEGREE_CORR);
+            drawMultiGraph(data, numGraphs, AVG_DEGREE_CORR, description);
             
         }
         
@@ -393,7 +413,7 @@ int main() {
         std::cout << "Would you like to plot the Euler characteristic? (y/n) ";
         if(getTF()) {
             std::cout << "Graphing Euler Characteristic" << std::endl;
-            drawMultiGraph(data, numGraphs, EULER_CHAR);
+            drawMultiGraph(data, numGraphs, EULER_CHAR, description);
         }
         
         
@@ -418,7 +438,7 @@ int main() {
 
                            
     delete [] data;
-    std::cout << "Be sure to move all result files to a different folder to ensure they are not overwritten." << std::endl;
+    std::cout << "If you plan on putting future results in the " << folder << " folder, be sure to move the data elsewhere to avoid overwriting it." << std::endl;
     
 }
                            

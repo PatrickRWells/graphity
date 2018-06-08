@@ -5,7 +5,7 @@
 \red0\green0\blue0;\red255\green255\blue255;}
 {\*\expandedcolortbl;;\cssrgb\c0\c41176\c85098;\cssrgb\c0\c0\c0;\cssrgb\c100000\c100000\c100000;
 \csgray\c0\c0;\csgray\c100000;}
-\margl1440\margr1440\vieww22100\viewh8400\viewkind0
+\margl1440\margr1440\vieww22420\viewh11020\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs36 \cf0 Graphity User\'92s Guide\
@@ -22,6 +22,7 @@
 3. The hGraph class\
 4. Graphics\
 5. Some Useful Programming Tricks\
+6. Extending with a new module\
 \
 
 \b\fs28 0. Necessary Dependencies\
@@ -383,7 +384,10 @@ int getDegree(int node):
 \b0 Returns true if two nodes are connected and false if they aren\'92t.\
 
 \b void numCliques(): 
-\b0 Prints out the number of cliques of every size.
+\b0 Prints out the number of cliques of every size.\
+
+\b double curvatureAt(int node)
+\b0 : Outputs the curvature at a given node. The sum of the curvature at every node is equal to the Euler Characteristic of the graph. 
 \b \
 
 \b0 \
@@ -498,10 +502,10 @@ The plotting function is found in the resource/graphics/graphutil/ folder. It wa
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1\fs22 \cf3 \cb5 void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable);\
+\f1\fs22 \cf3 \cb5 void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, std::string descriptors[]);\
 \
 
-\f0 In keeping with the standard laid out in the Monte-Carlo simulation, the first index of the double array indicates the data series (the graph in the Monte Carlo simulation), while the second refers to the specific set of values to be plotted (the observable). In the Monte Carlo simulation, this is done by passing the data pointer, along with the numGraphs variable and the integer constant corresponding to the data being plotted. \
+\f0 In keeping with the standard laid out in the Monte-Carlo simulation, the first index of the double array indicates the data series (the graph in the Monte Carlo simulation), while the second refers to the specific set of values to be plotted (the observable). In the Monte Carlo simulation, this is done by passing the data pointer, along with the numGraphs variable and the integer constant corresponding to the data being plotted. The fourth argument is an array of strings that will be used as legend entries (if the user chooses to draw a legend).\
 \
 \
 The graph imaging function can be found in the resource/grapics/graphImager/ folder. The function has the following prototype: \
@@ -565,4 +569,29 @@ for(int i = 0; i < NUM_NODES; i++) \{\
 \
 Initializing j to be i+1 both ensures that i never equals j and also that no edge is double-counted. For example, i = 1, j = 2 is allowed, however i = 2, j = 1 is not allowed because j is 
 \i always 
-\i0 greater than i. An example of where the is used is in the compliment() algorithm, which returns a graph in which all edges flipped to the opposite state. }
+\i0 greater than i. An example of where the is used is in the compliment() algorithm, which returns a graph in which all edges flipped to the opposite state. \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b\fs28 \cf0 6. Extending with a New Module\
+
+\b0\fs22 It may come to pass that at some point in the future a new module needs to be written with the resources (such as the hGraph class) that this project already has. In this case, there are two primary things that need to be considered: includes and makefiles.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b \cf0 Includes:
+\b0  \
+Any new module to this project will have to include header files that contain necessary definitions, such as the hGraph class. I will use the Monte Carlo simulation cpp file as an example in this case. I recommend including files without writing out the full path and tell the compiler were to find them in the makefile, rather than writing out the full path in the #include statement of the program you are writing.  \
+The Monte Carlo simulation directly includes three other header files from the project: \'93hamiltonians.h\'94, \'93graphics/graphUtil/graphingUtil.hpp\'94, and \'93graphics/graphImager/graphImager.h\'94. hamiltonians.h itself includes all the hamiltonians that have been installed. hamiltonians.h 
+\i also
+\i0  includes the hGraph.h header file, and as such it is unnecessary to include it a second time in MonteCarlo.cpp. In general, the simpler one makes the includes of their program, the more complex the makefile has to be, however makefiles allow you to define a path as a variable, and this makes it extremely simple to change in the event that some files are moved around at some point.\
+
+\b Makefiles:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b0 \cf0 Makefiles are tricky to write and I will not go into too many technical details here. However fundamentally a makefile is just a sequence of commands to be executed by the terminal with the specific purpose of compiling a particular file. There are a two main parts to the file.\
+\
+The first piece of the file is a set of constants that can be used throughout the file. These constants are not required, but it easier to write the makefile using them than to write what the stand for every time its needed. In all the makefiles written for this project, the first two variables are used to hold the name of the compiler and the C++ standard to use. This project uses gcc and c++11 consistently as the compiler and standard respectively. Presumably, it would compile on other compilers such as Clang, as well as latter C++ standards. It most certainly cannot compile using standards 
+\i older
+\i0  than c++11, as a number of features of c++11 are used frequently throughout the project.\
+\
+}
