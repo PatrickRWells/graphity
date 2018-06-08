@@ -45,6 +45,10 @@ int main() {
             folder += '/';
         }
     }
+    
+    else {
+        folder = "";
+    }
 
     std::string energyOutput = folder + "energy.csv";
     
@@ -211,6 +215,18 @@ int main() {
         }
     }
     
+    for(int i = 0; i < numGraphs; i++) {
+        description[i] = folder + description[i] + ".csv";
+        
+        std::ofstream output(description[i]);
+        output << graphs[i]->getSize() << std::endl;
+        output << *graphs[i];
+        output.close();
+
+        
+        
+    }
+
     
     allOut.open(folder + "allOut.csv");
     allOut << SIZE << std::endl;
@@ -361,14 +377,14 @@ int main() {
     
     if(getTF()) {
         std::cout << "Plotting energy..." << std::endl; //plots energy
-        drawMultiGraph(data, numGraphs, ENERGY, description); //See the graphics folder in resources for information, or the corresponding entry in the user guide
+        drawMultiGraph(data, numGraphs, ENERGY, description, folder); //See the graphics folder in resources for information, or the corresponding entry in the user guide
     }
     
     if(observables[ENERGY_CORR]) {
         std::cout << "Would you like to plot the energy correlation function? (y/n) ";
         if(getTF()) {
             std::cout << "Plotting energy correlation function... " << std::endl; //plots energy correlation function
-            drawMultiGraph(data, numGraphs, ENERGY_CORR, description);
+            drawMultiGraph(data, numGraphs, ENERGY_CORR, description, folder);
         }
         
     }
@@ -377,7 +393,7 @@ int main() {
         std::cout << "Would you like to plot the dimensionality? (y/n) ";
         if(getTF() ){
             std::cout << "Plotting dimensionality... " << std::endl; //plots dimensionality.
-            drawMultiGraph(data, numGraphs, DIMEN, description);
+            drawMultiGraph(data, numGraphs, DIMEN, description, folder);
         }
     }
     
@@ -385,7 +401,7 @@ int main() {
         std::cout << "Would you like to plot the dimensionality correlation function? (y/n) ";
         if(getTF()) {
             std::cout << "Plotting dimensionality correlation function... " << std::endl; //plots dimensionality correlation function
-            drawMultiGraph(data, numGraphs, DIMEN_CORR, description);
+            drawMultiGraph(data, numGraphs, DIMEN_CORR, description, folder);
         }
     }
     
@@ -393,7 +409,7 @@ int main() {
         std::cout << "Would you like to plot the average node degree? (y/n) ";
         if(getTF()) {
             std::cout << "Plotting average node degree" << std::endl; //plots average node degree
-            drawMultiGraph(data, numGraphs, AVG_DEGREE, description);
+            drawMultiGraph(data, numGraphs, AVG_DEGREE, description, folder);
             
         }
         
@@ -403,7 +419,7 @@ int main() {
         std::cout << "Would you like to plot the average node degree correlation function? (y/n) ";
         if(getTF()) {
             std::cout << "Graph average node degree correlation function" << std::endl; //plots dimensionality correlation function
-            drawMultiGraph(data, numGraphs, AVG_DEGREE_CORR, description);
+            drawMultiGraph(data, numGraphs, AVG_DEGREE_CORR, description, folder);
             
         }
         
@@ -413,7 +429,7 @@ int main() {
         std::cout << "Would you like to plot the Euler characteristic? (y/n) ";
         if(getTF()) {
             std::cout << "Graphing Euler Characteristic" << std::endl;
-            drawMultiGraph(data, numGraphs, EULER_CHAR, description);
+            drawMultiGraph(data, numGraphs, EULER_CHAR, description, folder);
         }
         
         
@@ -423,7 +439,7 @@ int main() {
     if(getTF()) {
         for(int i = 0; i < numGraphs; i++) {
             std::cout << "Imaging graph " << description[i] << "..." << std::endl;
-            graphImage(*graphs[i]);
+            graphImage(*graphs[i], folder);
         }
     }
 
@@ -621,11 +637,6 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
         
     }
     std::cout << "Simulation on graph " << descriptor << " complete" << std::endl;
-    descriptor += ".csv";
-    std::ofstream output(descriptor);
-    output << graph->getSize() << std::endl;
-    output << *graph;
-    output.close();
     std::cout << std::endl;
 
     

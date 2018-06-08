@@ -14,7 +14,7 @@
 #include <cairo.h>
 #include "hGraph/hGraph.h"
 
-void graphImage(hGraph graph);
+void graphImage(hGraph graph, std::string folder);
 double energyVal(double position[][2], hGraph graph);
 double distanceSquare(double x1, double y1, double x2, double y2);
 

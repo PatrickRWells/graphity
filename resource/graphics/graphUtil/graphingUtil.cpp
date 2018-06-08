@@ -15,7 +15,7 @@
 
 
 
-void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, std::string descriptors[]) {
+void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, std::string descriptors[], std::string folder) {
     /*
      Takes in three parameters. A double array with all the data. An integer indicating the number
      of data series (typically the number of graphs simulated over in the Monte-Carlo simulation,
@@ -30,6 +30,7 @@ void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, 
     std::cout << "Input a filename for the plot: ";
     std::getline(std::cin, fileName);
     fileName += ".png";
+    fileName = folder + fileName;
     int values = data[0][observable].size();
     
     std::string lowBoundS;

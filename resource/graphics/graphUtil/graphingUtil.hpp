@@ -29,7 +29,7 @@ const int AVG_DEGREE_CORR = 6;
 const int EULER_CHAR = 7;
 
 
-void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, std::string descriptors[]);
+void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, std::string descriptors[], std::string folder);
 void correlationFn(std::vector<double> **data, int run, int inData, int outData);
 
 

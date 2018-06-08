@@ -7,7 +7,7 @@
 
 #include "graphImager.h"
 
-void graphImage(hGraph graph) {
+void graphImage(hGraph graph, std::string folder) {
     
     double TINV = 2.5;
     int imageSize;
@@ -19,6 +19,7 @@ void graphImage(hGraph graph) {
     std::cout << "Input image name: ";
     getline(std::cin, imageName);
     imageName += ".png";
+    imageName = folder + imageName;
     
     int numSweeps = 1000;
     int num = 0;
