@@ -76,8 +76,8 @@ int main() {
     std::ofstream outStreams[NUM_OBSERVABLES]; //Forward declaration of output file streams for observables. These may or may not be used depending on the data the user wishes to collect
 
     //Sets simulation functions. This is the section that is edited by the python script. Can also be set manually
-	simFunction = curveDiffHam;
-	simPartial = curveDiffPartial;
+	simFunction = basicSquareHam;
+	simPartial = basicSquarePartial;
     //
 
     std::cout << "Would you like to input a graph from a file? (y/n) "; //Checks if the user would like to input a graph from a file (vs. using randomly initialized graphs);
@@ -160,6 +160,7 @@ int main() {
     paramOut << "Inverse Temperature: " << TINV << std::endl;
     paramOut << "Sweeps performed: " << maxSweeps << std::endl;
     paramOut << "Source term: " << SOURCE << std::endl;
+    paramOut << "Sweeps between measurements: " << collectionTime << std::endl;
     paramOut.close(); //This file contians all the simulation's parameters for future reference.
     
     

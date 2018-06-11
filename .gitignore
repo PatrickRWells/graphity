@@ -15,3 +15,4 @@ Simulate/Monte-Carlo/Results_secondary.zip
 lib/nauty/
 lib/.DS_Store
 parameters.txt
+*.zip

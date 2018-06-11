@@ -343,12 +343,10 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
     int maxEdges = NUM_NODES*(NUM_NODES-1) / 2;
     int edges = 0;
     for(int i = 0; i < NUM_NODES; i++) {
-        std::cout << getDegree(i) << std::endl;
+        edges+= getDegree(i);
     }
     edges /= 2;
-    std::cout << edges << std::endl;
     if(edges == maxEdges) {
-        std::cout << NUM_NODES -1;
         _dimension = NUM_NODES -1;
         return;
     }
