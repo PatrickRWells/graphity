@@ -221,6 +221,7 @@ void hGraph::flipEdge(int nodeA, int nodeB) {
 
     cliquesFound = false; //In general, if an edge if flipped this information is lost.
     dimensionFound = false; //There is no closed-form algorithm (that I am aware) that determines the new dimensionality if a single edge is removed.
+    curvatureAtNode = std::vector<double>(NUM_NODES, 0);
     
 }
 

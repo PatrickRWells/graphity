@@ -18,6 +18,7 @@ bool getTF(); //Utility function. Returns true if user types 'y' and false if us
 
 bool WOLFF = false;
 int NUM_CORES = 4; //Number of cores in the CPU
+int threadsPer = 0;
 double TINV;    //Beta
 int SIZE;       //Number of nodes in the graphs
 int maxSweeps;  //Number of sweeps that will be performed
@@ -127,7 +128,7 @@ int main() {
     std::cin >> maxSweeps;
     std::cout << "Number of available threads? ";
     std::cin >> NUM_CORES;
-    
+    threadsPer = NUM_CORES/numGraphs;
     std::cin.clear(); //Clears the cin buffer to ensure it all works as expected later.
     std::cin.ignore(100, '\n');
 
@@ -466,7 +467,7 @@ int main() {
 
 void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> ** data, int simNum, bool progress, std::string descriptor) {
     int selected = 0;
-    graph->setThreads(NUM_CORES);
+    graph->setThreads(threadsPer);
     std::random_device rd; //c++11 random number generator
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> randNode(0, SIZE - 1); //Generates a random integer corresponding to anode
@@ -611,7 +612,7 @@ void monteCarlo (hGraph * graph, std::vector<bool> observe, std::vector<double> 
                 
                            
                 if(observe[DIMEN]) { //Calculates and stores dimension if requested
-                    graph->setThreads(NUM_CORES);
+                    graph->setThreads(threadsPer);
                     data[simNum][DIMEN].push_back(graph->getDimension());
                     
                 }
@@ -678,7 +679,7 @@ bool getTF() {
 void wolffAlgorithm(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor) {
     std::cout << *graph << std::endl;
     int selected = 0;
-    graph->setThreads(NUM_CORES);
+    graph->setThreads(threadsPer);
     std::random_device rd; //c++11 random number generator
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> randNode(0, SIZE - 1);
