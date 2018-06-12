@@ -69,6 +69,8 @@ Where $J$ and $K$ are weighting constants, and $d_i$ simply represents the degre
 A set of seed graphs are evolved according to this Hamiltonian using a Monte-Carlo simulation with a Metropolis algorithm. 
 \section{Geometrical Properties of Graphs}
 Geometrical properties of the graphs considered are defined as in \cite{Knill:2011}. This definition of dimensionality is computationally problematic, not due to the complexity of the algorithm but rather due to its fundamentally recursive nature. Calculating the dimensionality of a complete graph $K_N$  on $N$ nodes requires $N!$ recursive calls, which quickly becomes computationally intractable as N increases. Of course, $K_N$ is just an N-1-dimensional simplex, but no such simplification exists for highly dense graphs close to $K_N$. While the graphs considered in the simulation were in general not so dense as to require such a high number of recursive calls, they were still complex enough to impose an upper limit on the size of the graphs considered.
+
+The Euler Characteristic $\chi$ is equal to the sum of the curvatures at every node, as defined in \cite{Knill:2011}
 \section{Conclusion}  
 \begin{thebibliography}{99}
   
@@ -120,7 +122,10 @@ Geometrical properties of the graphs considered are defined as in \cite{Knill:20
    %``On the Dimensionality and Euler Characteristic of Random Graphs``
    [arXiv:1112.5749 [math.PR]]
   
-  
+  \bibitem{nautyTraces}
+  McKay, B.D. and Piperno, A.,
+  Practical Graph Isomorphism, II, 
+  Journal of Symbolic Computation, 60 (2014), pp. 94-112, http://dx.doi.org/10.1016/j.jsc.2013.09.003
  
 \end{thebibliography}
 

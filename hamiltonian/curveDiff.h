@@ -56,6 +56,7 @@ void curveDiff::calculate(hGraph &host) { //This is where all the main calculati
     
         int size = host.getSize();
         double data[size];
+        host.getEulerChar(); //Has to calculate the curvature at every point anyway and is multithreaded.
         double sum = 0;
         for(int i = 0; i < size; i++) {
             double val = host.curvatureAt(i);

@@ -6,19 +6,6 @@
 //
 //
 
-#define TIMING
-
-#ifdef TIMING
-#define INIT_TIMER auto start = std::chrono::high_resolution_clock::now();
-#define START_TIMER  start = std::chrono::high_resolution_clock::now();
-#define STOP_TIMER(name)  std::cout << "RUNTIME of " << name << ": " << \
-`).count() << " ms " << std::endl;
-#else
-#define INIT_TIMER
-#define START_TIMER
-#define STOP_TIMER(name)
-#endif
-
 #ifndef _hGraph_h
 #define _hGraph_h
 
@@ -32,7 +19,7 @@
 #include <cmath>
 
 
-#define MAXN 500
+#define MAXN 500 //This is used for Nauty. Says we will not provide it with a graph larger than 500 nodes.
 #include "nauty.h"
 
 
@@ -63,6 +50,7 @@ private:
     std::vector<double> _hausdorffDimen;
     std::vector<int> _eccentricities;
     std::vector <int> _numCliques;
+    std::vector <double> curvatureAtNode;
 
     
     bool cliquesFound = false;

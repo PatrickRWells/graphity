@@ -240,27 +240,145 @@ void hGraph::acceptPartial(double partial) { //Adds the value passed to the func
 
 //---------------------------CALCULATIONS---------------------------//
 
-void hGraph::calcEulerChar() { //Based on the definition by Oliver Knills. Requires counting of all cliques in the graph.
-    if(!cliquesFound) {         //checks to make sure the cliques have been counted, does so if they have not.
-        _numCliques = std::vector <int> (NUM_NODES, 0);
-        countCliques();
-    }
-    int sum = 0;
-    for(int i = 0; i < _numCliques.size(); i++) { //See Knill, "On the Dimensionality and Euler Characteristic of Random Graphs"
-        if((i+1) % 2 == 1) {                      //for information regarding this algorithm.
-            sum += _numCliques[i];
+void hGraph::calcEulerChar() { //Knill presents two equivalent definitions of the Euler Characteristic of a graph.
+    double sum = 0;            //Definition used here is the sum of the curvatures at every node, because it is easily parallelizable
+    int numFound = 0;
+    for(int i = 0; i < NUM_NODES; i++) {
+        if(curvatureAtNode.size() == i) {
+            curvatureAtNode.push_back(0);
         }
-        else {
-            sum -= _numCliques[i];
+        else if(curvatureAtNode[i] != 0) {
+            numFound++; //Counts how many curvatures have already been found.
+        }
+
+        
+    }
+    if(_numThreads == 1) {
+        for(int i = 0; i < NUM_NODES; i++) {
+            if(curvatureAtNode[i] == 0) { //Checks if the curvature at that node has already been calculated.
+                curvatureAt(i); //While curvatureAt does return the value, it also stores it in the vector curvatureAtNode,
+            }                   //which is an attribute of the hGraph class. The sum is calculated at the bottom of the function
         }
     }
-    _eulerChar = sum;
     
+    
+    else if(_numThreads >= NUM_NODES) { //If there are as many or more threads than their are nodes.
+
+        std::vector<std::future<double>> futures;
+        bool mainThread = (numFound == 0 ? true : false); //If some of the curvatures have already been found, the main thread will not need to do a calculation.
+        int i = 0;                                        //If you are unfamiliar with the syntax in the above line, look up "c++ ternary operator"
+        while(true) {
+            if(i == (NUM_NODES - 1)) {
+                if(mainThread) {
+                    break;
+                }
+                else {
+                    futures.push_back(std::async(std::launch::async, &hGraph::curvatureAt, this, i));
+                    break;
+                }
+            }
+            if(curvatureAtNode[i] == 0) {
+                futures.push_back(std::async(std::launch::async, &hGraph::curvatureAt, this, i));
+
+            }
+            i++;
+        }
+
+        double tempA = 0;
+        double count = 0;
+
+        if(mainThread) {
+            curvatureAt(NUM_NODES - 1);
+        }
+        for(int i = 0; i < futures.size(); i++) {
+                futures[i].get(); //Again. While this will return a value, it is already stored elsewhere so it is unnecessary keep it here.
+        }
+    }
+    
+    else { //This is what runs if there are more nodes than their are threads.
+        int numLaunches = (NUM_NODES-numFound)/_numThreads;//Number of times threads will have to be launched (i.e. for 30 nodes and 10 threads each thread will process 3 nodes)
+        int extra = (NUM_NODES-numFound) % _numThreads; //Nodes not covered by the aboce (i.e. for 32 nodes and 10 threads, there will be two leftover nodes).
+        numLaunches += (extra == 0 ? 0 : 1); //There has to be one more launch if there are extra nodes.
+        int found = 0; //Nodes are processed in numerical order. This variable tracks how many nodes have been processed that had ALREADY been calculated.
+        for(int i = 0; i < numLaunches; i++) {
+            std::vector<std::future<double>> futures; //Holds the thread objects
+
+            if(i != (numLaunches -1) || extra == 0 ) { //If this particulary "launch" will use all available threads
+                int j = 0;
+                while(true) {
+                    int index = i*_numThreads + j + found;
+                    if(curvatureAtNode[index] == 0) { //if the value has not yet been found
+                        futures.push_back(std::async(std::launch::async, &hGraph::curvatureAt, this, index));
+                        j++;
+                    }
+                    else {
+                        found++;
+                    }
+                
+                    if(j == _numThreads - 1) { //Allowx the main thread to do some of the work.
+                        break;
+                    }
+                
+                }
+                curvatureAt((i+1)*_numThreads + found -1); //main thread does work.
+                
+            }
+            else { //Calculates for the "extra" nodes.
+                int j = 0;
+                while(true) {
+                    int index = i*_numThreads + j + found;
+                    if(curvatureAtNode[index] == 0) {
+                        futures.push_back(std::async(std::launch::async, &hGraph::curvatureAt, this, index));
+                        j++;
+                    }
+                    else {
+                        found++;
+                    }
+                    
+                    if(j == extra) {
+                        break;
+                    }
+                    
+                }
+                
+                
+            }
+            for(int j = 0; j < futures.size(); j++) {
+                futures[j].get();
+                
+            }
+            
+        }
+        
+        
+    }
+    for(int i = 0; i < NUM_NODES; i++) {
+        sum += curvatureAtNode[i]; //Calculates the sum from the vector that was populated previously.
+        
+    }
+
+    _eulerChar = round(sum);
+    //The Euler Characteristic is always an integer, but the individual curvatures may not be. As such, it is possible that
+    //a rounding error will cause the sum to be very very close to, but not quite equal to, the correct value.
+    //Assigning a double to an int truncates the decimal, so rounding the value is always correct.
+
 }
 
 double hGraph::curvatureAt(int node) {
+    
+    if(curvatureAtNode.size() != 0 && curvatureAtNode[node] != 0) {
+        return curvatureAtNode[node];
+    }
+    
+    else if(curvatureAtNode.size() == 0) {
+        
+        curvatureAtNode = std::vector<double>(NUM_NODES, 0);
+        
+    }
+
     hGraph temp = unitSphere(node);
     if(temp.getSize() == 0) {
+        curvatureAtNode[node] = 1;
         return 1;
     }
     std::vector <int> tempVector = temp.numCliques();
@@ -275,6 +393,8 @@ double hGraph::curvatureAt(int node) {
 
         }
     }
+    
+    curvatureAtNode[node] = sum+1;
     return sum + 1;
     
     

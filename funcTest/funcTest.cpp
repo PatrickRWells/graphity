@@ -29,10 +29,11 @@ bool getTF();
 
 int main() {
 
-    hGraph graph = zeroGraph(20);
+    hGraph graph = zeroGraph(15);
+    graph.setThreads(4);
+    //std::cout << graph.curvatureAt(2) << std::endl;
+
     std::cout << graph.getEulerChar() << std::endl;
-    curveDiffHam(graph);
-    
 }
 
 bool getTF() {
