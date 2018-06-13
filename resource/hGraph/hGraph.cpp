@@ -48,19 +48,17 @@
 
 hGraph::hGraph(int size):NUM_NODES(size) { //Basic constructor. Creates an graph of given size with no connections. Most often used of the constructors
     _adjMatrix = MatrixXi::Zero(size, size);
-    _degVector = Eigen::VectorXi::Zero(size);
+    _degVector = std::vector<int>(size , 0);
     _numCliques = std::vector <int> (size, 0);
-    for(int i = 0; i < size; i++) {
-        _eccentricities.push_back(0); //Initializes this vector with zeroes
+    _eccentricities = std::vector<int> (size, 0); //Initializes this vector with zeroes
         
-    }
     
 }
 
 hGraph::hGraph() {  //default constructor. Creates placeholder. Should not be used often.
 
     _adjMatrix = MatrixXi::Zero(1, 1);
-    _degVector = Eigen::VectorXi::Zero(1);
+    _degVector = std::vector<int> {0};
     _hamiltonian = 0.0;
 
 }
@@ -68,12 +66,12 @@ hGraph::hGraph() {  //default constructor. Creates placeholder. Should not be us
 hGraph::hGraph(int size, MatrixXi adjMatrix):NUM_NODES(size) { //Takes a size and a previously defined adjacency matrix and creates an hGraph object.
     _adjMatrix = MatrixXi::Zero(size, size); //Matrix has to be created and assigned in seperate steps
     _adjMatrix = adjMatrix;
-    _degVector = Eigen::VectorXi::Zero(size);
+    _degVector = std::vector<int> (size, 0);
     _hamiltonian = 0.0;
     _dimension = 0; //this is not initialized by default due to the high computing cost.
     _numCliques = std::vector<int> (size, 0);
+    _eccentricities = std::vector<int> (size, 0);
     for(int i = 0; i < NUM_NODES; i++) {
-        _eccentricities.push_back(0);
         for(int j = 0; j < NUM_NODES; j++) {
             _degVector[i] += _adjMatrix(i, j);
         }
@@ -128,13 +126,7 @@ int hGraph:: getSize() { //simple getter function
 }
 
 std::vector<int> hGraph::numCliques() { //simply outputs the number of cliques (NOT maximal cliques) of any given size. The cliques are stored in an vector attribute called "
-    if(!cliquesFound) {
-        _numCliques = std::vector<int> (NUM_NODES, 0);
-        countCliques();
-
-    }
-    _numCliques = std::vector<int> (NUM_NODES, 0);
-    countCliques();
+    countCliques(); //this function checks if the cliques have already been found, and simply terminates if so.
     return _numCliques;
 
 }
@@ -145,11 +137,17 @@ int hGraph::getDegree(int node) { //simply gets the degree of a given node.
         exit(4);
     }
     
-    return _degVector(node);
+    return _degVector[node];
     
 }
 
 bool hGraph::isConnected(int row, int column) { //checks if two nodes are connected.
+    if(row < 0 || row >= NUM_NODES || column < 0 || column > NUM_NODES) { //Recall that C++ is zero indexed, the nodes of a graph of size 10 will be labled 0...9
+        std::cerr << "Critical error, only acceptable node values are between 0 and " << NUM_NODES - 1 << std::endl;
+        exit(4);
+    }
+    
+    
     if(_adjMatrix(row, column) == 1) {
         return true;
     }
@@ -200,7 +198,7 @@ void hGraph::setHamiltonian(double val) { //sets the value of the hamiltonian.
     _hamiltonian = val;
 }
 
-void hGraph::setThreads(int threads) { //Note, this does NOT check to ensure that that number of threads can actually be used. That is done by multithreaded algorithms.
+void hGraph::setThreads(int threads) { //Note, this does NOT check to ensure that the given number of threads can actually be used. That is done by multithreaded algorithms.
     _numThreads = threads;
 }
 
@@ -222,6 +220,7 @@ void hGraph::flipEdge(int nodeA, int nodeB) {
     cliquesFound = false; //In general, if an edge if flipped this information is lost.
     dimensionFound = false; //There is no closed-form algorithm (that I am aware) that determines the new dimensionality if a single edge is removed.
     curvatureAtNode = std::vector<double>(NUM_NODES, 0);
+
     
 }
 
@@ -361,7 +360,7 @@ void hGraph::calcEulerChar() { //Knill presents two equivalent definitions of th
     _eulerChar = round(sum);
     //The Euler Characteristic is always an integer, but the individual curvatures may not be. As such, it is possible that
     //a rounding error will cause the sum to be very very close to, but not quite equal to, the correct value.
-    //Assigning a double to an int truncates the decimal, so rounding the value is always correct.
+    //Assigning a double to an int truncates the decimal, so rounding the value ensures it is correct.
 
 }
 
@@ -430,6 +429,13 @@ MatrixXi hGraph::getShortestPaths() {
     }
     
 
+    for(int i = 0; i < NUM_NODES; i++) {
+        for(int j = 0; j < NUM_NODES; j++) {
+            if(pathMatrix(i, j) == 10000000) {
+                pathMatrix(i, j) = -1;
+            }
+        }
+    }
     
     return pathMatrix;
     
@@ -449,10 +455,10 @@ hGraph hGraph::compliment() { //Returns an hGraph object where the adjacency mat
     
 }
 
-double hGraph::getAvgDegree() { //Gets the average degree of a node
+double hGraph::getAvgDegree() { //Returns the average node degree 
     double avg = 0;
     for(int i = 0; i < NUM_NODES; i++) {
-        avg += getDegree(i);
+        avg += _degVector[i];
     }
     return avg/NUM_NODES;
 }
@@ -936,6 +942,9 @@ hGraph hGraph::unitSphere(int node) { //outputs the unit sphere around a given. 
 }
 
 void hGraph::countCliques() { //Declares necessary objects for initial call of cliqueSearch, then counts all cliques. Uses a moified version of the Bron-Kerbosch algorithm
+    if(cliquesFound) {
+        return;
+    }
     std::vector<int> vectorR(0);
     std::vector<int> vectorP(NUM_NODES);
     for(int i = 0; i < NUM_NODES; i++) {
@@ -1044,7 +1053,11 @@ std::ofstream &operator << (std::ofstream &fs, const hGraph &rhs)  { //allows us
 void hGraph::toStream(std::ostream &os) const { //outputs hGraphs in a human-readable format for standard output. See documentation for information on formatting and usage.
     
     os << "Adjacency Matrix: " << std::endl << _adjMatrix << std::endl;
-    os << "Node Degrees: " << std::endl << _degVector << std::endl;
+    os << "Node Degrees: " << std::endl;
+    for(int i = 0; i < NUM_NODES; i++) {
+        os << _degVector[i] << std::endl;
+    }
+    os << std::endl;
     os << "Dimensionality: " << _dimension << std::endl;
     os << "Euler Characteristic: " << _eulerChar << std::endl;
     os << "Value of most recently used hamiltonian: " << _hamiltonian << std::endl;
@@ -1069,8 +1082,7 @@ void hGraph::setMatrix(int size, MatrixXi data) { //resets the matrix based on n
     NUM_NODES = size;
     _adjMatrix.resize(size, size);
     _adjMatrix = data;
-    _degVector.resize(size);
-    _degVector = Eigen::VectorXi::Zero(size);
+    _degVector = std::vector<int>(size, 0);
     _hamiltonian = 0.0;
     _dimension = 0;
     _numCliques = std::vector<int> (size, 0);

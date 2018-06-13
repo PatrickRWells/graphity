@@ -2,9 +2,9 @@
 {\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;\f2\fnil\fcharset0 Menlo-Italic;
 \f3\fnil\fcharset0 Menlo-BoldItalic;}
 {\colortbl;\red255\green255\blue255;\red9\green80\blue208;\red0\green0\blue0;\red255\green255\blue255;
-\red0\green0\blue0;\red255\green255\blue255;}
+\red0\green0\blue0;\red255\green255\blue255;\red255\green255\blue255;}
 {\*\expandedcolortbl;;\cssrgb\c0\c41176\c85098;\cssrgb\c0\c0\c0;\cssrgb\c100000\c100000\c100000;
-\csgray\c0\c0;\csgray\c100000;}
+\csgray\c0\c0;\cssrgb\c100000\c100000\c100000;\csgray\c100000;}
 \margl1440\margr1440\vieww22420\viewh11020\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
@@ -97,10 +97,7 @@ Additionally, the script requires the module \'93pexpect\'94. The easiest way to
 
 \b0 \
 
-\fs22 The Python Script run.py in the main Graphity folder has been created to outsource as much of the necessary code modification as possible. This allows the user to run many different simulations with many different parameters (and even different hamiltonians) without ever modifying the underlying code base. For example: If the user creates a new hamiltonian and then tells the Python script to install it, the script modify the appropriate header file to include the hamiltonian (allowing it to be used by the simulation) and edits the hamiltonians.txt file, which is used as a reference. If the user then asks the python script to run the simulation with the new hamiltonian, the MonteCarlo.cpp file is edited so that the function objects reference the correct simulation function, and simulation is rebuilt using the makefile. 
-\i\b This is why the naming conventions outlined in the \'93Writing new Hamiltonians\'94  section must be followed exactly.
-\b0  
-\i0 The Python script does not dynamically determine the name of the simulation functions, but instead assumes them based on a template. If any naming conventions are not followed, it will prevent the simulations from compiling.\
+\fs22 The Python Script run.py in the main Graphity folder has been created to outsource as much of the necessary code modification as possible. This allows the user to run many different simulations with many different parameters (and even different hamiltonians) without ever modifying the underlying code base. For example: If the user creates a new hamiltonian and then tells the Python script to install it, the script modify the appropriate header file to include the hamiltonian (allowing it to be used by the simulation) and edits the hamiltonians.txt file, which is used as a reference. If the user then asks the python script to run the simulation with the new hamiltonian, the MonteCarlo.cpp file is edited so that the function objects reference the correct simulation function, and simulation is rebuilt using the makefile. \
 \
 For the most part, the script is self-explanatory. However it is important to note that when running modules from the python script, the working directory will be the main graphity directory (where the python script is located), rather than the directory where the module resides. The only place where this will really matter is in outputting files. For example, if the Monte Carlo simulation is called by the python script, and the folder it is told to place its output in is called \'93data,\'94 it will look for the folder graphity/data/. However if the Monte Carlo simulation is called directly form the command line, it will look at graphity/Simulate/Monte-Carlo/data/. 
 \b \cf3 \cb4 \
@@ -163,8 +160,7 @@ Presumably, any observable will need to be calculated in the simulation itself. 
 \f0\fs24 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\fs22 \cf0 \cb1 \
-observe[DIMEN] corresponds to the true/false value determined previously. simNum is an integer corresponding to the graph that is currently being simulated on, and is passed to the MonteCarlo function. by main. Because data is stored in vectors, data points should always be added using the push_back function.\
+\fs22 \cf0 \cb1 observe[DIMEN] corresponds to the true/false value determined previously. simNum is an integer corresponding to the graph that is currently being simulated on, and is passed to the MonteCarlo function. by main. Because data is stored in vectors, data points should always be added using the push_back function.\
 \
 3. Calculating the correlation function\
 If the correlation function of an observable is meaningful, it can be calculated easily after the simulation has been run. For example: \
@@ -225,29 +221,83 @@ The Monte Carlo simulation can automatically make data plots. This is done towar
 \b\fs24 Writing new Hamiltonians\
 
 \b0\fs22 \
-The Hamiltonian folder includes a template hamiltonian, which can be copied and edited to create a new hamiltonian. The process is simple, but if it is not followed, the python script will not be able to correctly edit files such that the hamiltonian can be used in simulations.\
+The Python script is capable of creating entirely new hamiltonians without the user ever having to open the hamiltonian file itself. This can be done using \'93Create new Hamiltonian\'94 menu option. After prompting the user for the name of the hamiltonian, the script will give the user the option to write the calculation code right then. If the user chooses to do so, a textile will open for the user to edit to add the calculation code. Based on the code and the name provided, the script will create the header file. If the code does not contain errors, there will be no need for the header file to be edited. However if the code is not provided at creation time, or if there are errors in the code provided, the header file will have to be edited manually. It is recommended that the script be used to create the file, even if the code is not provided at that time, as it will ensure that all necessary naming conventions are followed.\
+\
+Every hamiltonian contains six attributes that can/should be used in the calculation function:\
+_result: A double that contains the result of an energy calculation over the entire graph\
+_partial: A double that contains the change in the energy of the graph if some number of edges are flipped (see below)\
+isPartial: a boolean that contains the value true if a partial calculation has been requested, and false otherwise.\
+nodeA & nodeB: Vectors of integers that correspond to pairs of nodes to be flipped if a partial calculation is being performed.\
+sourceT: Contains the value of the source term.\
+\
+If you are writing the calculation code by way of the Python script, you will not see these variables declared. Simply use them as though they have been.\
+\
+The calculation function must contain two routines: one for a full calculation, and one for a partial calculation. 
+\b The result of a full calculation must be assigned to the _result attribute, and the result of the partial calculation must be assigned to _partial.
+\b0   The graph that the energy is being calculated on is passed to the function as the variable \'93host.\'94 The user has access to all public hGraph member functions (see available functions below) by using this host. For example, getting the dimensionality of the host would be done by calling \'93host.getDimension().\'94\
+\
+A well implemented calculation function would look something like this:\
+\
+\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
+
+\fs24 \cf3 \cb6 \CocoaLigature1 \
+
+\f1\fs22 if(!isPartial) \{\
+	double sum;\
+	
+\f2\i Calculate the value of the energy, adding to sum along the way\
+	
+\f1\i0 _result = sum;\
+\}\
+\
+else \{\
+	double sum;\
+
+\f2\i 	Calculate the partial value, adding to sum along the way\
+
+\f1\i0 	_partial = sum;\
+\
+\}\
+
+\f0\fs24 \
+Unless there is an easy closed-form way to calculate the change in energy for a particular set of edge flips, it is likely easiest to calculate a partial hamiltonian using the following code, which can be copied and pasted directly:\
+\
+\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf3 \cb5 if(isPartial) \{
+\f0\fs24 \
+
+\f1\fs22     hGraph temp(host.getSize());
+\f0\fs24 \
+
+\f1\fs22     temp = host; 					//creates a copy of the graph
+\f0\fs24 \
+
+\f1\fs22     temp.flipEdge(nodeA,nodeB); 		//flips the edges in the copy. Note that nodeA and nodeB are vectors of nodes, not numbers
+\f0\fs24 \
+
+\f1\fs22     basicSquareHam(temp);			//Calculates the value of the hamiltonian for the graph with the flipped edges
+\f0\fs24 \
+
+\f1\fs22     _partial = temp.getHam() - host.getHam();
+\f0\fs24 \
+
+\f1\fs22    									//_partial gets the difference between the two values.
+\f0\fs24 \
+
+\f1\fs22 \}
+\f0\fs24 \
+\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf3 \cb6 	\
+
+\f0 This code assumes that the total energy for the graph in question has already been calculated. If this is not necessarily the case, this code will not work. Remember that the nodes being flipped are stored in the vectors nodeA and nodeB, with the edges to be flipped corresponding to the elements at matching indices. For example if nodeA[0] == 2, and nodeB[0] == 4, then the edge between node 2 and node 4 is to be flipped.\
+\
+
+\fs24 There isa  template hamiltonian that can be used as a reference, however it is no longer particularly necessary as the python script can generate its own files without the user having to edit the template file. It is probably a better idea to examine already existing hamiltonians for ideas on how to write them.
+\fs22 \cf3 \cb1 \CocoaLigature0 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-
-\b\fs28 \cf0 \CocoaLigature1 \
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-
-\b0\fs22 \cf3 \CocoaLigature0 The hamiltonians name must be unique. As a first step, replace all instances of \'93template\'94 in the template file with the name of the hamiltonian. For example, if the name of the hamiltonian was \'93gerald,\'94 the line "void TemplateHam(hGraph &host);\'94 in the template would become \'93void geraldHam(hGraph &host);\'94 I do generally recommend naming your hamiltonian something that indicates what it does though.\
-The resultant file must then be saved as name.h. In the case of the previous example, that would be gerald.h. Always assume case sensitivity. \
-\
-The \'93calculate\'94 function is where all the magic happens. The graph is passed to the calculate function as \'93host.\'94 All public member functions of a graph can then be accessed directly. Recall that graph object that will be passed to the calculation function is just a copy of the graph, and as such there is no risk of side effects that could impact the simulation itself. See the hGraph documentation for a list of available functions.\
-\
-Note that at the bottom of the header there are two functions, one of which is a partial function. The partial function is used to get the 
-\i change 
-\i0 value of a hamiltonian if the edges represented by the two vectors are flipped. However, there is only one calculate function for the hamiltonian. In the event that the partial function is called, the vectors will be placed in the nodeA and nodeB attributes of the hamiltonian, and the boolean attribute isPartial will be set to true (it is false by default). It is up to the writer of the hamiltonian to define the behavior in the case that only a partial hamiltonian calculation is requested. This can be done in the calculation function based on the isPartial attribute. A simple 
-\i if
-\i0  statement with isPartial passed as the argument can determine which calculation needs to be done. The simplest way to get a partial hamiltonian is to create a copy of the current graph, flip the edges, and then pass it to the main hamiltonian function. The value of the hamiltonian for this graph can then be compared with the value of the hamiltonian for the original graph. However if there is a relatively straightforward algorithm for calculating the change in energy if certain edges are flipped without constructing an entirely new graph object, it may be faster to do this.\
-\
-
-\b Important
-\b0 : When doing the complete hamiltonian on a graph, the final value of the hamiltonian needs to be assigned to the _result attribute of the hamiltonian. When doing a partial calculation, the value needs to be assigned to the _partial attribute. Note that the two helper functions at  the bottom of the header file are NOT member functions of the hamiltonian. They are simply helper functions designed to abstract the process away from the user. The first, which to continue the example from above would be called \'93geraldHam\'94 does 
-\i not
-\i0  return a value, and instead sets the value of the graphs internal hamiltonian attribute to the result. This DOES modify the original graph object that was passed to the function, but only the value of its hamiltonian attribute, which can then be accessed using graph.getHam() by the calling program. The second function, \'93geraldPartial\'94 in our example, returns the value of the change in energy to the calling program, and will need to be stored in a variable. Please note that these functions take in the object by value, not by reference. In the event that a pointer to a graph is being used, as in the Monte Carlo simulation, the pointer will need to be dereferenced.\
-\
+\cf3 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
 \b \cf3 Hamiltonians with variable parameters\
@@ -382,7 +432,7 @@ void setMatrix(int size, MatrixXi data):
 \b0 Returns the automorphism group size of the graph in scientific notation, with the first element in the vector corresponding to the base and the second corresponding the the exponent. Be aware that only one process can be using the library that performs the calculation at once, so any multithreaded process that uses this function will need to protect it with a mutex\
 
 \b MatrixXi getShortestPaths(): 
-\b0 Returns a matrix with element i, j corresponding to the shortest path between nodes i and j in the graph. In the  event that there is no path between two nodes, the entry corresponding to two nodes that are not connected will be 10000000\
+\b0 Returns a matrix with element i, j corresponding to the shortest path between nodes i and j in the graph. In the  event that there is no path between two nodes, the entry corresponding to two nodes that are not connected will be -1\
 
 \b double getDimension(): 
 \b0 Gets the dimensionality (as defined by O. Knill) of the graph. See below for an explanation of the algorithm.\
@@ -443,7 +493,7 @@ Memory allocation is taken care of by the readGraphFile function, but it is the 
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1 \cf3 \cb6 for(int i = 0; i < numGraphs; i++) \{
+\f1 \cf3 \cb7 for(int i = 0; i < numGraphs; i++) \{
 \f0\fs24 \
 
 \f1\fs22     delete graphs[i];

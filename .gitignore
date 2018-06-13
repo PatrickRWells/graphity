@@ -16,3 +16,4 @@ lib/nauty/
 lib/.DS_Store
 parameters.txt
 *.zip
+__pycache__/*

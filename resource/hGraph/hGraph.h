@@ -39,7 +39,7 @@ private:
     MatrixXi _adjMatrix;
     int _numThreads = 1;
     double _hamiltonian;
-    Eigen::VectorXi _degVector;
+    std::vector<int> _degVector;
     MatrixXi _paths;
 
 

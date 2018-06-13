@@ -11,6 +11,7 @@ import os
 import re
 import sys
 import imp
+from resourceFunctions import *
 
 if sys.version_info < (3, 6):
     sys.tracebacklimit = 0
@@ -28,141 +29,6 @@ except:
 
 import pexpect
 
-
-def menu(): #simple menu function
-    print("Menu:")
-    print("     0. Generate Graphs")
-    print("     1. Simulate")
-    print("     2. Install Hamiltonian")
-    print("     3. Uninstall Hamiltonian")
-    print("     4. Clean installation")
-    print("     5. Quit")
-
-
-    access = int(input("Make a numerical selection from the above list: "))
-    return access
-
-
-# Installs a hamiltonian for use in simulation
-# Hamiltonains must be in the 'hamiltonian' subfolder
-# Edits hamiltonian.txt with name and hamiltonians.h with an appropriate include statement
-# Requires input of a filename (c header file) where hamiltonian is implemented
-
-def installHam(name):
-    wFile = open("hamiltonian/hamiltonians.txt", "a+")
-    wFile.seek(0)
-    hamName = ""
-    for char in name:
-        if char == '.':
-            break
-        hamName += char
-    
-    installed = False
-    
-    for line in wFile:
-        if line.strip() == hamName:
-            print("Hamiltonian has already been installed")
-            wFile.close()
-            installed = True
-            break
-    
-    
-    if installed == False:
-        wFile.write(hamName + '\n')
-        wFile.close()
-        hFile = open("hamiltonian/hamiltonians.h", 'r')
-        lookup = "#endif /* hamiltonians_h */"
-        linenum = 0
-        for num, line in enumerate(hFile, 0):
-            if line.strip() == lookup:
-                linenum = num
-                break
-        hFile.seek(0)
-        contents = hFile.readlines()
-        hFile.close()
-        contents.insert(linenum, '#include "' + name + '"' + '\n')
-        eFile = open("hamiltonian/hamiltonians.h", "w")
-        contents = "".join(contents)
-        eFile.write(contents)
-        eFile.close
-
-def uninstallHam(name):
-    linenum = 0
-    found = False
-    rFile = open("hamiltonian/hamiltonians.txt", "r")
-    for num, line in enumerate(rFile, 0):
-        if line.strip() == name:
-            linenum = num
-            found = True
-            break
-    if not found:
-        print("Error: hamiltonian not found")
-        return
-    rFile.seek(0)
-    contents = rFile.readlines()
-    rFile.close()
-    contents.pop(linenum)
-    oFile = open("hamiltonian/hamiltonians.txt", "w")
-    contents = "".join(contents)
-    oFile.write(contents)
-    oFile.close
-
-    name += ".h"
-    lookup = '#include "' + name + '"'
-    hFile = open("hamiltonian/hamiltonians.h", "r")
-    for num, line in enumerate(hFile, 0):
-        if line.strip() == lookup:
-            linenum = num
-            break
-    hFile.seek(0)
-    contents = hFile.readlines()
-    hFile.close()
-    contents.pop(linenum)
-    oFile = open("hamiltonian/hamiltonians.h", "w")
-    contents = "".join(contents)
-    oFile.write(contents)
-    oFile.close
-
-
-
-# Modifies simulation source file to set it to run the correct hamiltonian
-# Can be found on line that reads 'simFunction = ......."
-# For the Monte-Carlo simulation, also edits the partial hamiltonian line
-# As an input, takes the name of a hamiltonian as it reads in hamiltonian.txt (assumes associated header file is there)
-
-
-def setHam(name, monte):
-    partialName = name + "Partial"
-    name += "Ham" #Naming convention
-    simFile = None
-    if not monte:
-        simFile = open("Simulate/BasicSim/Simulate.cpp" , 'r')
-    else:
-        simFile = open("Simulate/Monte-Carlo/MonteCarlo.cpp" , 'r')
-    lookup = "simFunction ="
-    lookup2 = "simPartial = "
-    linenum = 0
-    for num, line in enumerate(simFile, 0):
-        if line.strip().startswith(lookup):
-            linenum = num
-            break
-
-    simFile.seek(0)
-    contents = simFile.readlines()
-    simFile.close()
-    contents[linenum] = '\t' + lookup + ' ' + name + ";\n"
-    if monte:
-        contents[linenum + 1] = '\t' + lookup2 + partialName + ";\n"
-        oFile = open("Simulate/Monte-Carlo/MonteCarlo.cpp", "w")
-        contents = "".join(contents)
-        oFile.write(contents)
-        oFile.close
-    else:
-        oFile = open("Simulate/BasicSim/Simulate.cpp", "w")
-        contents = "".join(contents)
-        oFile.write(contents)
-        oFile.close
-
 buildCanRun = False
 
 
@@ -171,28 +37,7 @@ buildCanRun = False
 while True:
     access = menu()
 
-    if access == 0:
-        
-        
-        if buildCanRun == False:
-            print("Checking if buildGraphs needs to be built...")
-            proc = subprocess.Popen(['make'],
-                            stdout=subprocess.PIPE, cwd='buildGraphs')
-            exit_code = proc.wait()
-            if exit_code == 0:
-                buildCanRun = True;
-                print("buildGraphs built sucessfully")
-            else:
-                print("buildGraphs failed:")
-                print(proc.communicate()[0].decode('utf-8'))
-                print("terminating")
-                break
-
-        proc2 = pexpect.spawn('./buildGraphs/buildGraphs')
-        proc2.interact()
-
-
-    elif access == 1:
+    if access == 1:
         path = None
         simType = input("Do a Monte-Carlo simulation? (Y/N): ").upper()
         monteC = True
@@ -249,8 +94,10 @@ while True:
         
 
         
-        
     elif access == 2:
+        newHam()
+    
+    elif access == 3:
         filename = input("Please enter the name of the header file: ")
         path = "hamiltonian/" + filename
         
@@ -263,7 +110,7 @@ while True:
             print("Hamiltonian not found.")
             print("Make sure the spelling of the filename is correct and the file is located in the hamiltonian folder")
 
-    elif access == 3:
+    elif access == 4:
         print("Currently installed hamiltonians: ")
         rFile = open("hamiltonian/hamiltonians.txt", "r")
         print(rFile.read())
@@ -272,7 +119,7 @@ while True:
     
     
 
-    elif access == 4:
+    elif access == 5:
 
         proc = subprocess.Popen(['make', 'clean'],
                             stdout=subprocess.PIPE, cwd='buildGraphs')
@@ -281,7 +128,7 @@ while True:
         proc2 = subprocess.Popen(['make', 'clean'],
                     stdout=subprocess.PIPE, cwd='Simulate')
 
-    elif access == 5:
+    elif access == 6:
         break
 
     
