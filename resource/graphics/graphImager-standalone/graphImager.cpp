@@ -101,8 +101,6 @@ int main() {
             if(counter == graphSize) {
                 sweepCount++;
                 counter = 0;
-                std::cout << sweepCount << std::endl;
-
                 
             }
             
@@ -211,90 +209,7 @@ double energyVal(double position[][2], hGraph graph) {
         }
     }
     
-    double sumC = 0;
-
-    
-    double ***angles;
-    angles = new double **[size];
-    for (int i = 0; i < size; i++) {
-        angles[i] = new double * [size];
-        for(int j = 0; j < size; j++) {
-            angles[i][j] = new double[size];
-            for(int k = 0; k < size; k++) {
-                angles[i][j][k] = 0;
-            }
-
-        }
-    }
-    /*
-    for(int i = 0; i < size; i++) {
-        for(int j = i + 1; j < size; j++) {
-            for(int k = 0; k < size; k++) {
-                if(i == k || j == k) {
-                    continue;
-                }
-                else if(graph.isConnected(i, j) && graph.isConnected(i, k)) {
-                    double sum = 0;
-                    double aSquare = distanceSquare(position[i][0], position[i][1], position[j][0], position[j][1]);
-                    double bSquare = distanceSquare(position[i][0], position[i][1], position[k][0], position[k][1]);
-                    double cSquare = distanceSquare(position[j][0], position[j][1], position[k][0], position[k][1]);
-                    sum = aSquare + bSquare - cSquare;
-                    sum /= (2*sqrt(aSquare)*sqrt(bSquare));
-                    sum = acos(sum);
-                    angles[i][j][k] = sum;
-                    
-                    
-                }
-                
-                
-            }
-        }
-    }
-    
-    
-    for(int i = 0; i < size; i++) {
-        double tempSum = 0;
-        int nodeDegree = graph.getDegree(i);
-        double prefAngle = 2*M_PI/nodeDegree;
-        for(int j = i+1; j < size; j++) {
-            for(int k = 0; k < size; k++) {
-                if(i == k || j == k) {
-                    continue;
-                }
-                
-                else if (graph.isConnected(i, j) && graph.isConnected(i, k)) {
-                    double tempAngle = angles[i][j][k] - prefAngle;
-                    tempSum += tempAngle*tempAngle;
-                    
-                    
-                    
-                    
-                }
-            }
-        }
-     
-        double weight = graph.getAvgDegree()/nodeDegree;
-        weight *= weight;
-        double weight2 = 1.5;
-        sumC += tempSum*weight*weight2;
-        
-    }*/
-    
-    for(int i = 0; i < size; i++) {
-        for(int j = 0; j < size; j++) {
-
-            
-            delete [] angles[i][j];
-            
-        }
-        
-        delete [] angles [i];
-        
-    }
-    
-    delete [] angles;
-    
-    return sumA + sumB + sumC;
+    return sumA + sumB;
     
 }
 

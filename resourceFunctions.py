@@ -15,9 +15,9 @@ def menu(): #simple menu function
     print("Menu:")
     print("     1. Simulate")
     print("     2. Create New Hamiltonian")
-    print("     3. Install Hamiltonian")
-    print("     4. Uninstall Hamiltonian")
-    print("     5. Clean installation")
+    print("     3. Edit hamiltonian")
+    print("     4. Install Hamiltonian")
+    print("     5. Uninstall Hamiltonian")
     print("     6. Quit")
 
 
@@ -206,9 +206,8 @@ def newHam():
 
     oFile.close()
     print("File " + name + ".h created in the hamiltonian folder")
-    if writeCode:
-        if input("Would you like to install the hamiltonian? (y/n)").upper() == 'Y':
-            installHam(filename)
+    if input("Would you like to install the hamiltonian? (y/n)").upper() == 'Y':
+        installHam(filename)
 
     sleep(2)
 
@@ -219,17 +218,91 @@ def newHam():
 def writeCalcCode():
     filename = ".tempcode"
     oFile = open(filename, "w")
-    oFile.write("//The c++ code written in this file will be put into the calculation function of the hamiltinian\n")
-    oFile.write("//The graph the hamiltonian is running in is accessed through the variable host\n")
-    oFile.write("//The values of the complete calculation should be assigned to _result and _partial respectively\n")
-    oFile.write("//The source term can be accessed via the sourceT variable.\n")
-    oFile.write("//See the documentation for available functions\n\n")
-    oFile.write("//IMPORTANT: Please SAVE and CLOSE the file when you are done editing it. You may add your own comments, but please do not edit the ones already present\n\n")
+    calcCodeHeader(oFile)
     oFile.write("void calculate(hGraph host) { \n\t\n\t\n} //End Calculation")
     oFile.close()
     proc = pexpect.spawn('open -a TextEdit .tempcode')
     proc.interact()
     input("When you are finished, save the file and press enter")
+
+def editCalcCode(name):
+    filename = name + ".h"
+    path = "hamiltonian/" + filename
+    iFile = open(path, "r")
+    calcContents = iFile.readlines()
+    iFile.close()
+    while True:
+        line = calcContents.pop(0)
+        if line.strip().startswith("void " + name + "::calculate"):
+            break
+
+    calcContents.reverse()
+
+
+    found = False
+    while True:
+        line = calcContents.pop(0)
+        if line.strip().startswith("void " + name + "Ham"):
+            found = True
+        if found and "}" in line:
+            break
+
+    calcContents.reverse()
+    calcFile = open(".tempcode", "w")
+    calcCodeHeader(calcFile)
+    calcFile.write("void calculate(hGraph host) {\n")
+    for line in calcContents:
+        calcFile.write(line)
+    calcFile.write("}")
+    calcFile.close()
+
+    proc = pexpect.spawn('open -a TextEdit .tempcode')
+    proc.interact()
+    input("When you are finished, save the file and press enter")
+    newCalcFile = open(".tempcode", "r")
+    data = newCalcFile.readlines()
+    newCalcFile.close()
+    os.remove(".tempcode")
+
+    while True:
+        line = data.pop(0)
+        if line.strip().startswith("void calculate"):
+            break
+    while True:
+        line = data.pop()
+        if line.strip().startswith("}"):
+            break
+
+    templateFile = open("hamiltonian/.template", "r")
+    found = False
+    i = 0
+    for line in templateFile:
+        line = line.replace("Template", name)
+        line = line.replace("template", name)
+        if not found:
+            data.insert(i, line)
+            i += 1
+        else:
+            data.append(line)
+
+        if line.strip().startswith("void " + name + "::calculate"):
+            found = True
+
+    finalOut = open(path, "w")
+    for line in data:
+        finalOut.write(line)
+    print("Hamiltonian edited sucessfully")
+    sleep(2)
+
+
+
+def calcCodeHeader(oFile):
+    oFile.write("//The c++ code written in this file will be put into the calculation function of the hamiltonian\n")
+    oFile.write("//The graph the hamiltonian is running in is accessed through the variable host\n")
+    oFile.write("//The values of the complete calculation should be assigned to _result and _partial respectively\n")
+    oFile.write("//The source term can be accessed via the sourceT variable.\n")
+    oFile.write("//See the documentation for available functions\n\n")
+    oFile.write("//IMPORTANT: Please SAVE and CLOSE the file when you are done editing it. You may add your own comments, but please do not edit the ones already present\n\n")
 
 
 

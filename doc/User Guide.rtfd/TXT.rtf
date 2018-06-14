@@ -2,10 +2,10 @@
 {\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;\f2\fnil\fcharset0 Menlo-Italic;
 \f3\fnil\fcharset0 Menlo-BoldItalic;}
 {\colortbl;\red255\green255\blue255;\red9\green80\blue208;\red0\green0\blue0;\red255\green255\blue255;
-\red0\green0\blue0;\red255\green255\blue255;\red255\green255\blue255;}
+\red0\green0\blue0;\red255\green255\blue255;}
 {\*\expandedcolortbl;;\cssrgb\c0\c41176\c85098;\cssrgb\c0\c0\c0;\cssrgb\c100000\c100000\c100000;
-\csgray\c0\c0;\cssrgb\c100000\c100000\c100000;\csgray\c100000;}
-\margl1440\margr1440\vieww22420\viewh11020\viewkind0
+\csgray\c0\c0;\csgray\c100000;}
+\margl1440\margr1440\vieww10220\viewh11020\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs36 \cf0 Graphity User\'92s Guide\
@@ -213,15 +213,17 @@ The Monte Carlo simulation can automatically make data plots. This is done towar
 
 \b0\fs22 \cf3 \CocoaLigature0 Hamiltonians are implemented in header files that can be found in the Hamiltonian folder. The hGraph class uses a modified version of the visitor design patterns to allow hamiltonians to calculate the energy of a particular graph. Essentially, the hamiltonians are plugins that can be easily interchanged in a simulation without having to rewrite the simulation. Hamiltonians are defined as classes and all derive from the Abstract Hamiltonian superclass. To use the hamiltonian, a object of the hamiltonian type is created, and is passed to an hGraph using the accept function. The graph then calls the hamiltonian\'92s calculate function, passing itself as a parameter. The hamiltonian can then use functions implemented in the hGraph class to calculate the value, which it stores in its _result attribute. While this may seem to require extra work, it makes it extremely easy for the user to switch between hamiltonians when running a simulation, and allows the person writing the hamiltonian to define extra functions within the hamiltonians if the calculation required are particularly complex. Additionally it prevents unwanted side effects by doing the calculations based on a copy of the graph, rather than the graph itself, and then simply assigning the result to the appropriate attribute of the original graph object. This entire process is wrapped up in a single function, which is defined at the end of the hamiltonian.\
 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b Note: Do not edit the \'93hamiltonians.txt\'94 file or the \'93hamiltonians.h\'94 file. These files are managed by the python script.
-\b0 \
+\b \cf3 Note: Do not edit the \'93hamiltonians.txt\'94 file or the \'93hamiltonians.h\'94 file. These files are managed by the python script.
+\b0 \cf3 \
 \
 
-\b\fs24 Writing new Hamiltonians\
+\b\fs24 \cf3 Writing new Hamiltonians\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0\fs22 \
-The Python script is capable of creating entirely new hamiltonians without the user ever having to open the hamiltonian file itself. This can be done using \'93Create new Hamiltonian\'94 menu option. After prompting the user for the name of the hamiltonian, the script will give the user the option to write the calculation code right then. If the user chooses to do so, a textile will open for the user to edit to add the calculation code. Based on the code and the name provided, the script will create the header file. If the code does not contain errors, there will be no need for the header file to be edited. However if the code is not provided at creation time, or if there are errors in the code provided, the header file will have to be edited manually. It is recommended that the script be used to create the file, even if the code is not provided at that time, as it will ensure that all necessary naming conventions are followed.\
+\b0\fs22 \cf3 \
+The Python script is capable of creating entirely new hamiltonians without the user ever having to open the hamiltonian file itself. This can be done using \'93Create new Hamiltonian\'94 menu option. After prompting the user for the name of the hamiltonian, the script will give the user the option to write the calculation code right then. If the user chooses to do so, a textile will open for the user to edit to add the calculation code. Based on the code and the name provided, the script will create the header file. If the code does not contain errors, there will be no need for the header file to be edited. However if the code is not provided at creation time, or if there are errors in the code provided, the header file can be edited using the \'93Edit Hamiltonian\'94 option, though the hamiltonian will have to be installed for this option to be enabled. It is highly recommended that the script be used to create the file, even if the code is not provided at that time, as it will ensure that all necessary naming conventions are followed.\
 \
 Every hamiltonian contains six attributes that can/should be used in the calculation function:\
 _result: A double that contains the result of an energy calculation over the entire graph\
@@ -233,14 +235,14 @@ sourceT: Contains the value of the source term.\
 If you are writing the calculation code by way of the Python script, you will not see these variables declared. Simply use them as though they have been.\
 \
 The calculation function must contain two routines: one for a full calculation, and one for a partial calculation. 
-\b The result of a full calculation must be assigned to the _result attribute, and the result of the partial calculation must be assigned to _partial.
-\b0   The graph that the energy is being calculated on is passed to the function as the variable \'93host.\'94 The user has access to all public hGraph member functions (see available functions below) by using this host. For example, getting the dimensionality of the host would be done by calling \'93host.getDimension().\'94\
+\b \cf3 The result of a full calculation must be assigned to the _result attribute, and the result of the partial calculation must be assigned to _partial.
+\b0 \cf3   The graph that the energy is being calculated on is passed to the function as the variable \'93host.\'94 The user has access to all public hGraph member functions (see available functions below) by using this host. For example, getting the dimensionality of the host would be done by calling \'93host.getDimension().\'94\
 \
 A well implemented calculation function would look something like this:\
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\fs24 \cf3 \cb6 \CocoaLigature1 \
+\fs24 \cf3 \cb4 \CocoaLigature1 \
 
 \f1\fs22 if(!isPartial) \{\
 	double sum;\
@@ -289,41 +291,45 @@ Unless there is an easy closed-form way to calculate the change in energy for a 
 \f0\fs24 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1\fs22 \cf3 \cb6 	\
+\f1\fs22 \cf3 \cb4 	\
+\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f0 This code assumes that the total energy for the graph in question has already been calculated. If this is not necessarily the case, this code will not work. Remember that the nodes being flipped are stored in the vectors nodeA and nodeB, with the edges to be flipped corresponding to the elements at matching indices. For example if nodeA[0] == 2, and nodeB[0] == 4, then the edge between node 2 and node 4 is to be flipped.\
+\f0 \cf3 This code assumes that the total energy for the graph in question has already been calculated. If this is not necessarily the case, this code will not work. Remember that the nodes being flipped are stored in the vectors nodeA and nodeB, with the edges to be flipped corresponding to the elements at matching indices. For example if nodeA[0] == 2, and nodeB[0] == 4, then the edge between node 2 and node 4 is to be flipped.\
 \
+\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\fs24 There isa  template hamiltonian that can be used as a reference, however it is no longer particularly necessary as the python script can generate its own files without the user having to edit the template file. It is probably a better idea to examine already existing hamiltonians for ideas on how to write them.
-\fs22 \cf3 \cb1 \CocoaLigature0 \
+\fs24 \cf3 There is a  template hamiltonian that can be used as a reference, however it is no longer particularly necessary as the python script can generate its own files without the user having to edit the template file. It is probably a better idea to examine already existing hamiltonians for ideas on how to write them.
+\fs22 \cb1 \CocoaLigature0 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf3 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
 \b \cf3 Hamiltonians with variable parameters\
+\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\b0 In some cases, it may be desirable to write a hamiltonian that contains some sort of variable parameter that can be set dynamically by the user at the time of simulation. In this case, the variable parameter should be declared as a global variable in hamiltonians.h header file and then used like any other variable in the calculation function of the appropriate hamiltonian. This is the only case in which the hamiltonians.h header file should be manually edited. The Monte Carlo simulation will have to be edited to prompt the user for the value of the parameter. 
-\b Currently, the simulation is using the Basic Square Hamiltonian, which includes a variable called \'93SOURCE.\'94 
-\b0 If future hamiltonians only contain one variable parameter, it may be best to just call them \'93SOURCE\'94 in order to avoid having to edit the Monte Carlo Simulation. However if in the future hamiltonians are used that have no source term, or have multiple source terms, the Monte Carlo simulation will have to be edited to set those variable accordingly.\
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf3 \
-
-\b Installing hamiltonians\
-
-\b0 Once the hamiltonian has been written, it has to be installed. This can be done simply by running the Python script and selecting the corresponding options. All hamiltonian header files need to remain in the hamiltonian folder. If after installing a new hamiltonian you are unable to run the simulation, there is a high probability that there is an error in the hamiltonian itself. The compiler errors should give you an idea of what the problem is. \
+\b0 \cf3 In some cases, it may be desirable to write a hamiltonian that contains some sort of variable parameter that can be set dynamically by the user at the time of simulation. In this case, the variable parameter should be declared as a global variable in hamiltonians.h header file and then used like any other variable in the calculation function of the appropriate hamiltonian. This is the only case in which the hamiltonians.h header file should be manually edited. The Monte Carlo simulation will have to be edited to prompt the user for the value of the parameter. As of now, there is a single variable parameter, named SOURCE, declared in the hamiltonians.h header file. It is set by the Monte Carlo simulation, and can then be utilized by any hamiltonian.\
 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b How hamiltonians are utilized by the Monte Carlo simulation\
+\b \cf3 Installing hamiltonians\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 When an hGraph object is passed to the Monte Carlo simulation as a seed, the full hamiltonian is only called to find the initial energy of the graph. At the end of the day, it is the 
-\i change 
-\i0 in energy that determines whether a particular Monte Carlo step is taken, rather than the actual total value of the energy. For each Monte Carlo step, the value of the partial hamiltonian is used to determine whether or not the step is to be accepted. If the answer is yes, the appropriate edges of the original graph object are flipped, and the value of the hamiltonian for the graph object is modified using the acceptPartial function, which modifies the internal value of the hamiltonian for the graph object by the amount passed to it.\
+\b0 \cf3 Once the hamiltonian has been written, it has to be installed. This can be done simply by running the Python script and selecting the corresponding options. All hamiltonian header files need to remain in the hamiltonian folder. If after installing a new hamiltonian you are unable to run the simulation, there is a high probability that there is an error in the hamiltonian itself. The compiler errors should give you an idea of what the problem is. \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b \cf3 How hamiltonians are utilized by the Monte Carlo simulation\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b0 \cf3 When an hGraph object is passed to the Monte Carlo simulation as a seed, the full hamiltonian is only called to find the initial energy of the graph. At the end of the day, it is the 
+\i \cf3 change 
+\i0 \cf3 in energy that determines whether a particular Monte Carlo step is taken, rather than the actual total value of the energy. For each Monte Carlo step, the value of the partial hamiltonian is used to determine whether or not the step is to be accepted. If the answer is yes, the appropriate edges of the original graph object are flipped, and the value of the hamiltonian for the graph object is modified using the acceptPartial function, which modifies the internal value of the hamiltonian for the graph object by the amount passed to it.\
 \
 In the Monte-Carlo simulation itself, the simulation functions are referred to as 
-\i simFunction
-\i0  and 
-\i simPartial. 
-\i0 These functions are defined globally and set towards the top of the main program. In this way, the function names only have to be changed once when a new hamiltonian is used, rather than being changed every place in the program they are utilized. These two lines are the ones that are edited by the Python script.\
+\i \cf3 simFunction
+\i0 \cf3  and 
+\i \cf3 simPartial. 
+\i0 \cf3 These functions are defined globally and set towards the top of the main program. In this way, the function names only have to be changed once when a new hamiltonian is used, rather than being changed every place in the program they are utilized. These two lines are the ones that are edited by the Python script.\
 \
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
@@ -493,7 +499,7 @@ Memory allocation is taken care of by the readGraphFile function, but it is the 
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1 \cf3 \cb7 for(int i = 0; i < numGraphs; i++) \{
+\f1 \cf3 \cb6 for(int i = 0; i < numGraphs; i++) \{
 \f0\fs24 \
 
 \f1\fs22     delete graphs[i];
@@ -617,6 +623,14 @@ In addition to these, there is a standalone module, called GraphCSV, that does t
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
+\b \cf0 The Eigen Library:\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b0 \cf0 The Eigen library is a C++ linear algebra library that is used extensively in the project. Its matrix class is the one used for adjacency matrices in the hGraph class. The library has plenty of features, and as such when writing new algorithms it should be possible to simply use matrix functions built into the library itself. Documentation for the library can be found at {\field{\*\fldinst{HYPERLINK "http://eigen.tuxfamily.org/index.php?title=Main_Page"}}{\fldrslt http://eigen.tuxfamily.org/index.php?title=Main_Page}}. A matrix in Eigen is a template class, meaning template argument must be supplied when creating new matrices. However, Eigen has defined several type names that allow the user to create matrices without using template arguments. For example, a variable sized matrix of integers (the type used for the adjacency matrices) is of type Matrix<int, Dynamic, Dynamic> (a matrix of integers where the number of rows and the number of columns is not fixed), can be represented compactly as an object of type MatrixXi, as it is in the hGraph class. \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
 \b \cf0 Looping over all pairs of nodes\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
@@ -675,10 +689,18 @@ The Monte Carlo simulation directly includes three other header files from the p
 \b Makefiles:\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf0 Makefiles are tricky to write and I will not go into too many technical details here. However fundamentally a makefile is just a sequence of commands to be executed by the terminal with the specific purpose of compiling a particular file. There are a two main parts to the file.\
+\b0 \cf0 Makefiles can be tricky to write. However fundamentally a makefile is just a sequence of commands to be executed by the terminal with the specific purpose of compiling a particular file. There are a two main parts in a makefile.\
 \
-The first piece of the file is a set of constants that can be used throughout the file. These constants are not required, but it easier to write the makefile using them than to write what the stand for every time its needed. In all the makefiles written for this project, the first two variables are used to hold the name of the compiler and the C++ standard to use. This project uses gcc and c++11 consistently as the compiler and standard respectively. Presumably, it would compile on other compilers such as Clang, as well as latter C++ standards. It most certainly cannot compile using standards 
+The first piece of the file is a set of constants that can be used throughout the file. These constants are not required, but it easier to write the makefile using them than to writing out what they stand for every time its needed. In all the makefiles written for this project, the first two variables are used to hold the name of the compiler and the C++ standard to use. This project uses gcc and c++11 consistently as the compiler and standard respectively. Presumably, it would compile on other compilers such as Clang, as well as latter C++ standards. It most certainly cannot compile using standards 
 \i older
 \i0  than c++11, as a number of features of c++11 are used frequently throughout the project.\
+\
+The second piece of the file is a series of commands that tell the compiler how to compile the main program as well as any other pieces that the main program needs in order to operate correctly. The commands are not necessarily executed in order. Rather, when the command \'91Make\'92 is called, the compiler checks if it has the necessary files needed to build the main program, and if not searches in the makefile for instructions on how to build them. The Monte Carlo makefile is linked to everything and will be used as an example.\
+\
+The most important constant declared in the Monte Carlo makefile is the INCLUDES variable. An include statement tells the compiler where to search for files that are included in the files to be compiled. The MonteCarlo.cpp file, for example, includes the \'93hamiltonians.h\'94 file. Without an include statement, the compiler would only look in the main MonteCarlo folder and would not be able to find that file. The INCLUDE variable in the makefile, however contains -I $(ROOT)/hamiltonian, where ROOT is a variable pointing to the highest-level directory in the project. All the completion commands in the makefile have the INCLUDE variable in them, which ensures that the compiler has access to all important directories. \
+\
+The line following the declaration of the INCLUDES constant tells the compiler which of the commands that are to follow should be considered the \'93primary\'94 one, that is, what will be compiled if the user runs \'93make\'94 without specifying any arguments. In the case of the MonteCarlo makefile, the default object to compile is titled \'93MonteCarlo,\'94 as would be expected.\
+\
+The command to actually make the MonteCarlo executable contains to lines, the first, which begins with \'93MonteCarlo:\'94 tells the compiler what files are needed in order to actually compile the program. If any of the files don\'92t exist, the compiler will search the makefiles for information on how to get them (which may require it to do other compilations). The second line contains the actually command that the compiler will use to compile the program.\
 \
 }

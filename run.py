@@ -98,6 +98,13 @@ while True:
         newHam()
     
     elif access == 3:
+        print("Currently installed hamiltonians: ")
+        rFile = open("hamiltonian/hamiltonians.txt", "r")
+        print(rFile.read())
+        choice = input("Which hamiltonian would you like to edit? ")
+        editCalcCode(choice)
+
+    elif access == 4:
         filename = input("Please enter the name of the header file: ")
         path = "hamiltonian/" + filename
         
@@ -110,7 +117,7 @@ while True:
             print("Hamiltonian not found.")
             print("Make sure the spelling of the filename is correct and the file is located in the hamiltonian folder")
 
-    elif access == 4:
+    elif access == 5:
         print("Currently installed hamiltonians: ")
         rFile = open("hamiltonian/hamiltonians.txt", "r")
         print(rFile.read())
@@ -118,16 +125,6 @@ while True:
         uninstallHam(choice)
     
     
-
-    elif access == 5:
-
-        proc = subprocess.Popen(['make', 'clean'],
-                            stdout=subprocess.PIPE, cwd='buildGraphs')
-        proc.communicate()[0].decode('utf-8')
-
-        proc2 = subprocess.Popen(['make', 'clean'],
-                    stdout=subprocess.PIPE, cwd='Simulate')
-
     elif access == 6:
         break
 

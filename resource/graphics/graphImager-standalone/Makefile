@@ -1,20 +1,20 @@
 CXX = g++
 CXXFLAGS = -std=c++11
 OBJS = depend/hGraph.o
-HGRAPH = ../../resource/hGraph/
+HGRAPH = ../../../resource/hGraph/
 MAIN = graphImage
-ROOT = ../..
+ROOT = ../../..
 
 INCLUDES = -I $(ROOT)/resource -I $(ROOT)/hamiltonian -I $(HOME)/root/include -I $(ROOT)/lib/nauty
 
-default: graphImage
+default: graphImager
 
-graphImage: depend/hGraph.o graphImager.cpp
+graphImager: depend/hGraph.o graphImager.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) graphImager.cpp `pkg-config --cflags --libs cairo` $(ROOT)/lib/nauty/nauty.a
 
-depend/hGraph.o: ../../resource/hGraph/hGraph.cpp 
+depend/hGraph.o: $(ROOT)/resource/hGraph/hGraph.cpp 
 	$ mkdir -p depend
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c  ../../resource/hGraph/hGraph.cpp -o depend/hGraph.o
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c  $(ROOT)/resource/hGraph/hGraph.cpp -o depend/hGraph.o
 
 clean:
 	$(RM) *.o $(MAIN)

@@ -1411,7 +1411,7 @@ hGraph zeroGraph(int size) { //generates a graph with no edges.
 
 //the triple pointer is a C++ requirement regarding memory management in external functions
 
-void readGraphFile(hGraph *** graphs, int &num) { //Taktes in a double (NOT TRIPLE) pointer to an hGraph, as well as an integer variable.
+void readGraphFile(hGraph *** graphs, int &num) { //Takes in the address to a double (NOT TRIPLE) pointer to an hGraph, as well as an integer variable.
     int size;                                     //After function runs, graphs will be an array of pointers to graphs
     char cSize;                                   //variable num will contain the number of graphs read.
     std::string filename;

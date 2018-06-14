@@ -43,9 +43,7 @@ double Template::result() { //There should be no reason to edit this function;
     return _result;
 }
 
-void Template::calculate(hGraph &host) { //This is where all the main calculation takes place.
-
-    
+void Template::calculate(hGraph &host) { //This is where all the main calculation takes place.    
 }
 
 void TemplateHam(hGraph &host) {
@@ -55,6 +53,7 @@ void TemplateHam(hGraph &host) {
     host.setHamiltonian(Ham.result());
     
 }
+
 double TemplatePartial(hGraph &host, std::vector<int> nodeA, std::vector<int> nodeB) { 
     if(nodeA.size() != nodeB.size()) {
         std::cout << "Fatal error: vectors passed to a partial hamiltonian must contain the same number of elements" << std::endl;
@@ -67,4 +66,4 @@ double TemplatePartial(hGraph &host, std::vector<int> nodeA, std::vector<int> no
     
 }
 
-#endif /* basic2_h */
+#endif /* template_h */

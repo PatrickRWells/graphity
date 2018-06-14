@@ -1,19 +1,28 @@
+//
+//  basicSquare.h
+//
+//
+//  Created by Patrick on 11/17/17.
+//
+//  To use this basicSquare, start by changing all instances of "basicSquare" to the name of your file
+
 #ifndef basicSquare_h
 #define basicSquare_h
 
 #include "absHamiltonian.h"
 #include <cmath>
 
+
 void basicSquareHam(hGraph &host);
 class basicSquare : public absHamiltonian {
     
 private:
-    double _result; //Use this attribute to store the result of full energy calculations.
-    double _partial;//Use this attribute to store the result of partial energy calculations.
+    double _result; //Result of the computation. Should not be changed.
+    double _partial;
     std::vector<int> nodeA;
     std::vector<int> nodeB;
     int numEdges = 0;
-    double sourceT = 0;
+    double sourceT = 10;
     bool isPartial = false;
 public:
     basicSquare();
@@ -26,24 +35,28 @@ public:
     
 };
 
-basicSquare::basicSquare() : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
+basicSquare::basicSquare() : _result(0.0) {
     sourceT = SOURCE;
 }
 
-basicSquare::basicSquare(std::vector<int> node1, std::vector<int> node2) : _result(0.0) { //This constructor is used by the utility function when doing only a partial calculation.
+basicSquare::basicSquare(std::vector<int> node1, std::vector<int> node2) : _result(0.0) { //unlikely that it should be changed, unless you have some background energy level
+    //std::cout << "Input value of source term: ";
+    //std::cin >> source;
     nodeA = node1;
     nodeB = node2;
     numEdges = node1.size();
     isPartial = true;
+    sourceT = SOURCE;
+
     
 }
 
-
-double basicSquare::result() { //There should be no reason to edit this function;
+double basicSquare::result() { //just leave the function iteslf as-is
     return _result;
 }
 
-void basicSquare::calculate(hGraph &host) { //This is where all the main calculation takes place.    
+void basicSquare::calculate(hGraph &host) { //This is where all the main calculation takes place
+    
     if(!isPartial) {
         int size = host.getSize();
         for(int i = 0; i < size; i++) {
@@ -77,17 +90,17 @@ void basicSquare::calculate(hGraph &host) { //This is where all the main calcula
         double diff = temp.getHam() - host.getHam();
         _partial = diff;
     }
+    
 }
 
 void basicSquareHam(hGraph &host) {
-                                
     basicSquare Ham;
     host.accept(Ham);
     host.setHamiltonian(Ham.result());
     
 }
 
-double basicSquarePartial(hGraph &host, std::vector<int> nodeA, std::vector<int> nodeB) { 
+double basicSquarePartial(hGraph &host, std::vector<int> nodeA, std::vector<int> nodeB) {
     if(nodeA.size() != nodeB.size()) {
         std::cout << "Fatal error: vectors passed to a partial hamiltonian must contain the same number of elements" << std::endl;
         exit(2);
@@ -99,4 +112,4 @@ double basicSquarePartial(hGraph &host, std::vector<int> nodeA, std::vector<int>
     
 }
 
-#endif /* basicSquare_h */
+#endif /* basic2_h */

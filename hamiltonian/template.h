@@ -3,7 +3,8 @@
 //
 //
 //  Created by Patrick on 11/17/17.
-//
+//  While this template may be useful, it is no longer necessary to manually edit it to create new hamiltonians
+//  Using the python script to do so is encouraged
 //  To use this template, start by changing all instances of "Template" to the name of your file (with correct capitalization)
 
 #ifndef template_h
