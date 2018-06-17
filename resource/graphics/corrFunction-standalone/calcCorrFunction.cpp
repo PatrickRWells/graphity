@@ -1,8 +1,8 @@
 //
-//  graphCSV.cpp
+//  calcCorrFunction.cpp
 //  
 //
-//  Created by Patrick on 5/16/18.
+//  Created by Patrick on 6/14/18.
 //
 
 #include <iostream>
@@ -11,10 +11,12 @@
 
 int main() {
     std::string filename;
+    std::string ofilename;
     std::ifstream input;
-
+    std::ofstream output;
+    
     while(true) {
-        std::cout << "Enter the filename that contains the data you would like to plot: ";
+        std::cout << "Enter the filename that contains the data for which you would like to calculate the autocorrelation function: ";
         std::getline(std::cin, filename);
         input.open(filename);
         if(input.good()) {
@@ -25,6 +27,10 @@ int main() {
         }
         
     }
+    
+    std::cout << "Enter a name for the output file: ";
+    std::getline(std::cin, ofilename);
+    ofilename += ".csv";
     
     std::string line;
     int numLines;
@@ -45,7 +51,7 @@ int main() {
     std::vector <double> ** data = new std::vector<double> * [numLines];
     for(int i = 0; i < numLines; i++) {
         
-        data[i] = new std::vector<double> [1];;
+        data[i] = new std::vector<double> [2];;
         
     }
     
@@ -67,7 +73,7 @@ int main() {
                 tempStr = "";
                 j = 0;
                 break;
-    
+                
             }
             else {
                 tempStr += ch;
@@ -75,33 +81,26 @@ int main() {
             }
         }
     }
-
-    std::string description[numLines];
+    
     for(int i = 0; i < numLines; i++) {
-        std::cout << "Enter a descriptor for data series " << i+1 << ": ";
-        std::getline(std::cin, description[i]);
-        
+        std::cout << "Calculating correlation function for data series " << i+1 << std::endl;
+        correlationFn(data, i, 0, 1);
     }
     
-    drawMultiGraph(data, numLines, 0, description, "");
-    
+    output.open(ofilename);
+    for(int i = 0; i < numLines; i++) {
+        for (int j = 0; j < data[i][1].size() - 1; j++){
+            output << data[i][1][j];
+            output << ",";
+        }
+        output << data[i][1][data[i][1].size() - 1];
+        output << std::endl;
+    }
+    output.close();
+    std::cout << "Correlation function written to file " << ofilename << std::endl;
+
     for(int i = 0; i < numLines; i++) {
         delete [] data[i];
     }
     delete [] data;
-
-    
-    
 }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-

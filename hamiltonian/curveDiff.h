@@ -1,11 +1,3 @@
-//
-//  curveDiff.h
-//
-//
-//  Created by Patrick on 11/17/17.
-//
-//  To use this curveDiff, start by changing all instances of "curveDiff" to the name of your file (with correct capitalization)
-
 #ifndef curveDiff_h
 #define curveDiff_h
 
@@ -21,8 +13,8 @@ private:
     std::vector<int> nodeA;
     std::vector<int> nodeB;
     int numEdges = 0;
-    bool isPartial = false;
     double sourceT = 0;
+    bool isPartial = false;
 public:
     curveDiff();
     curveDiff(std::vector<int> node1, std::vector<int> node2);
@@ -51,7 +43,7 @@ double curveDiff::result() { //There should be no reason to edit this function;
     return _result;
 }
 
-void curveDiff::calculate(hGraph &host) { //This is where all the main calculation takes place.
+void curveDiff::calculate(hGraph &host) { //This is where all the main calculation takes place.    
     if(!isPartial) {
     
         int size = host.getSize();
@@ -94,15 +86,15 @@ void curveDiff::calculate(hGraph &host) { //This is where all the main calculati
     
 }
 
-void curveDiffHam(hGraph &host) { //do not edit this function except to change instances of the word "curveDiff"
-                                 //For example, if your hamiltonian is named "basic" this function should be titled "basicHam"
+void curveDiffHam(hGraph &host) {
+                                
     curveDiff Ham;
     host.accept(Ham);
     host.setHamiltonian(Ham.result());
     
 }
-//Note the difference between the partial hamiltonian and the full one. The full one sets the value in the graph object, the partial just returns a value
-double curveDiffPartial(hGraph &host, std::vector<int> nodeA, std::vector<int> nodeB) {    //Do not edit this function except to change instance of the word "curveDiff"
+
+double curveDiffPartial(hGraph &host, std::vector<int> nodeA, std::vector<int> nodeB) { 
     if(nodeA.size() != nodeB.size()) {
         std::cout << "Fatal error: vectors passed to a partial hamiltonian must contain the same number of elements" << std::endl;
         exit(2);
@@ -114,4 +106,4 @@ double curveDiffPartial(hGraph &host, std::vector<int> nodeA, std::vector<int> n
     
 }
 
-#endif /* basic2_h */
+#endif /* curveDiff_h */

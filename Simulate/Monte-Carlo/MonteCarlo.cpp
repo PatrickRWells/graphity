@@ -666,10 +666,10 @@ bool getTF() {
             
         }
         else {
-            std::cout << "Invalid input." << std::endl;
-            std::cout << "Please enter a 'y' or an 'n': ";
             std::cin.clear();
             std::cin.ignore(100, '\n');
+            std::cout << "Invalid input." << std::endl;
+            std::cout << "Please enter a 'y' or an 'n': ";
             
         }
     }

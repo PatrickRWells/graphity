@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cmath>
 #include <vector>
 
 bool getTF();
@@ -37,7 +38,6 @@ int main() {
     int lineLength = line.length();
     while(true) {
         getline(input,line); //gets the next line of the CSV file
-        std::cout << line[0] << std::endl;
         
         if(input.eof()) {  //checks if end of CSV file has been reached;
             break;
@@ -66,28 +66,48 @@ int main() {
         }
     }
     
+    double averages[numLines];
+    
     std::cout << "Data read..." << std::endl;
-    std::cout << "Would you like to calculate the average of the data? (y/n) ";
-    if(getTF()) {
-        for(int i = 0; i < numLines; i++ ) {
-            double sum = 0;
-            for(int j = 0; j < data[i].size(); j++) {
-                sum += data[i][j];
-            }
-            std::cout << "Data set " << i << " average: " << sum/(data[i].size()) << std::endl;
+    for(int i = 0; i < numLines; i++ ) {
+        double sum = 0;
+        for(int j = 0; j < data[i].size(); j++) {
+            sum += data[i][j];
         }
+        averages[i] = sum/(data[i].size());
+        std::cout << "Data set " << i+1 << " average: " << sum/(data[i].size()) << std::endl;
     }
     
-    std::cout << "Woudl you like to calculate the average of the square of the data? (y/n) ";
+    std::cout << "Would you like to calculate the average of the square of the data? (y/n) ";
     if(getTF()) {
         for(int i = 0; i < numLines; i++ ) {
             double sum = 0;
             for(int j = 0; j < data[i].size(); j++) {
                 sum += (data[i][j]*data[i][j]);
             }
-            std::cout << "Data set " << i << " average of squares: " << sum/(data[i].size()) << std::endl;
+            std::cout << "Data set " << i+1 << " average of squares: " << sum/(data[i].size()) << std::endl;
         }
     }
+    
+    std::cout << "Would you like to calculate the standard deviation of the data? (y/n) ";
+    if(getTF()) {
+        for(int i = 0; i < numLines; i++) {
+            double sum = 0;
+            for(int j = 0; j  < data[i].size(); j++) {
+                double partial = data[i][j] - averages[i];
+                sum += partial*partial;
+                
+            }
+            sum = sum/(data[i].size() - 1);
+            sum = sqrt(sum);
+            std::cout << "Data set " << i+1 << " standard deviaton: " << sum << std::endl;
+            
+        }
+    
+    
+    }
+    
+    
     
     
 }

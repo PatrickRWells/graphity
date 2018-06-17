@@ -112,7 +112,7 @@ std::vector<double> hGraph::getSpectralDimen() { //simple getter function. See b
     
 }
 
-double hGraph::getHam() {  //simple getter function
+double hGraph::getHam() const {  //simple getter function
     return _hamiltonian;
 }
 
@@ -121,7 +121,7 @@ int hGraph::getEulerChar() { //simple getter function. See below for the euler c
     return _eulerChar;
 }
 
-int hGraph:: getSize() { //simple getter function
+int hGraph:: getSize() const{ //simple getter function
     return NUM_NODES;
 }
 
@@ -131,7 +131,7 @@ std::vector<int> hGraph::numCliques() { //simply outputs the number of cliques (
 
 }
 
-int hGraph::getDegree(int node) { //simply gets the degree of a given node.
+int hGraph::getDegree(int node) const { //simply gets the degree of a given node.
     if(node < 0 || node >= NUM_NODES) { //Recall that C++ is zero indexed, the nodes of a graph of size 10 will be labled 0...9
         std::cerr << "Critical error, only acceptable node values are between 0 and " << NUM_NODES - 1 << std::endl;
         exit(4);
@@ -141,7 +141,7 @@ int hGraph::getDegree(int node) { //simply gets the degree of a given node.
     
 }
 
-bool hGraph::isConnected(int row, int column) { //checks if two nodes are connected.
+bool hGraph::isConnected(int row, int column) const { //checks if two nodes are connected.
     if(row < 0 || row >= NUM_NODES || column < 0 || column > NUM_NODES) { //Recall that C++ is zero indexed, the nodes of a graph of size 10 will be labled 0...9
         std::cerr << "Critical error, only acceptable node values are between 0 and " << NUM_NODES - 1 << std::endl;
         exit(4);
@@ -442,7 +442,7 @@ MatrixXi hGraph::getShortestPaths() {
     
 }
 
-hGraph hGraph::compliment() { //Returns an hGraph object where the adjacency matrix is the compliment of the original hGraph's adjacency matrix.
+hGraph hGraph::compliment() const { //Returns an hGraph object where the adjacency matrix is the compliment of the original hGraph's adjacency matrix.
     hGraph temp(NUM_NODES, _adjMatrix);
     for(int i = 0; i < NUM_NODES; i++) {
         for(int j = i+1; j < NUM_NODES; j++) { //Using nested loops where the inner loop 
@@ -455,7 +455,7 @@ hGraph hGraph::compliment() { //Returns an hGraph object where the adjacency mat
     
 }
 
-double hGraph::getAvgDegree() { //Returns the average node degree 
+double hGraph::getAvgDegree() const { //Returns the average node degree
     double avg = 0;
     for(int i = 0; i < NUM_NODES; i++) {
         avg += _degVector[i];
@@ -889,7 +889,7 @@ void hGraph::calculateHausDimen() {
 }
 
 
-std::vector<double> hGraph::autoGroupSize() {
+std::vector<double> hGraph::autoGroupSize() const {
     //Calculates the size of the automorphism group using the Nauty/Traces library. See user guide.
     
     int m, n;
@@ -916,7 +916,7 @@ std::vector<double> hGraph::autoGroupSize() {
 }
 
 
-hGraph hGraph::unitSphere(int node) { //outputs the unit sphere around a given. Node the united sphere contains
+hGraph hGraph::unitSphere(int node) const { //outputs the unit sphere around a given. Node the united sphere contains
     //all nodes connected to the given node, as well as all edges between those nodes
     
     
@@ -1104,6 +1104,23 @@ void hGraph::setMatrix(int size, MatrixXi data) { //resets the matrix based on n
 
 void hGraph::accept(absHamiltonian &ham) { //Used in visitor design pattern.
     ham.calculate(*this);
+    
+}
+
+bool hGraph::operator != (hGraph & rhs) const {
+    
+    return !(*this == rhs);
+    
+}
+
+
+bool hGraph::operator == (hGraph & rhs) const {
+    
+    if(this->getSize() != rhs.getSize()) {
+        return false;
+    }
+    
+    return isIsomorphic(*this, rhs);
     
 }
 
@@ -1515,7 +1532,7 @@ void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove)
     matrix.conservativeResize(numRows,numCols);
 }
 
-MatrixXi unitSphere(MatrixXi matrix, int node) {
+MatrixXi unitSphere(MatrixXi matrix, int node)  {
     
     //This function is used by the newer version of the dimensionality algorithm.
     //a -1 in the header indicates the node is not in the sphere, a -2 denotes the node the sphere was taken around.

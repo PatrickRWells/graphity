@@ -29,8 +29,11 @@ bool getTF();
 
 int main() {
 
-    hGraph graph = randomGraph(15, 0);
-    std::cout << graph << std::endl;
+    hGraph graph = randomGraph(10,0);
+    hGraph graph2 = randomGraph(10,0);
+    if(graph != graph2) {
+        std::cout << "Yay!" << std::endl;
+    }
 }
 
 bool getTF() {

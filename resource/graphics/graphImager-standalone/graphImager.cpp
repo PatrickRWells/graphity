@@ -173,6 +173,12 @@ int main() {
 
         
     }
+    for(int i = 0; i < numGraphs; i++) {
+        
+        delete graphs[i];
+        
+    }
+    delete [] graphs;
     
     
     

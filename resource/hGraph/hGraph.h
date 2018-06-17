@@ -86,31 +86,34 @@ public:
     void accept(absHamiltonian &ham);
     void acceptPartial(double partial);
     void setThreads(int threads);
-    hGraph compliment();
-    hGraph unitSphere(int node);
+    hGraph compliment() const;
+    hGraph unitSphere(int node) const;
     void flipEdge(int nodeA, int nodeB);
     void flipEdge(std::vector<int> nodeA, std::vector<int> nodeB);
+    bool equals(hGraph &rhs);
 
 
     
     std::vector<int> getFractionalDimen();
-    double getAvgDegree();
+    double getAvgDegree() const;
     std::vector<int> getEccentricity();
     int getDiameter();
-    std::vector<double> autoGroupSize();
+    std::vector<double> autoGroupSize() const;
     MatrixXi getShortestPaths();
     double getDimension();
     std::vector<double> getSpectralDimen();
     std::vector<double> getHausdorffDimen();
-    int getDegree(int node);
-    int getSize();
+    int getDegree(int node) const;
+    int getSize() const;
     int getEulerChar();
     double curvatureAt(int node);
-    double getHam();
+    double getHam() const;
 
-    bool isConnected(int row, int column);
+    bool isConnected(int row, int column) const;
     std::vector<int> numCliques();
 
+    bool operator == (hGraph & rhs) const;
+    bool operator != (hGraph &rhs) const;
     friend std::ostream &operator << (std::ostream &os, const hGraph &rhs);
     friend std::ofstream &operator <<(std::ofstream &fs, const hGraph &rhs);
 };

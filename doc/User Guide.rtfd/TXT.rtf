@@ -5,7 +5,7 @@
 \red0\green0\blue0;\red255\green255\blue255;}
 {\*\expandedcolortbl;;\cssrgb\c0\c41176\c85098;\cssrgb\c0\c0\c0;\cssrgb\c100000\c100000\c100000;
 \csgray\c0\c0;\csgray\c100000;}
-\margl1440\margr1440\vieww10220\viewh11020\viewkind0
+\margl1440\margr1440\vieww18320\viewh11020\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs36 \cf0 Graphity User\'92s Guide\
@@ -22,8 +22,9 @@
 \fs22 3. Hamiltonians\
 4. The hGraph class\
 5. Graphics\
-6. Some Useful Programming Tricks\
-7. Extending with a new module\
+6. Other scripts\
+7. Some Useful Programming Tricks\
+8. Extending with a new module\
 \
 
 \b\fs28 0. Necessary Dependencies\
@@ -216,10 +217,10 @@ The Monte Carlo simulation can automatically make data plots. This is done towar
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \b \cf3 Note: Do not edit the \'93hamiltonians.txt\'94 file or the \'93hamiltonians.h\'94 file. These files are managed by the python script.
-\b0 \cf3 \
+\b0 \
 \
 
-\b\fs24 \cf3 Writing new Hamiltonians\
+\b\fs24 Writing new Hamiltonians\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \b0\fs22 \cf3 \
@@ -235,8 +236,8 @@ sourceT: Contains the value of the source term.\
 If you are writing the calculation code by way of the Python script, you will not see these variables declared. Simply use them as though they have been.\
 \
 The calculation function must contain two routines: one for a full calculation, and one for a partial calculation. 
-\b \cf3 The result of a full calculation must be assigned to the _result attribute, and the result of the partial calculation must be assigned to _partial.
-\b0 \cf3   The graph that the energy is being calculated on is passed to the function as the variable \'93host.\'94 The user has access to all public hGraph member functions (see available functions below) by using this host. For example, getting the dimensionality of the host would be done by calling \'93host.getDimension().\'94\
+\b The result of a full calculation must be assigned to the _result attribute, and the result of the partial calculation must be assigned to _partial.
+\b0   The graph that the energy is being calculated on is passed to the function as the variable \'93host.\'94 The user has access to all public hGraph member functions (see available functions below) by using this host. For example, getting the dimensionality of the host would be done by calling \'93host.getDimension().\'94\
 \
 A well implemented calculation function would look something like this:\
 \
@@ -322,14 +323,14 @@ Unless there is an easy closed-form way to calculate the change in energy for a 
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \b0 \cf3 When an hGraph object is passed to the Monte Carlo simulation as a seed, the full hamiltonian is only called to find the initial energy of the graph. At the end of the day, it is the 
-\i \cf3 change 
-\i0 \cf3 in energy that determines whether a particular Monte Carlo step is taken, rather than the actual total value of the energy. For each Monte Carlo step, the value of the partial hamiltonian is used to determine whether or not the step is to be accepted. If the answer is yes, the appropriate edges of the original graph object are flipped, and the value of the hamiltonian for the graph object is modified using the acceptPartial function, which modifies the internal value of the hamiltonian for the graph object by the amount passed to it.\
+\i change 
+\i0 in energy that determines whether a particular Monte Carlo step is taken, rather than the actual total value of the energy. For each Monte Carlo step, the value of the partial hamiltonian is used to determine whether or not the step is to be accepted. If the answer is yes, the appropriate edges of the original graph object are flipped, and the value of the hamiltonian for the graph object is modified using the acceptPartial function, which modifies the internal value of the hamiltonian for the graph object by the amount passed to it.\
 \
 In the Monte-Carlo simulation itself, the simulation functions are referred to as 
-\i \cf3 simFunction
-\i0 \cf3  and 
-\i \cf3 simPartial. 
-\i0 \cf3 These functions are defined globally and set towards the top of the main program. In this way, the function names only have to be changed once when a new hamiltonian is used, rather than being changed every place in the program they are utilized. These two lines are the ones that are edited by the Python script.\
+\i simFunction
+\i0  and 
+\i simPartial. 
+\i0 These functions are defined globally and set towards the top of the main program. In this way, the function names only have to be changed once when a new hamiltonian is used, rather than being changed every place in the program they are utilized. These two lines are the ones that are edited by the Python script.\
 \
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
@@ -529,7 +530,9 @@ Each graph should have an adjacency matrix, followed by an empty line, followed 
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \b \cf0 bool isIsomorphic(hGraph graph1, hGraph graph2): 
-\b0 Returns true if the two graphs are isomorphic, and false if they are not. This function uses the Nauty/Traces library, which can crash if it is accessed by multiple processes at once. Because of that, any use of this function should be protected by a mutex if it will be run on multiple threads.\
+\b0 Returns true if the two graphs are isomorphic, and false if they are not. This function uses the Nauty/Traces library, which can crash if it is accessed by multiple processes at once. Because of that, any use of this function should be protected by a mutex if it will be run on multiple threads. 
+\b The == and != operators have been overloaded to return the value of this function. 
+\b0 In other words, if you have the hGraph objects graph1 and graph 2, and you call \'93graph1 == graph2\'94, the output will be whether or not the graphs are isomorphic. The != operator works in exactly the same way\
 
 \b \
 hGraph randomGraph(int size, double fillFrac):
@@ -610,12 +613,49 @@ The graph imaging function can be found in the resource/grapics/graphImager/ fol
 \i0  to ensure that the folder actually exists. 
 \b0 If the folder does not exist, image output will faill.\
 \
-In addition to these, there is a standalone module, called GraphCSV, that does the same thing as drawMultiGraph, but on data that has already been stored in a CSV file. It its pre-compiled and can be copied wherever it is needed.\cb1 \
+In addition to these, there is a standalone module, called GraphCSV, that does the same thing as drawMultiGraph, but on data that has already been stored in a CSV file. It its pre-compiled and can be copied wherever it is needed.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b\fs28 \cf0 \cb1 6. Other Scripts
+\b0\fs22 \cb4 \
+\pard\tx543\pardeftab543\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\fs24 \cf0 \cb1 The scripts folder contains several programs that allow the user to do various interesting things on data that has 
+\i already been written to CSV files.
+\i0  All of these functions (except one) are already implemented as part of a more extensive module (such as the Monte Carlo simulation) but it is always possible that the user did not request them at the time. Because they are pre-compiled, they can be copied to wherever the data in question is. All of the functions dynamically determine the number of data series/points in the file they are given.\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\b \cf0 calcCorrFunction
+\b0  calculates the correlation function for the data in a given CSV file and outputs it to a new CSV file\
+
+\b graphCSV 
+\b0 generates a plot out of data in a CSV file\
+
+\b graphImager 
+\b0 generates an image of the graph(s) in a CSV file.\
+
+\b averages: 
+\b0 calculates the averages and standard deviations for a data file. It was created because sometimes the CSV files in question are too large to be opened completely in Excel.
+\fs22 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \fs24 \cf0 \
+The code for 
+\b averages
+\b0  can be found in the folder scripts/average while the code for the rest is found in resources/graphics.\
+\
+Because 
+\b averages
+\b0  does not connect to any modules, it does not have a makefile. If necessary, it can be compiled quite simply by running the following form the terminal: \
+\
+g++ averages.cpp -o averages\
+\
 
-\b\fs28 6. Some Useful Programming Tips\
+\b\fs28 7. Some Useful Programming Tips\
 
 \b0\fs24 \
 
@@ -674,7 +714,7 @@ Initializing j to be i+1 both ensures that i never equals j and also that no edg
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs28 \cf0 7. Extending with a New Module\
+\b\fs28 \cf0 8. Extending with a New Module\
 
 \b0\fs22 It may come to pass that at some point in the future a new module needs to be written with the resources (such as the hGraph class) that this project already has. In this case, there are two primary things that need to be considered: includes and makefiles.\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
