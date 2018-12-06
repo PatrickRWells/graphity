@@ -675,7 +675,7 @@ bool getTF() {
     }
 }
 
-
+//The following is incomplete
 void wolffAlgorithm(hGraph * graph, std::vector<bool> observe, std::vector<double> data[][NUM_OBSERVABLES], int simNum, bool progress, std::string descriptor) {
     std::cout << *graph << std::endl;
     int selected = 0;

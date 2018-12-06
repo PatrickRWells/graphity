@@ -473,29 +473,24 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
         edges+= getDegree(i);
     }
     edges /= 2;
-    if(edges == maxEdges) {
+    /*if(edges == maxEdges) {
         _dimension = NUM_NODES -1;
         return;
-    }
+    }*/
 
     
     std::vector<int> * trip;
     trip = new std::vector<int>[3];
-    double *** values;
-    values = new double ** [NUM_NODES];
-    int triples = 0;
+    int numVals = binomCoef(NUM_NODES, 3);
+    double  * values = new double[numVals];
+    for(int i = 0; i < numVals; i++){
+        values[i] = -2;
+    }
+
     
-
     for(int i = 0; i < NUM_NODES; i++) {
-
-        values[i] = new double * [NUM_NODES-i];
-
         for(int j = 0; j < NUM_NODES - i; j++) {
-
-            values[i][j] = new double[NUM_NODES-j];
             for(int k = 0; k < NUM_NODES - j; k++) {
-                
-                values[i][j][k] = -2.0;
                 if(i < i + j && i + j < j + k) {
                     if(isConnected(i, i+j) && isConnected(i + j, j + k)) { //ensures the depth-3 sphere in question actually exists
                         trip[0].push_back(i);
@@ -643,10 +638,11 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
 
     }
     delete [] values;
+     */
 
 }
 
-double hGraph::dimension(MatrixXi amat, double *** data, std::vector<int> * trp, int lowerBound, int upperBound, bool init)  { //utility function used by main calcDimension function
+double hGraph::dimension(MatrixXi amat, double * data, std::vector<int> * trp, int lowerBound, int upperBound, bool init)  { //utility function used by main calcDimension function
     if(init) { //calculates all 3-sphres needed
         MatrixXi tempAmat(NUM_NODES, NUM_NODES);
         
@@ -1656,6 +1652,24 @@ int gcd(int numA, int numB) {
     return num2;
 }
 
+int binomCoef(int n, int k) {
+    if(k > n) {
+        return 0;
+    }
+    if(k == n || k == 0) {
+        return 1;
+    }
+    
+    else {
+        int val = n;
+        for (int i = 2; i <= k; i++) {
+            val *= (n + 1 - i);
+            val /= i;
+        }
+        return val;
+    }
+
+}
 
 
 //---------------------------END OTHER CALCULATION FUNCTIONS---------------------------//

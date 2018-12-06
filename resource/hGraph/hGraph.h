@@ -170,7 +170,7 @@ public:
 //Forward declaration of needed resource functions
 
 void readGraphFile(hGraph *** graphs, int &num);
-
+int binomCoef(int n, int k);
 MatrixXi unitSphere(MatrixXi matrix, int node);
 void removeColumn(Eigen::MatrixXi& matrix, unsigned int colToRemove);
 void removeRow(Eigen::MatrixXi& matrix, unsigned int rowToRemove);
