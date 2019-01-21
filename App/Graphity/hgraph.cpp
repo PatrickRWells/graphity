@@ -8,7 +8,7 @@
 
 #include <algorithm>
 #include "hGraph.h"
-//#include "absHamiltonian.h"
+#include "hamiltonian/absHamiltonian.h"
 /*
 ------CONTENTS------
 hGraph Class

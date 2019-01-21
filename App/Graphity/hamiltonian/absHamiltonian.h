@@ -9,7 +9,8 @@
 
 #ifndef absHamiltonian_h
 #define absHamiltonian_h
-#include "hGraph/hGraph.h"
+
+class hGraph;
 
 class absHamiltonian {
 public:
