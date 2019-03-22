@@ -29,11 +29,10 @@ bool getTF();
 
 int main() {
 
-    hGraph graph = randomGraph(10,0);
-    hGraph graph2 = randomGraph(10,0);
-    if(graph != graph2) {
-        std::cout << "Yay!" << std::endl;
-    }
+    hGraph graph = randomGraph(20,0.8);
+    graph.setThreads(8);
+    std::cout << graph.getDimension() << std::endl;
+
 }
 
 bool getTF() {

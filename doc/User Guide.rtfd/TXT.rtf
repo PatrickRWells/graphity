@@ -1,20 +1,21 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf400
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;\f2\fnil\fcharset0 Menlo-Italic;
-\f3\fnil\fcharset0 Menlo-BoldItalic;}
-{\colortbl;\red255\green255\blue255;\red9\green80\blue208;\red0\green0\blue0;\red255\green255\blue255;
-\red0\green0\blue0;\red255\green255\blue255;}
-{\*\expandedcolortbl;;\cssrgb\c0\c41176\c85098;\cssrgb\c0\c0\c0;\cssrgb\c100000\c100000\c100000;
-\csgray\c0\c0;\csgray\c100000;}
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf200
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;\f2\fmodern\fcharset0 Courier;
+\f3\fnil\fcharset0 Menlo-Regular;\f4\fnil\fcharset0 Menlo-Italic;\f5\fswiss\fcharset0 Helvetica-Oblique;
+\f6\fswiss\fcharset0 Helvetica-BoldOblique;\f7\fnil\fcharset0 Menlo-BoldItalic;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;\red0\green0\blue0;
+\red255\green255\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c100000\c100000\c100000;\csgray\c0\c0;
+\csgray\c100000;}
 \margl1440\margr1440\vieww18320\viewh11020\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs36 \cf0 Graphity User\'92s Guide\
 \
 
-\b\fs28 Table of Contents\
+\f1\b\fs28 Table of Contents\
 \
 
-\b0\fs24 0. Necessary dependencies\
+\f0\b0\fs24 0. Necessary dependencies\
 1. Using the Python Script\
 2. The Monte Carlo Simulation
 \fs28 \
@@ -27,25 +28,25 @@
 8. Extending with a new module\
 \
 
-\b\fs28 0. Necessary Dependencies\
+\f1\b\fs28 0. Necessary Dependencies\
 \
 
-\b0\fs22 There are a few libraries that need to be installed that are not present in the main repository, either for configuration reasons or because of their size. Missing any of the dependencies (with the exception of python) will prevent the Monte-Carlo simulation from running.\
+\f0\b0\fs22 There are a few libraries that need to be installed that are not present in the main repository, either for configuration reasons or because of their size. Missing any of the dependencies (with the exception of python) will prevent the Monte-Carlo simulation from running.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 Nauty/Traces
-\b0  \
+\f1\b \cf0 Nauty/Traces
+\f0\b0  \
 Nauty and Traces are a pair of libraries that are used calculate the size of a graph\'92s automorphism group, as well as whether two graphs are isomorphic. They can be downloaded from {\field{\*\fldinst{HYPERLINK "http://pallini.di.uniroma1.it/"}}{\fldrslt http://pallini.di.uniroma1.it/}}. They cannot be included in the repository because their configuration is machine-specific\
 Once downloaded, unzip the folder and configure it using the instructions under \'93Installation procedure\'94 found on the page linked to above. Once this is done, the folder 
-\b must 
-\b0 be placed in the \'91lib\'92 folder of the project. The folder name must be \'91nauty.\'92 (because Makefiles aren\'92t very smart)\
+\f1\b must 
+\f0\b0 be placed in the \'91lib\'92 folder of the project. The folder name must be \'91nauty.\'92 (because Makefiles aren\'92t very smart)\
 \
 
-\b CERN Root\
+\f1\b CERN Root\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf0 Root is a data visualization library used to plot data. It cannot be included in the main repository due to its size. It can be downloaded from {\field{\*\fldinst{HYPERLINK "https://root.cern.ch/"}}{\fldrslt https://root.cern.ch/}}. It needs to be installed in a folder titled \'93root\'94 in the user\'92s home folder. Installation instructions can be found on the website.\
+\f0\b0 \cf0 Root is a data visualization library used to plot data. It cannot be included in the main repository due to its size. It can be downloaded from {\field{\*\fldinst{HYPERLINK "https://root.cern.ch/"}}{\fldrslt https://root.cern.ch/}}. It needs to be installed in a folder titled \'93root\'94 in the user\'92s home folder. Installation instructions can be found on the website.\
 \
 The makefiles for the project need to be able to run the `root` command on the command line. This command is not enabled by default. It can be enabled by running a python script found in the root installation, but this has to be done every time the terminal is restarted, which is tedious. To ensure that the command is always enabled, edit the file .bash_profile (or create it if it doesn\'92t exist) in the user\'92s home folder. Because it is a dot file, it will likely need to be edited from the terminal. Add the following lines: \
 \
@@ -61,15 +62,18 @@ export PYTHONPATH=$ROOTSYS/lib:$PYTHONPATH\
 \fs22 \kerning1\expnd0\expndtw0 In order to ensure that this worked, restart the terminal and run the command \'93root\'94. It should now start the root interpreter. \
 \
 
-\b Cairo\
+\f1\b Cairo\
 \
 
-\b0 Cairo is a graphics library that is used to make images of the graphs. I recommend installing it using Homebrew.\
+\f0\b0 Cairo is a graphics library that is used to make images of the graphs. I recommend installing it using Homebrew.\
 \
 
 \fs24 \expnd0\expndtw0\kerning0
 1. Check if Homebrew is installed by running "brew list" in the command line.\
-2a. If Homebrew is not installed, install it by running "ruby -e "$(curl -fsSL {\field{\*\fldinst{HYPERLINK "https://raw.githubusercontent.com/Homebrew/install/master/install"}}{\fldrslt \cf2 \ul \ulc2 https://raw.githubusercontent.com/Homebrew/install/master/install}})" < /dev/null 2> /dev/nul"\
+2a. If Homebrew is not installed, install it by running "
+\f2 \cf2 \outl0\strokewidth0 \strokec2 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"\
+
+\f0 \cf0 \outl0\strokewidth0 \
 3. Check the list of installed packages generated by step 1 for "pkg-config." If it is not installed, run "brew install pkg-config"\
 4. Check the list of installed package generated by step 1 for \'93cairo." if it is not installed, run "brew install cairo."\
 
@@ -77,54 +81,54 @@ export PYTHONPATH=$ROOTSYS/lib:$PYTHONPATH\
 pkg-config is a command that is needed by the makefiles to link to cairo.\
 \
 
-\b Python\
+\f1\b Python\
 \
 
-\b0 The Python management script was written in Python 3.6. Many Macs will have an older version of python installed by default, so you may need to upgrade to a newer version before using the script.\
+\f0\b0 The Python management script was written in Python 3.6. Many Macs will have an older version of python installed by default, so you may need to upgrade to a newer version before using the script.\
 Additionally, the script requires the module \'93pexpect\'94. The easiest way to install the library is by running the following command: \
 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 
-\f1 \cf3 \cb4 \CocoaLigature0 python3.6 -m pip install
+\f3 \cf2 \cb3 \CocoaLigature0 python3.6 -m pip install
 \f0 \CocoaLigature1  
-\f1  pexpect\
+\f3  pexpect\
 \
 
 \f0 Obviously if your default version of python is 3.6 or greater, the 3.6 and probably the -m) in the command is unnecessary.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs28 \cf0 \cb1 1. The Python Script\
+\f1\b\fs28 \cf0 \cb1 1. The Python Script\
 
-\b0 \
+\f0\b0 \
 
 \fs22 The Python Script run.py in the main Graphity folder has been created to outsource as much of the necessary code modification as possible. This allows the user to run many different simulations with many different parameters (and even different hamiltonians) without ever modifying the underlying code base. For example: If the user creates a new hamiltonian and then tells the Python script to install it, the script modify the appropriate header file to include the hamiltonian (allowing it to be used by the simulation) and edits the hamiltonians.txt file, which is used as a reference. If the user then asks the python script to run the simulation with the new hamiltonian, the MonteCarlo.cpp file is edited so that the function objects reference the correct simulation function, and simulation is rebuilt using the makefile. \
 \
 For the most part, the script is self-explanatory. However it is important to note that when running modules from the python script, the working directory will be the main graphity directory (where the python script is located), rather than the directory where the module resides. The only place where this will really matter is in outputting files. For example, if the Monte Carlo simulation is called by the python script, and the folder it is told to place its output in is called \'93data,\'94 it will look for the folder graphity/data/. However if the Monte Carlo simulation is called directly form the command line, it will look at graphity/Simulate/Monte-Carlo/data/. 
-\b \cf3 \cb4 \
+\f1\b \cf2 \cb3 \
 
-\b0 \cf0 \cb1 \
+\f0\b0 \cf0 \cb1 \
 
-\b\fs28 2. The Monte Carlo Simulation
-\b0 \
+\f1\b\fs28 2. The Monte Carlo Simulation
+\f0\b0 \
 \
 
 \fs22 The Monte Carlo simulation is the main simulation in the project. It is almost entirely self contained, meaning the user should almost never have to edit the simulation code. The Monte Carlo simulation can be called either by the Python script or from the terminal. Note that if the user wishes to change the hamiltonian, they will need to call the simulation from the Python. The Python script edits the code to ensure the correct hamiltonian is being used. Once this change has been made once, using the python script is unnecessary until the user wishes to change the hamiltonian again.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 Note on placing the data in a separate folder: 
-\b0 The first prompt the user gets when running the Monte-Carlo simulation is in what folder they would like to place the data (relative to the current working directory). In the event that the folder does not exist, the Monte Carlo simulation will attempt to create it. However it can only create the final folder in the path. If, for example, you tell it to put data in data/basicHam/nofield/TINV-0.1 and any of the folders prior to TINV-0.1 does not exist, the folder creation will fail and the Monte Carlo simulation will automatically terminate\
+\f1\b \cf0 Note on placing the data in a separate folder: 
+\f0\b0 The first prompt the user gets when running the Monte-Carlo simulation is in what folder they would like to place the data (relative to the current working directory). In the event that the folder does not exist, the Monte Carlo simulation will attempt to create it. However it can only create the final folder in the path. If, for example, you tell it to put data in data/basicHam/nofield/TINV-0.1 and any of the folders prior to TINV-0.1 does not exist, the folder creation will fail and the Monte Carlo simulation will automatically terminate\
 \
 The Monte Carlo simulation can be seeded with a graph of the user\'92s choosing. This graph should be stored in a CSV file that has been outputted either in a previous run of the simulation, or in another module of the project. See the hGraph class documentation for information on inputting and outputting graph files. If the user opts not to input a graph from file, three seed graphs will be generated. Two will be random graphs, and the third will be an empty graphs. The user will be prompted for all other data that is needed in order for the simulation to run. All files containing outputted data will be placed in the same folder as the simulation files themselves, and should be moved before rerunning the simulation to ensure no data is lost. \
 \
 The Monte Carlo simulation allows the user to change parameters, including what data to collect and how frequently, simply by answering the initial prompts. As such there should be no reason, in general, for the user to have to edit the code itself. However if the user wishes to add a new observable to the simulation then there are some fairly straightforward edits that need to be made. \
 \
 
-\b How the Monte Carlo simulation stores data\
+\f1\b How the Monte Carlo simulation stores data\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf0 \
+\f0\b0 \cf0 \
 Data in the Monte Carlo simulation is stored in a 2-dimensional array of vectors. The size of the array is determined by the number of graphs being simulated on, as well as the number of observables being measured by the simulation. Each observable has a unique identifier. These identifiers are all fully capitalized to make them easy to see. Each identifier is itself mapped to a unique integer. For example, the energy observable has a corresponding identifier ENERGY and maps to the number 4. The first index of the data array corresponds to the graph, with the second corresponding to the observable. For example, the vector located at data[0][ENERGY] would contain the energy values for graph 0 (as indexed in the simulation). Vectors are as they are easily resizable and allow for simpler memory management. \
 \
 The identifiers and their corresponding integers are defined in the graphUtil.h file in resource/graphics/graphUtil/. They are defined here because they are also used by the plotting program. If you wish to add a new observable, simply add a new constant, give it a unique identifier, and upgrade the NUM_OBSERVABLES value accordingly.\
@@ -136,10 +140,10 @@ This is done towards the top of the monteCarlo file. There is a global vector of
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1 \cf3 \cb5     std::cout << "Would you like to calculate the dimensionality? (y/n) ";
+\f3 \cf2 \cb4     std::cout << "Would you like to calculate the dimensionality? (y/n) ";
 \f0\fs24 \
 
-\f1\fs22     observables[DIMEN] = getTF();\
+\f3\fs22     observables[DIMEN] = getTF();\
 \
 
 \f0 getTF() is a function that takes a y/n character inputted by the user and returns true for y and false for n. As you can see, the unique identifiers for the observables are also used by this vector. Note that all values in this vector default to false.\
@@ -148,16 +152,16 @@ This is done towards the top of the monteCarlo file. There is a global vector of
 Presumably, any observable will need to be calculated in the simulation itself. Currently this is done right before the main loop (for initial values) and every n sweeps, where n is given by the user (defaults to 1).  For example:\
 \
 
-\f1     if(observe[DIMEN]) \{ //Calculates initial dimensionality (if requested)
+\f3     if(observe[DIMEN]) \{ //Calculates initial dimensionality (if requested)
 \f0\fs24 \
 
-\f1\fs22         graph->calcDimension();
+\f3\fs22         graph->calcDimension();
 \f0\fs24 \
 
-\f1\fs22         data[simNum][DIMEN].push_back(graph->getDimension());
+\f3\fs22         data[simNum][DIMEN].push_back(graph->getDimension());
 \f0\fs24 \
 
-\f1\fs22     \}
+\f3\fs22     \}
 \f0\fs24 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
@@ -168,31 +172,31 @@ If the correlation function of an observable is meaningful, it can be calculated
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1 \cf3 \cb5     if(observables[AVG_DEGREE_CORR]) \{
+\f3 \cf2 \cb4     if(observables[AVG_DEGREE_CORR]) \{
 \f0\fs24 \
 
-\f1\fs22         std::cout << "Calculating average degree correlation function..." << std::endl;
+\f3\fs22         std::cout << "Calculating average degree correlation function..." << std::endl;
 \f0\fs24 \
 
-\f1\fs22         for(int i = 0; i < numGraphs; i++) \{
+\f3\fs22         for(int i = 0; i < numGraphs; i++) \{
 \f0\fs24 \
 
-\f1\fs22             correlationFn(data, i , AVG_DEGREE, AVG_DEGREE_CORR);
+\f3\fs22             correlationFn(data, i , AVG_DEGREE, AVG_DEGREE_CORR);
 \f0\fs24 \
 
-\f1\fs22         \}
+\f3\fs22         \}
 \f0\fs24 \
 
-\f1\fs22         std::cout << "Average degree correlation function calculation complete" << std::endl;
+\f3\fs22         std::cout << "Average degree correlation function calculation complete" << std::endl;
 \f0\fs24 \
 
-\f1\fs22     \}
+\f3\fs22     \}
 \f0\fs24 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs22 \cf0 \cb1 \
+\f1\b\fs22 \cf0 \cb1 \
 Notice that the correlation function is an observable, and will need to be added to the list of constants as described above. 
-\b0 The correlation function takes as an input the array of data (a pointer), the integer value associated with the graph, the unique identifier for the data to calculate the correlation function on, and the unique identifier corresponding to the correlation function for that data (so it knows where to put the calculated values). \
+\f0\b0 The correlation function takes as an input the array of data (a pointer), the integer value associated with the graph, the unique identifier for the data to calculate the correlation function on, and the unique identifier corresponding to the correlation function for that data (so it knows where to put the calculated values). \
 \
 4. Outputting to CSVs\
 The data can be outputted to a CSV. I recommend just copying and pasting one of the already existing CSV output blocks and replacing the unique identifier and the output file stream. The output file streams are declared at the top of main. A new one is automatically created when NUM_OBSERVABLES is increased, and can be referenced by outStreams[UNIQUE_ID] where UNIQUE_ID is the unique identifier of the observable (corresponding to an integer)\
@@ -202,7 +206,7 @@ The Monte Carlo simulation can automatically make data plots. This is done towar
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs28 \cf0 3. Hamiltonians\
+\f1\b\fs28 \cf0 3. Hamiltonians\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
@@ -212,18 +216,18 @@ The Monte Carlo simulation can automatically make data plots. This is done towar
 \fs28 \cf0 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0\fs22 \cf3 \CocoaLigature0 Hamiltonians are implemented in header files that can be found in the Hamiltonian folder. The hGraph class uses a modified version of the visitor design patterns to allow hamiltonians to calculate the energy of a particular graph. Essentially, the hamiltonians are plugins that can be easily interchanged in a simulation without having to rewrite the simulation. Hamiltonians are defined as classes and all derive from the Abstract Hamiltonian superclass. To use the hamiltonian, a object of the hamiltonian type is created, and is passed to an hGraph using the accept function. The graph then calls the hamiltonian\'92s calculate function, passing itself as a parameter. The hamiltonian can then use functions implemented in the hGraph class to calculate the value, which it stores in its _result attribute. While this may seem to require extra work, it makes it extremely easy for the user to switch between hamiltonians when running a simulation, and allows the person writing the hamiltonian to define extra functions within the hamiltonians if the calculation required are particularly complex. Additionally it prevents unwanted side effects by doing the calculations based on a copy of the graph, rather than the graph itself, and then simply assigning the result to the appropriate attribute of the original graph object. This entire process is wrapped up in a single function, which is defined at the end of the hamiltonian.\
+\f0\b0\fs22 \cf2 \CocoaLigature0 Hamiltonians are implemented in header files that can be found in the Hamiltonian folder. The hGraph class uses a modified version of the visitor design patterns to allow hamiltonians to calculate the energy of a particular graph. Essentially, the hamiltonians are plugins that can be easily interchanged in a simulation without having to rewrite the simulation. Hamiltonians are defined as classes and all derive from the Abstract Hamiltonian superclass. To use the hamiltonian, a object of the hamiltonian type is created, and is passed to an hGraph using the accept function. The graph then calls the hamiltonian\'92s calculate function, passing itself as a parameter. The hamiltonian can then use functions implemented in the hGraph class to calculate the value, which it stores in its _result attribute. While this may seem to require extra work, it makes it extremely easy for the user to switch between hamiltonians when running a simulation, and allows the person writing the hamiltonian to define extra functions within the hamiltonians if the calculation required are particularly complex. Additionally it prevents unwanted side effects by doing the calculations based on a copy of the graph, rather than the graph itself, and then simply assigning the result to the appropriate attribute of the original graph object. This entire process is wrapped up in a single function, which is defined at the end of the hamiltonian.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf3 Note: Do not edit the \'93hamiltonians.txt\'94 file or the \'93hamiltonians.h\'94 file. These files are managed by the python script.
-\b0 \
+\f1\b \cf2 Note: Do not edit the \'93hamiltonians.txt\'94 file or the \'93hamiltonians.h\'94 file. These files are managed by the python script.
+\f0\b0 \
 \
 
-\b\fs24 Writing new Hamiltonians\
+\f1\b\fs24 Writing new Hamiltonians\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0\fs22 \cf3 \
+\f0\b0\fs22 \cf2 \
 The Python script is capable of creating entirely new hamiltonians without the user ever having to open the hamiltonian file itself. This can be done using \'93Create new Hamiltonian\'94 menu option. After prompting the user for the name of the hamiltonian, the script will give the user the option to write the calculation code right then. If the user chooses to do so, a textile will open for the user to edit to add the calculation code. Based on the code and the name provided, the script will create the header file. If the code does not contain errors, there will be no need for the header file to be edited. However if the code is not provided at creation time, or if there are errors in the code provided, the header file can be edited using the \'93Edit Hamiltonian\'94 option, though the hamiltonian will have to be installed for this option to be enabled. It is highly recommended that the script be used to create the file, even if the code is not provided at that time, as it will ensure that all necessary naming conventions are followed.\
 \
 Every hamiltonian contains six attributes that can/should be used in the calculation function:\
@@ -236,29 +240,29 @@ sourceT: Contains the value of the source term.\
 If you are writing the calculation code by way of the Python script, you will not see these variables declared. Simply use them as though they have been.\
 \
 The calculation function must contain two routines: one for a full calculation, and one for a partial calculation. 
-\b The result of a full calculation must be assigned to the _result attribute, and the result of the partial calculation must be assigned to _partial.
-\b0   The graph that the energy is being calculated on is passed to the function as the variable \'93host.\'94 The user has access to all public hGraph member functions (see available functions below) by using this host. For example, getting the dimensionality of the host would be done by calling \'93host.getDimension().\'94\
+\f1\b The result of a full calculation must be assigned to the _result attribute, and the result of the partial calculation must be assigned to _partial.
+\f0\b0   The graph that the energy is being calculated on is passed to the function as the variable \'93host.\'94 The user has access to all public hGraph member functions (see available functions below) by using this host. For example, getting the dimensionality of the host would be done by calling \'93host.getDimension().\'94\
 \
 A well implemented calculation function would look something like this:\
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\fs24 \cf3 \cb4 \CocoaLigature1 \
+\fs24 \cf2 \cb3 \CocoaLigature1 \
 
-\f1\fs22 if(!isPartial) \{\
+\f3\fs22 if(!isPartial) \{\
 	double sum;\
 	
-\f2\i Calculate the value of the energy, adding to sum along the way\
+\f4\i Calculate the value of the energy, adding to sum along the way\
 	
-\f1\i0 _result = sum;\
+\f3\i0 _result = sum;\
 \}\
 \
 else \{\
 	double sum;\
 
-\f2\i 	Calculate the partial value, adding to sum along the way\
+\f4\i 	Calculate the partial value, adding to sum along the way\
 
-\f1\i0 	_partial = sum;\
+\f3\i0 	_partial = sum;\
 \
 \}\
 
@@ -267,83 +271,83 @@ Unless there is an easy closed-form way to calculate the change in energy for a 
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1\fs22 \cf3 \cb5 if(isPartial) \{
+\f3\fs22 \cf2 \cb4 if(isPartial) \{
 \f0\fs24 \
 
-\f1\fs22     hGraph temp(host.getSize());
+\f3\fs22     hGraph temp(host.getSize());
 \f0\fs24 \
 
-\f1\fs22     temp = host; 					//creates a copy of the graph
+\f3\fs22     temp = host; 					//creates a copy of the graph
 \f0\fs24 \
 
-\f1\fs22     temp.flipEdge(nodeA,nodeB); 		//flips the edges in the copy. Note that nodeA and nodeB are vectors of nodes, not numbers
+\f3\fs22     temp.flipEdge(nodeA,nodeB); 		//flips the edges in the copy. Note that nodeA and nodeB are vectors of nodes, not numbers
 \f0\fs24 \
 
-\f1\fs22     basicSquareHam(temp);			//Calculates the value of the hamiltonian for the graph with the flipped edges
+\f3\fs22     basicSquareHam(temp);			//Calculates the value of the hamiltonian for the graph with the flipped edges
 \f0\fs24 \
 
-\f1\fs22     _partial = temp.getHam() - host.getHam();
+\f3\fs22     _partial = temp.getHam() - host.getHam();
 \f0\fs24 \
 
-\f1\fs22    									//_partial gets the difference between the two values.
+\f3\fs22    									//_partial gets the difference between the two values.
 \f0\fs24 \
 
-\f1\fs22 \}
+\f3\fs22 \}
 \f0\fs24 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1\fs22 \cf3 \cb4 	\
+\f3\fs22 \cf2 \cb3 	\
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f0 \cf3 This code assumes that the total energy for the graph in question has already been calculated. If this is not necessarily the case, this code will not work. Remember that the nodes being flipped are stored in the vectors nodeA and nodeB, with the edges to be flipped corresponding to the elements at matching indices. For example if nodeA[0] == 2, and nodeB[0] == 4, then the edge between node 2 and node 4 is to be flipped.\
+\f0 \cf2 This code assumes that the total energy for the graph in question has already been calculated. If this is not necessarily the case, this code will not work. Remember that the nodes being flipped are stored in the vectors nodeA and nodeB, with the edges to be flipped corresponding to the elements at matching indices. For example if nodeA[0] == 2, and nodeB[0] == 4, then the edge between node 2 and node 4 is to be flipped.\
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\fs24 \cf3 There is a  template hamiltonian that can be used as a reference, however it is no longer particularly necessary as the python script can generate its own files without the user having to edit the template file. It is probably a better idea to examine already existing hamiltonians for ideas on how to write them.
+\fs24 \cf2 There is a  template hamiltonian that can be used as a reference, however it is no longer particularly necessary as the python script can generate its own files without the user having to edit the template file. It is probably a better idea to examine already existing hamiltonians for ideas on how to write them.
 \fs22 \cb1 \CocoaLigature0 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-\cf3 \
+\cf2 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\b \cf3 Hamiltonians with variable parameters\
+\f1\b \cf2 Hamiltonians with variable parameters\
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\b0 \cf3 In some cases, it may be desirable to write a hamiltonian that contains some sort of variable parameter that can be set dynamically by the user at the time of simulation. In this case, the variable parameter should be declared as a global variable in hamiltonians.h header file and then used like any other variable in the calculation function of the appropriate hamiltonian. This is the only case in which the hamiltonians.h header file should be manually edited. The Monte Carlo simulation will have to be edited to prompt the user for the value of the parameter. As of now, there is a single variable parameter, named SOURCE, declared in the hamiltonians.h header file. It is set by the Monte Carlo simulation, and can then be utilized by any hamiltonian.\
+\f0\b0 \cf2 In some cases, it may be desirable to write a hamiltonian that contains some sort of variable parameter that can be set dynamically by the user at the time of simulation. In this case, the variable parameter should be declared as a global variable in hamiltonians.h header file and then used like any other variable in the calculation function of the appropriate hamiltonian. This is the only case in which the hamiltonians.h header file should be manually edited. The Monte Carlo simulation will have to be edited to prompt the user for the value of the parameter. As of now, there is a single variable parameter, named SOURCE, declared in the hamiltonians.h header file. It is set by the Monte Carlo simulation, and can then be utilized by any hamiltonian.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf3 Installing hamiltonians\
+\f1\b \cf2 Installing hamiltonians\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf3 Once the hamiltonian has been written, it has to be installed. This can be done simply by running the Python script and selecting the corresponding options. All hamiltonian header files need to remain in the hamiltonian folder. If after installing a new hamiltonian you are unable to run the simulation, there is a high probability that there is an error in the hamiltonian itself. The compiler errors should give you an idea of what the problem is. \
+\f0\b0 \cf2 Once the hamiltonian has been written, it has to be installed. This can be done simply by running the Python script and selecting the corresponding options. All hamiltonian header files need to remain in the hamiltonian folder. If after installing a new hamiltonian you are unable to run the simulation, there is a high probability that there is an error in the hamiltonian itself. The compiler errors should give you an idea of what the problem is. \
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf3 How hamiltonians are utilized by the Monte Carlo simulation\
+\f1\b \cf2 How hamiltonians are utilized by the Monte Carlo simulation\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf3 When an hGraph object is passed to the Monte Carlo simulation as a seed, the full hamiltonian is only called to find the initial energy of the graph. At the end of the day, it is the 
-\i change 
-\i0 in energy that determines whether a particular Monte Carlo step is taken, rather than the actual total value of the energy. For each Monte Carlo step, the value of the partial hamiltonian is used to determine whether or not the step is to be accepted. If the answer is yes, the appropriate edges of the original graph object are flipped, and the value of the hamiltonian for the graph object is modified using the acceptPartial function, which modifies the internal value of the hamiltonian for the graph object by the amount passed to it.\
+\f0\b0 \cf2 When an hGraph object is passed to the Monte Carlo simulation as a seed, the full hamiltonian is only called to find the initial energy of the graph. At the end of the day, it is the 
+\f5\i change 
+\f0\i0 in energy that determines whether a particular Monte Carlo step is taken, rather than the actual total value of the energy. For each Monte Carlo step, the value of the partial hamiltonian is used to determine whether or not the step is to be accepted. If the answer is yes, the appropriate edges of the original graph object are flipped, and the value of the hamiltonian for the graph object is modified using the acceptPartial function, which modifies the internal value of the hamiltonian for the graph object by the amount passed to it.\
 \
 In the Monte-Carlo simulation itself, the simulation functions are referred to as 
-\i simFunction
-\i0  and 
-\i simPartial. 
-\i0 These functions are defined globally and set towards the top of the main program. In this way, the function names only have to be changed once when a new hamiltonian is used, rather than being changed every place in the program they are utilized. These two lines are the ones that are edited by the Python script.\
+\f5\i simFunction
+\f0\i0  and 
+\f5\i simPartial. 
+\f0\i0 These functions are defined globally and set towards the top of the main program. In this way, the function names only have to be changed once when a new hamiltonian is used, rather than being changed every place in the program they are utilized. These two lines are the ones that are edited by the Python script.\
 \
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs28 \cf0 \CocoaLigature1 4. The hGraph class\
+\f1\b\fs28 \cf0 \CocoaLigature1 4. The hGraph class\
 \
 
-\b0\fs22 The hGraph class is the central piece of the entire graphity project. It contains all the necessary functions for creating, manipulating, and getting values from the graphs used in this project. An hGraph object consists of a number of attributes that contain information about the graph. An important thing to note is that since C++ is zero-indexed, the hGraph class is also zero-indexed, meaning that in a graph of 10 nodes the nodes themselves will be labeled (0\'859).\
+\f0\b0\fs22 The hGraph class is the central piece of the entire graphity project. It contains all the necessary functions for creating, manipulating, and getting values from the graphs used in this project. An hGraph object consists of a number of attributes that contain information about the graph. An important thing to note is that since C++ is zero-indexed, the hGraph class is also zero-indexed, meaning that in a graph of 10 nodes the nodes themselves will be labeled (0\'859).\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs24 \cf0 hGraph attributes:
-\b0 \
+\f1\b\fs24 \cf0 hGraph attributes:
+\f0\b0 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \fs22 \cf0 \
@@ -366,131 +370,131 @@ In keeping with good coding practices, none of these attributes are directly acc
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs24 \cf0 hGraph methods:\
+\f1\b\fs24 \cf0 hGraph methods:\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0\fs22 \cf0 This section contains information about all the methods in the hGraph class the user might wish to use. There are a number of utility functions in the class that will not be discussed here, but there should be no reason to call them explicitly. In general, functions that do specific calculations are private, meaning they are not called directly by the user. The user instead would call one of the many getter functions, which then calls the associated calculation function 
-\i if this is necessary. 
-\i0 The code for almost all of these functions are reasonably well commented, and should be relatively straightforward to follow for someone with C++ knowledge.\
+\f0\b0\fs22 \cf0 This section contains information about all the methods in the hGraph class the user might wish to use. There are a number of utility functions in the class that will not be discussed here, but there should be no reason to call them explicitly. In general, functions that do specific calculations are private, meaning they are not called directly by the user. The user instead would call one of the many getter functions, which then calls the associated calculation function 
+\f5\i if this is necessary. 
+\f0\i0 The code for almost all of these functions are reasonably well commented, and should be relatively straightforward to follow for someone with C++ knowledge.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 Constructors: 
-\b0 \
+\f1\b \cf0 Constructors: 
+\f0\b0 \
 There are three constructors in the hGraph class. The first, hGraph(int size, MatrixXi adjMatrix), sets the internal _adjMatrix attribute to the matrix passed to it. Obviously the argument 
-\i size
-\i0  must match the size of the matrix, which must be square.\
+\f5\i size
+\f0\i0  must match the size of the matrix, which must be square.\
 The second constructor, hGraph(int size), is the most useful one. It creates an hGraph object of a given with all values in the adjacency matrix set to zero. Other functions can than be used to initialize the graph, whether it be randomly or otherwise. \
 The final one hGraph() creates an empty graph with size one and should in general not be used.\
 
-\b Be careful not to assign graphs of different sizes to each other, as this will result in undefined behavior.\
+\f1\b Be careful not to assign graphs of different sizes to each other, as this will result in undefined behavior.\
 \
 Setters and Mutation functions:\
 \
 void setMatrix(int size, MatrixXi data): 
-\b0 Resizes the hGraph object and replaces the adjacency matrix with the matrix passed to the function. Likely has limited use\
+\f0\b0 Resizes the hGraph object and replaces the adjacency matrix with the matrix passed to the function. Likely has limited use\
 
-\b void setHamiltonian(double val): 
-\b0 Sets the value of the graph hamiltonian attribute to \'91val.\'92 Probably should only be called by the hamiltonian helper function\
+\f1\b void setHamiltonian(double val): 
+\f0\b0 Sets the value of the graph hamiltonian attribute to \'91val.\'92 Probably should only be called by the hamiltonian helper function\
 
-\b void accept(absHamiltonian &ham):
-\b0  Utility function used in calculating the hamiltonian. Should never be called except in the hamiltonian helper function.\
+\f1\b void accept(absHamiltonian &ham):
+\f0\b0  Utility function used in calculating the hamiltonian. Should never be called except in the hamiltonian helper function.\
 
-\b void acceptPartial(double partial):
-\b0  A bit of a misnomer given the previous definition. Adds the value of the argument `partial` to the current hamiltonian attribute of the graph. Used primarily in the Monte Carlo simulation.\
+\f1\b void acceptPartial(double partial):
+\f0\b0  A bit of a misnomer given the previous definition. Adds the value of the argument `partial` to the current hamiltonian attribute of the graph. Used primarily in the Monte Carlo simulation.\
 
-\b void setThreads(int threads): 
-\b0 Sets the _numThreads attribute, which is used by multithreaded algorithms. It is up to the user to know how many threads their machine can utilize at once.\
+\f1\b void setThreads(int threads): 
+\f0\b0 Sets the _numThreads attribute, which is used by multithreaded algorithms. It is up to the user to know how many threads their machine can utilize at once.\
 
-\b hGraph compliment(): 
-\b0 Returns an hGraph object that is the compliment (all edges flipped) of the current graph\
+\f1\b hGraph compliment(): 
+\f0\b0 Returns an hGraph object that is the compliment (all edges flipped) of the current graph\
 
-\b hGraph unitSphere(int node): 
-\b0  Returns an hGraph object corresponding to the unit sphere around a given node. Note that while the geometry will be preserved, the unit sphere will be an entirely new hGraph object, and as such node labeling will not persist between the objects.\
+\f1\b hGraph unitSphere(int node): 
+\f0\b0  Returns an hGraph object corresponding to the unit sphere around a given node. Note that while the geometry will be preserved, the unit sphere will be an entirely new hGraph object, and as such node labeling will not persist between the objects.\
 
-\b void flipEdge(int nodeA, int nodeB): 
-\b0 Flips the edge between the two nodes corresponding to the arguments passed. It updates their degrees in the degree vector accordingly\
+\f1\b void flipEdge(int nodeA, int nodeB): 
+\f0\b0 Flips the edge between the two nodes corresponding to the arguments passed. It updates their degrees in the degree vector accordingly\
 
-\b void flipEdge(std::vector<int> nodeA, std::vector<int> nodeB): 
-\b0 Flips all edges corresponding to the pairs of nodes in the two vectors. Values located at the same index in the two vectors are taken to be pairs. Updatesthe degree vector accordingly.\
+\f1\b void flipEdge(std::vector<int> nodeA, std::vector<int> nodeB): 
+\f0\b0 Flips all edges corresponding to the pairs of nodes in the two vectors. Values located at the same index in the two vectors are taken to be pairs. Updatesthe degree vector accordingly.\
 \
 
-\b Getter functions:\
+\f1\b Getter functions:\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf0 All getter functions call functions to calculate the value they need if necessary.\
+\f0\b0 \cf0 All getter functions call functions to calculate the value they need if necessary.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 std::vector<int> getFractionalDimen(): 
-\b0 Returns the value of the dimensionality (As defined by O. Knill) as a fraction. The first item in the vector is the numerator, the second is the denominator (not necessarily reduced).\
+\f1\b \cf0 std::vector<int> getFractionalDimen(): 
+\f0\b0 Returns the value of the dimensionality (As defined by O. Knill) as a fraction. The first item in the vector is the numerator, the second is the denominator (not necessarily reduced).\
 
-\b double getAvgDegree(): 
-\b0 Returns the average node degree for the graph\
+\f1\b double getAvgDegree(): 
+\f0\b0 Returns the average node degree for the graph\
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\b \cf0 std::vector<int> getEccentricity(): 
-\b0 Returns a vector containing the eccentricity of every node.\
+\f1\b \cf0 std::vector<int> getEccentricity(): 
+\f0\b0 Returns a vector containing the eccentricity of every node.\
 
-\b int getDiameter(): 
-\b0 Returns the diameter (maximum node eccentricity) of the graph\
+\f1\b int getDiameter(): 
+\f0\b0 Returns the diameter (maximum node eccentricity) of the graph\
 
-\b std::vector<double> autoGroupSize(): 
-\b0 Returns the automorphism group size of the graph in scientific notation, with the first element in the vector corresponding to the base and the second corresponding the the exponent. Be aware that only one process can be using the library that performs the calculation at once, so any multithreaded process that uses this function will need to protect it with a mutex\
+\f1\b std::vector<double> autoGroupSize(): 
+\f0\b0 Returns the automorphism group size of the graph in scientific notation, with the first element in the vector corresponding to the base and the second corresponding the the exponent. Be aware that only one process can be using the library that performs the calculation at once, so any multithreaded process that uses this function will need to protect it with a mutex\
 
-\b MatrixXi getShortestPaths(): 
-\b0 Returns a matrix with element i, j corresponding to the shortest path between nodes i and j in the graph. In the  event that there is no path between two nodes, the entry corresponding to two nodes that are not connected will be -1\
+\f1\b MatrixXi getShortestPaths(): 
+\f0\b0 Returns a matrix with element i, j corresponding to the shortest path between nodes i and j in the graph. In the  event that there is no path between two nodes, the entry corresponding to two nodes that are not connected will be -1\
 
-\b double getDimension(): 
-\b0 Gets the dimensionality (as defined by O. Knill) of the graph. See below for an explanation of the algorithm.\
+\f1\b double getDimension(): 
+\f0\b0 Gets the dimensionality (as defined by O. Knill) of the graph. See below for an explanation of the algorithm.\
 
-\b std::vector<double> getSpectralDimen(): 
-\b0 Returns a vector with the spectral dimension for various walk lengths. In theory the actual spectral dimension is the limit as the walk length goes to infinity. \
+\f1\b std::vector<double> getSpectralDimen(): 
+\f0\b0 Returns a vector with the spectral dimension for various walk lengths. In theory the actual spectral dimension is the limit as the walk length goes to infinity. \
 
-\b std::vector<double> getHausdorffDimen(): 
-\b0 Returns a vector with the Hausdorff dimension for various walk lengths.
-\b \
+\f1\b std::vector<double> getHausdorffDimen(): 
+\f0\b0 Returns a vector with the Hausdorff dimension for various walk lengths.
+\f1\b \
 int getDegree(int node): 
-\b0 Returns the degree of a given node\
+\f0\b0 Returns the degree of a given node\
 
-\b int getSize(): 
-\b0 Returns the number of nodes in the graph\
+\f1\b int getSize(): 
+\f0\b0 Returns the number of nodes in the graph\
 
-\b int getEulerChar(): 
-\b0 Returns the value of the Euler Characteristic (as defined by O. Knill) of the graph.\
+\f1\b int getEulerChar(): 
+\f0\b0 Returns the value of the Euler Characteristic (as defined by O. Knill) of the graph.\
 
-\b double getHam(): 
-\b0 Returns the value of the hamiltonian attribute of the graph. Note that this does NOT actually calculate a hamiltonian    \
+\f1\b double getHam(): 
+\f0\b0 Returns the value of the hamiltonian attribute of the graph. Note that this does NOT actually calculate a hamiltonian    \
 
-\b bool isConnected(int row, int column): 
-\b0 Returns true if two nodes are connected and false if they aren\'92t.\
+\f1\b bool isConnected(int row, int column): 
+\f0\b0 Returns true if two nodes are connected and false if they aren\'92t.\
 
-\b void numCliques(): 
-\b0 Prints out the number of cliques of every size.\
+\f1\b void numCliques(): 
+\f0\b0 Prints out the number of cliques of every size.\
 
-\b double curvatureAt(int node)
-\b0 : Outputs the curvature at a given node. The sum of the curvature at every node is equal to the Euler Characteristic of the graph. 
-\b \
+\f1\b double curvatureAt(int node)
+\f0\b0 : Outputs the curvature at a given node. The sum of the curvature at every node is equal to the Euler Characteristic of the graph. 
+\f1\b \
 
-\b0 \
+\f0\b0 \
 
-\b Utility functions not in hGraph:\
+\f1\b Utility functions not in hGraph:\
 \
 
-\b0 The following functions are NOT members of the hGraph class, though they are implemented in the same file.\
+\f0\b0 The following functions are NOT members of the hGraph class, though they are implemented in the same file.\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 \
+\f1\b \cf0 \
 void readGraphFile(hGraph *** graphs, int &num): 
-\b0 Reads graphs in from a file. Because the function has to do memory allocation, the usage is a little strange. In order to use it, a double pointer to an hGraph must be created, and then the address passed to the function. For example:\
+\f0\b0 Reads graphs in from a file. Because the function has to do memory allocation, the usage is a little strange. In order to use it, a double pointer to an hGraph must be created, and then the address passed to the function. For example:\
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1 \cf3 \cb5 \
+\f3 \cf2 \cb4 \
 hGraph ** graphs;\
 int numGraphs;
 \f0 \
 
-\f1 readGraphFile(&graphs, numGraphs);\
+\f3 readGraphFile(&graphs, numGraphs);\
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
@@ -500,18 +504,18 @@ Memory allocation is taken care of by the readGraphFile function, but it is the 
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1 \cf3 \cb6 for(int i = 0; i < numGraphs; i++) \{
+\f3 \cf2 \cb5 for(int i = 0; i < numGraphs; i++) \{
 \f0\fs24 \
 
-\f1\fs22     delete graphs[i];
+\f3\fs22     delete graphs[i];
 \f0\fs24 \
 
-\f1\fs22 \} \
+\f3\fs22 \} \
 delete [] graphs;\
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f0 \cf3 The readGraphFile function prompts the user for the filename. The file must be a CSV formatted according to the following guidelines:\
+\f0 \cf2 The readGraphFile function prompts the user for the filename. The file must be a CSV formatted according to the following guidelines:\
 1. The first line of the file should only contain the size of the graph as an integer\
 2. The second line should begin the first graph\
 3. Graphs are not separated by an empty line\
@@ -521,66 +525,66 @@ Each graph should have an adjacency matrix, followed by an empty line, followed 
 \cf0 \cb1 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 MatrixXi unitSphere(MatrixXi matrix, int node): 
-\b0 Returns at matrix corresponding to the unit sphere at a given node. The 0th item of a row or column will contain a -1 if the node corresponding to that row or column is not in the sphere, or a -2 if the sphere was taken around that node. This was primarily implemented for use in the dimensionality algorithm, but may be useful elsewhere. 
-\b \
+\f1\b \cf0 MatrixXi unitSphere(MatrixXi matrix, int node): 
+\f0\b0 Returns at matrix corresponding to the unit sphere at a given node. The 0th item of a row or column will contain a -1 if the node corresponding to that row or column is not in the sphere, or a -2 if the sphere was taken around that node. This was primarily implemented for use in the dimensionality algorithm, but may be useful elsewhere. 
+\f1\b \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf0 \
+\f0\b0 \cf0 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 bool isIsomorphic(hGraph graph1, hGraph graph2): 
-\b0 Returns true if the two graphs are isomorphic, and false if they are not. This function uses the Nauty/Traces library, which can crash if it is accessed by multiple processes at once. Because of that, any use of this function should be protected by a mutex if it will be run on multiple threads. 
-\b The == and != operators have been overloaded to return the value of this function. 
-\b0 In other words, if you have the hGraph objects graph1 and graph 2, and you call \'93graph1 == graph2\'94, the output will be whether or not the graphs are isomorphic. The != operator works in exactly the same way\
+\f1\b \cf0 bool isIsomorphic(hGraph graph1, hGraph graph2): 
+\f0\b0 Returns true if the two graphs are isomorphic, and false if they are not. This function uses the Nauty/Traces library, which can crash if it is accessed by multiple processes at once. Because of that, any use of this function should be protected by a mutex if it will be run on multiple threads. 
+\f1\b The == and != operators have been overloaded to return the value of this function. 
+\f0\b0 In other words, if you have the hGraph objects graph1 and graph 2, and you call \'93graph1 == graph2\'94, the output will be whether or not the graphs are isomorphic. The != operator works in exactly the same way\
 
-\b \
+\f1\b \
 hGraph randomGraph(int size, double fillFrac):
-\b0  Returns a random graph of given size. fillFrac is a decimal between 0 and 1 that tells the function how dense to make the graph. For example if fillFrac was given as 0.5, then half of the possible edges in the graph would be on, and half would be off, though which is which will be selected at random. If fillFrac is 0, then the filling fraction will be randomly initialized between 0.25 and 0.75. 
-\b \
+\f0\b0  Returns a random graph of given size. fillFrac is a decimal between 0 and 1 that tells the function how dense to make the graph. For example if fillFrac was given as 0.5, then half of the possible edges in the graph would be on, and half would be off, though which is which will be selected at random. If fillFrac is 0, then the filling fraction will be randomly initialized between 0.25 and 0.75. 
+\f1\b \
 hGraph compGraph(int size): 
-\b0 Returns a complete graph of the given size
-\b \
+\f0\b0 Returns a complete graph of the given size
+\f1\b \
 hGraph zeroGraph(int size): 
-\b0 Returns an empty graph of the given size\
+\f0\b0 Returns an empty graph of the given size\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs24 \cf0 A note on the dimensionality and Euler Characteristic algorithms\
+\f1\b\fs24 \cf0 A note on the dimensionality and Euler Characteristic algorithms\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf0 The dimensionality algorithm used in this project is discussed by Oliver Knill in his paper \'93On the Dimensionality and Euler Characteristic of Random Graphs.\'94 The algorithm is defined as follows:
-\b \
+\f0\b0 \cf0 The dimensionality algorithm used in this project is discussed by Oliver Knill in his paper \'93On the Dimensionality and Euler Characteristic of Random Graphs.\'94 The algorithm is defined as follows:
+\f1\b \
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\qc\partightenfactor0
 
-\b0 \cf0 {{\NeXTGraphic Pasted Graphic 2.pdf \width5240 \height940 \appleattachmentpadding0 \appleembedtype0 \appleaqc
+\f0\b0 \cf0 {{\NeXTGraphic Pasted Graphic 2.pdf \width5240 \height940 \appleattachmentpadding0 \appleembedtype0 \appleaqc
 }¬}\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\qc\partightenfactor0
 \cf0 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 \cf0 Where \{V\} is the set of vertices on the graph. The dimension of the empty graph is defined be -1. The function \'93sphere\'94 just takes the unit sphere at a particular node. This is, of course, a recursive algorithm, as the unit sphere is itself a graph with dimensionality defined by this algorithm. Because of this, it can be incredibly time consuming to calculate this value recursively, particularly for dense graphs. This problem is somewhat minimized by making use of the \'93commutative property\'94 of the sphere operator. Taking the unit sphere of a graph at node 1, and the taking the unit sphere of the resultant graph at node 2, is the same as doing it in reverse order. In fact, the graph that is arrived at after taking any number of successive unit sphere is the same regardless of the order in which the spheres are taken. This result is exploited to significantly reduce the number of recursive calls necessary.\
 \
 This algorithm exploits this fact by determining the dimensionality of all 
-\i existing and unique
-\i0  spheres of depth 3. Sphere uniqueness is determined by numerically ordered labeling. For example, the graph created by taking the sphere at node 12, followed by node 4, followed by node 23, would be labeled as 4, 12, 23. There are, of course, 6 spheres corresponding to this labeling, but only the numerically ordered on is calculated. All sets of 3 numerically ordered nodes for which a sphere exists are then generated, and their dimensionality calculated. Because each of the depth-three spheres are unique, it is a simple matter to distribute the calculation of their dimensionality amongst all available threads. Once these calculations have been completed, they are used to calculate the value for all unique depth-two spheres, which in turn are used to calculate the values for the depth-one spheres, which are then used to calculate the dimensionality of the overall graph.\
+\f5\i existing and unique
+\f0\i0  spheres of depth 3. Sphere uniqueness is determined by numerically ordered labeling. For example, the graph created by taking the sphere at node 12, followed by node 4, followed by node 23, would be labeled as 4, 12, 23. There are, of course, 6 spheres corresponding to this labeling, but only the numerically ordered on is calculated. All sets of 3 numerically ordered nodes for which a sphere exists are then generated, and their dimensionality calculated. Because each of the depth-three spheres are unique, it is a simple matter to distribute the calculation of their dimensionality amongst all available threads. Once these calculations have been completed, they are used to calculate the value for all unique depth-two spheres, which in turn are used to calculate the values for the depth-one spheres, which are then used to calculate the dimensionality of the overall graph.\
 \
 The choice to only go to a depth of three is not arbitrary. Storing all the necessary data values for a graph with 100 nodes takes on order of 1 MB. Increasing depth by one for a 100-node graph increases the storage requirement by approximately 100x, which quickly becomes intractable. \
 \
 The Euler Characteristic is defined by Knill in two equivalent ways. On of those is as the sum of the local curvature at every node. This particular method is used because it has the distinct advantage of being easily parallelizable, whereas his second definition is not. Because the curvature at a given node can itself be an interesting quantity, functions exist to calculate and return it separate of the Euler Characteristic calculation function. When the Euler Characteristic is computed, it stores the curvature values, and these values can then be accessed using the appropriate function without recalculating them. Similarly, if the value of the curvature at a given node is calculated, and then later the Euler Characteristic itself is calculated, the Euler Characteristic calculation will not recalculate the value of the curvature at that node. The user does not need to do this explicitly, as it is all taken care of by the functions themselves. \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs22 \cf0 \
+\f1\b\fs22 \cf0 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \fs24 \cf0 hList and hNode
-\b0 \
+\f0\b0 \
 The hGraph class header file and implementation file also contains two other classes called hList and hNode. These were used in a previous simulation to store lists of graphs, and are unlikely to be of much uses at this point.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs28 \cf0 5. Graphics\
+\f1\b\fs28 \cf0 5. Graphics\
 
-\b0 \
+\f0\b0 \
 
 \fs24 There are two main graphics modules implemented in this project. The first uses Root to plot data produced by the Monte Carlo simulation, while the second uses Cairo to make images of the graphs. Both Root and Cairo need to be installed prior separately. Instructions can be found in section 0.\
 \
@@ -588,7 +592,7 @@ The plotting function is found in the resource/graphics/graphutil/ folder. It wa
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1\fs22 \cf3 \cb5 void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, std::string descriptors[], std::string folder);\
+\f3\fs22 \cf2 \cb4 void drawMultiGraph(std::vector<double> ** data, int numSeries, int observable, std::string descriptors[], std::string folder);\
 \
 
 \f0 In keeping with the standard laid out in the Monte-Carlo simulation, the first index of the double array indicates the data series (the graph in the Monte Carlo simulation), while the second refers to the specific set of values to be plotted (the observable). In the Monte Carlo simulation, this is done by passing the data pointer, along with the numGraphs variable and the integer constant corresponding to the data being plotted. The fourth argument is an array of strings that will be used as legend entries (if the user chooses to draw a legend). The final argument is a string that contains the name of the folder that the  image will be placed in. See the note below.\
@@ -598,142 +602,142 @@ The graph imaging function can be found in the resource/grapics/graphImager/ fol
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1 \cf0 \cb4 void graphImage(hGraph graph, std::string folder);\
+\f3 \cf0 \cb3 void graphImage(hGraph graph, std::string folder);\
 \
 
 \f0 As should be clear from the prototype, it simply takes in a graph object (NOT a pointer to a graph object. It then prompts the user for important information (such as image size in pixels) and then outputs the graph to a file. In order to determine where to place the nodes on the graph, the various nodes are initialized at random places in the canvas, and a \'93hamiltonian\'94 is defined over them. A Monte Carlo simulation is then run on the nodes until a \'93low energy\'94 state is reached. This method is adapted from the one discussed in Section IV of arXiv:1210.3372 [gr-qc].\
 \
 
-\b Note on the \'93folder\'94 argument: 
-\b0 The folder argument in these two functions is used to instruct the functions which directory to place the outputted files 
-\i relative to the current working directory. 
-\i0 In the even that the empty string ( \'93\'94 ) is passed to the function, or the first character is a space, the resultant files will be placed in the current working directory. Folder strings should be formatted in the standard way (ex. the folder the \'93tests\'94 subfolder in the folder \'93data\'94 would be represented as data/tests/). This can include moving up the folder hierarchy by using .. (ex. if the current working directory is Monte-Carlo, and the parent directory contains the folder \'93Data\'94, that folder can be referenced with \'91../data\'92). Trailing slashes will be added when necessary. 
-\b It is the responsibility of the 
-\i calling program
-\i0  to ensure that the folder actually exists. 
-\b0 If the folder does not exist, image output will faill.\
+\f1\b Note on the \'93folder\'94 argument: 
+\f0\b0 The folder argument in these two functions is used to instruct the functions which directory to place the outputted files 
+\f5\i relative to the current working directory. 
+\f0\i0 In the even that the empty string ( \'93\'94 ) is passed to the function, or the first character is a space, the resultant files will be placed in the current working directory. Folder strings should be formatted in the standard way (ex. the folder the \'93tests\'94 subfolder in the folder \'93data\'94 would be represented as data/tests/). This can include moving up the folder hierarchy by using .. (ex. if the current working directory is Monte-Carlo, and the parent directory contains the folder \'93Data\'94, that folder can be referenced with \'91../data\'92). Trailing slashes will be added when necessary. 
+\f1\b It is the responsibility of the 
+\f6\i calling program
+\f1\i0  to ensure that the folder actually exists. 
+\f0\b0 If the folder does not exist, image output will faill.\
 \
 In addition to these, there is a standalone module, called GraphCSV, that does the same thing as drawMultiGraph, but on data that has already been stored in a CSV file. It its pre-compiled and can be copied wherever it is needed.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs28 \cf0 \cb1 6. Other Scripts
-\b0\fs22 \cb4 \
+\f1\b\fs28 \cf0 \cb1 6. Other Scripts
+\f0\b0\fs22 \cb3 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 \cf0 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \fs24 \cf0 \cb1 The scripts folder contains several programs that allow the user to do various interesting things on data that has 
-\i already been written to CSV files.
-\i0  All of these functions (except one) are already implemented as part of a more extensive module (such as the Monte Carlo simulation) but it is always possible that the user did not request them at the time. Because they are pre-compiled, they can be copied to wherever the data in question is. All of the functions dynamically determine the number of data series/points in the file they are given.\
+\f5\i already been written to CSV files.
+\f0\i0  All of these functions (except one) are already implemented as part of a more extensive module (such as the Monte Carlo simulation) but it is always possible that the user did not request them at the time. Because they are pre-compiled, they can be copied to wherever the data in question is. All of the functions dynamically determine the number of data series/points in the file they are given.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 calcCorrFunction
-\b0  calculates the correlation function for the data in a given CSV file and outputs it to a new CSV file\
+\f1\b \cf0 calcCorrFunction
+\f0\b0  calculates the correlation function for the data in a given CSV file and outputs it to a new CSV file\
 
-\b graphCSV 
-\b0 generates a plot out of data in a CSV file\
+\f1\b graphCSV 
+\f0\b0 generates a plot out of data in a CSV file\
 
-\b graphImager 
-\b0 generates an image of the graph(s) in a CSV file.\
+\f1\b graphImager 
+\f0\b0 generates an image of the graph(s) in a CSV file.\
 
-\b averages: 
-\b0 calculates the averages and standard deviations for a data file. It was created because sometimes the CSV files in question are too large to be opened completely in Excel.
+\f1\b averages: 
+\f0\b0 calculates the averages and standard deviations for a data file. It was created because sometimes the CSV files in question are too large to be opened completely in Excel.
 \fs22 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \fs24 \cf0 \
 The code for 
-\b averages
-\b0  can be found in the folder scripts/average while the code for the rest is found in resources/graphics.\
+\f1\b averages
+\f0\b0  can be found in the folder scripts/average while the code for the rest is found in resources/graphics.\
 \
 Because 
-\b averages
-\b0  does not connect to any modules, it does not have a makefile. If necessary, it can be compiled quite simply by running the following form the terminal: \
+\f1\b averages
+\f0\b0  does not connect to any modules, it does not have a makefile. If necessary, it can be compiled quite simply by running the following form the terminal: \
 \
 g++ averages.cpp -o averages\
 \
 
-\b\fs28 7. Some Useful Programming Tips\
+\f1\b\fs28 7. Some Useful Programming Tips\
 
-\b0\fs24 \
+\f0\b0\fs24 \
 
 \fs22 The following are just a few tricks that are useful to keep in mind when programming new algorithms.\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 The Eigen Library:\
+\f1\b \cf0 The Eigen Library:\
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf0 The Eigen library is a C++ linear algebra library that is used extensively in the project. Its matrix class is the one used for adjacency matrices in the hGraph class. The library has plenty of features, and as such when writing new algorithms it should be possible to simply use matrix functions built into the library itself. Documentation for the library can be found at {\field{\*\fldinst{HYPERLINK "http://eigen.tuxfamily.org/index.php?title=Main_Page"}}{\fldrslt http://eigen.tuxfamily.org/index.php?title=Main_Page}}. A matrix in Eigen is a template class, meaning template argument must be supplied when creating new matrices. However, Eigen has defined several type names that allow the user to create matrices without using template arguments. For example, a variable sized matrix of integers (the type used for the adjacency matrices) is of type Matrix<int, Dynamic, Dynamic> (a matrix of integers where the number of rows and the number of columns is not fixed), can be represented compactly as an object of type MatrixXi, as it is in the hGraph class. \
+\f0\b0 \cf0 The Eigen library is a C++ linear algebra library that is used extensively in the project. Its matrix class is the one used for adjacency matrices in the hGraph class. The library has plenty of features, and as such when writing new algorithms it should be possible to simply use matrix functions built into the library itself. Documentation for the library can be found at {\field{\*\fldinst{HYPERLINK "http://eigen.tuxfamily.org/index.php?title=Main_Page"}}{\fldrslt http://eigen.tuxfamily.org/index.php?title=Main_Page}}. A matrix in Eigen is a template class, meaning template argument must be supplied when creating new matrices. However, Eigen has defined several type names that allow the user to create matrices without using template arguments. For example, a variable sized matrix of integers (the type used for the adjacency matrices) is of type Matrix<int, Dynamic, Dynamic> (a matrix of integers where the number of rows and the number of columns is not fixed), can be represented compactly as an object of type MatrixXi, as it is in the hGraph class. \
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 Looping over all pairs of nodes\
+\f1\b \cf0 Looping over all pairs of nodes\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf0 There is a simple way to loop over all pairs of nodes (aka all edges) in a graph without repeating any edges. One might initially approach the problem by creating two for loops like this:\
+\f0\b0 \cf0 There is a simple way to loop over all pairs of nodes (aka all edges) in a graph without repeating any edges. One might initially approach the problem by creating two for loops like this:\
 \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1 \cf3 \cb5 for(int i = 0; i < NUM_NODES; i++) \{\
+\f3 \cf2 \cb4 for(int i = 0; i < NUM_NODES; i++) \{\
 	for(int j = 0; j < NUM_NODES; j++) \{\
 		
-\f2\i do some procedure;\
+\f4\i do some procedure;\
 	
-\f1\i0 \}
-\f2\i \
+\f3\i0 \}
+\f4\i \
 
-\f1\i0 \}\
+\f3\i0 \}\
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f0\b \cf0 \cb1 \
+\f1\b \cf0 \cb1 \
 
-\b0 However this will double count all the edges (as the edge represented by i = 1, j = 2, is the same as the edge represented by i = 2, j = 1) and will also include instances where i is equal to j, which corresponds to an edge with both ends on the same node (which is prohibited in our graphs). One approach might be to include a conditional in the body of the loop that excludes such cases, but this requires unnecessary calculations that will slow the algorithm. There is a much simpler way to do it that avoids excess checks: \
+\f0\b0 However this will double count all the edges (as the edge represented by i = 1, j = 2, is the same as the edge represented by i = 2, j = 1) and will also include instances where i is equal to j, which corresponds to an edge with both ends on the same node (which is prohibited in our graphs). One approach might be to include a conditional in the body of the loop that excludes such cases, but this requires unnecessary calculations that will slow the algorithm. There is a much simpler way to do it that avoids excess checks: \
 \pard\tx543\pardeftab543\pardirnatural\partightenfactor0
 
-\f1 \cf3 \cb5 \
+\f3 \cf2 \cb4 \
 for(int i = 0; i < NUM_NODES; i++) \{\
 	for(
-\f3\i\b int j = i+1
-\f1\i0\b0 ; j < NUM_NODES; j++) \{\
+\f7\i\b int j = i+1
+\f3\i0\b0 ; j < NUM_NODES; j++) \{\
 		
-\f2\i do some procedure;\
+\f4\i do some procedure;\
 	
-\f1\i0 \}
-\f2\i \
+\f3\i0 \}
+\f4\i \
 
-\f1\i0 \}
+\f3\i0 \}
 \f0 \cf0 \cb1 \
 \
 Initializing j to be i+1 both ensures that i never equals j and also that no edge is double-counted. For example, i = 1, j = 2 is allowed, however i = 2, j = 1 is not allowed because j is 
-\i always 
-\i0 greater than i. An example of where the is used is in the compliment() algorithm, which returns a graph in which all edges flipped to the opposite state. \
+\f5\i always 
+\f0\i0 greater than i. An example of where the is used is in the compliment() algorithm, which returns a graph in which all edges flipped to the opposite state. \
 \
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b\fs28 \cf0 8. Extending with a New Module\
+\f1\b\fs28 \cf0 8. Extending with a New Module\
 
-\b0\fs22 It may come to pass that at some point in the future a new module needs to be written with the resources (such as the hGraph class) that this project already has. In this case, there are two primary things that need to be considered: includes and makefiles.\
+\f0\b0\fs22 It may come to pass that at some point in the future a new module needs to be written with the resources (such as the hGraph class) that this project already has. In this case, there are two primary things that need to be considered: includes and makefiles.\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b \cf0 Includes:
-\b0  \
+\f1\b \cf0 Includes:
+\f0\b0  \
 Any new module to this project will have to include header files that contain necessary definitions, such as the hGraph class. I will use the Monte Carlo simulation cpp file as an example in this case. I recommend including files without writing out the full path and tell the compiler were to find them in the makefile, rather than writing out the full path in the #include statement of the program you are writing.  \
 The Monte Carlo simulation directly includes three other header files from the project: \'93hamiltonians.h\'94, \'93graphics/graphUtil/graphingUtil.hpp\'94, and \'93graphics/graphImager/graphImager.h\'94. hamiltonians.h itself includes all the hamiltonians that have been installed. hamiltonians.h 
-\i also
-\i0  includes the hGraph.h header file, and as such it is unnecessary to include it a second time in MonteCarlo.cpp. In general, the simpler one makes the includes of their program, the more complex the makefile has to be, however makefiles allow you to define a path as a variable, and this makes it extremely simple to change in the event that some files are moved around at some point.\
+\f5\i also
+\f0\i0  includes the hGraph.h header file, and as such it is unnecessary to include it a second time in MonteCarlo.cpp. In general, the simpler one makes the includes of their program, the more complex the makefile has to be, however makefiles allow you to define a path as a variable, and this makes it extremely simple to change in the event that some files are moved around at some point.\
 
-\b Makefiles:\
+\f1\b Makefiles:\
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\b0 \cf0 Makefiles can be tricky to write. However fundamentally a makefile is just a sequence of commands to be executed by the terminal with the specific purpose of compiling a particular file. There are a two main parts in a makefile.\
+\f0\b0 \cf0 Makefiles can be tricky to write. However fundamentally a makefile is just a sequence of commands to be executed by the terminal with the specific purpose of compiling a particular file. There are a two main parts in a makefile.\
 \
 The first piece of the file is a set of constants that can be used throughout the file. These constants are not required, but it easier to write the makefile using them than to writing out what they stand for every time its needed. In all the makefiles written for this project, the first two variables are used to hold the name of the compiler and the C++ standard to use. This project uses gcc and c++11 consistently as the compiler and standard respectively. Presumably, it would compile on other compilers such as Clang, as well as latter C++ standards. It most certainly cannot compile using standards 
-\i older
-\i0  than c++11, as a number of features of c++11 are used frequently throughout the project.\
+\f5\i older
+\f0\i0  than c++11, as a number of features of c++11 are used frequently throughout the project.\
 \
 The second piece of the file is a series of commands that tell the compiler how to compile the main program as well as any other pieces that the main program needs in order to operate correctly. The commands are not necessarily executed in order. Rather, when the command \'91Make\'92 is called, the compiler checks if it has the necessary files needed to build the main program, and if not searches in the makefile for instructions on how to build them. The Monte Carlo makefile is linked to everything and will be used as an example.\
 \

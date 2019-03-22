@@ -9,4 +9,6 @@ double SOURCE = 0.0;
 #include "basicSquare.h"
 
 #include "curveDiff.h"
+#include "testHam.h"
+#include "basicSquare.h"
 #endif /* hamiltonians_h */

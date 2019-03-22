@@ -59,10 +59,15 @@ private:
     
     void toStream(std::ostream &os) const;
     void toFile(std::ofstream &fs) const;
-    void calcDimension();
+    double calcDimension();
+    double dimension(MatrixXi amat, double *** data, std::vector<int> * trp, int lowerBound, int upperBound, bool init);
+
     void oldCalcDimension(); //Multithreaded version
     double oldDimension(int a, int b, bool multi);     //Single threaded version for recursive calls
-    double dimension(MatrixXi amat, double *** data, std::vector<int> * trp, int lowerBound, int upperBound, bool init);
+   
+    void denseCalcDimension();
+    double denseHelper(std::vector<int> nodes);
+    
     void calculateEccen();
     void calculateHausDimen();
     
@@ -80,7 +85,7 @@ public:
     hGraph(int size);
     hGraph();
     ~hGraph();
-    
+
     void setMatrix(int size, MatrixXi data);
     void setHamiltonian(double val);
     void accept(absHamiltonian &ham);
@@ -91,8 +96,6 @@ public:
     void flipEdge(int nodeA, int nodeB);
     void flipEdge(std::vector<int> nodeA, std::vector<int> nodeB);
     bool equals(hGraph &rhs);
-
-
     
     std::vector<int> getFractionalDimen();
     double getAvgDegree() const;

@@ -1,4 +1,4 @@
-    //
+        //
 //  hGraph.cpp
 //  
 //
@@ -97,7 +97,7 @@ hGraph::~hGraph() { //Since the hGraph class does not include any pointers, ther
 
 double hGraph::getDimension() { //simple getter function. See below for the dimensionality algorithm.
     if(!dimensionFound) { //Checks if the dimenison has already been calculated
-        calcDimension();
+        denseCalcDimension();
         dimensionFound = true;
     }
     return _dimension;
@@ -464,7 +464,7 @@ double hGraph::getAvgDegree() const { //Returns the average node degree
 }
 
 
-void hGraph::calcDimension() { //The base algorithm can be found in "On the Dimensionality and Euler Characteristic of Random Graphs" by O.Knill
+double hGraph::calcDimension() { //The base algorithm can be found in "On the Dimensionality and Euler Characteristic of Random Graphs" by O.Knill
 
     int num = 0;               //A more detailed explanation of this particular implementation can be found in the users guide
     int maxEdges = NUM_NODES*(NUM_NODES-1) / 2;
@@ -475,7 +475,7 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
     edges /= 2;
     if(edges == maxEdges) {
         _dimension = NUM_NODES -1;
-        return;
+        return NUM_NODES -1;
     }
 
     
@@ -628,7 +628,8 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
         }
         
     }
-    _dimension = 1 + sphSum1/NUM_NODES; //final result
+    double answer = 1 + sphSum1/NUM_NODES;
+    _dimension = answer; //final result
     
     
     for(int i = 0; i < NUM_NODES; i++) { //deletes pointers
@@ -644,6 +645,7 @@ void hGraph::calcDimension() { //The base algorithm can be found in "On the Dime
     }
     delete [] values;
 
+    return answer; //There are cases where I need this value to be returned.
 }
 
 double hGraph::dimension(MatrixXi amat, double *** data, std::vector<int> * trp, int lowerBound, int upperBound, bool init)  { //utility function used by main calcDimension function
@@ -705,6 +707,70 @@ double hGraph::dimension(MatrixXi amat, double *** data, std::vector<int> * trp,
     }
 }
 
+void hGraph::denseCalcDimension() {
+    double sum = 0;
+    hGraph calcGraph = this->compliment();
+    std::vector<int> nodes;
+    std::vector<int> contains;
+    for(int i = 0; i < NUM_NODES; i++) {
+        
+        if(calcGraph.getDegree(i) != 0) {
+            nodes.push_back(i);
+        }
+        else {
+            sum++;
+        }
+    }
+
+    if(nodes.size() == 0) {
+        
+        std::cout << NUM_NODES - 1; 
+        
+    }
+    contains.push_back(nodes.back());
+    nodes.pop_back();
+    int numSub = 0;
+    while(true) {
+        for(int j = 0; j < contains.size(); j++) {
+            for(int i = nodes.size() - 1; i >= 0; i--) {
+                
+                if(calcGraph.isConnected(nodes.at(i), contains.at(j))) {
+                    contains.push_back(nodes.at(i));
+                    nodes.erase(nodes.begin() + i);
+                }
+                
+            }
+        }
+        
+        sum += 1 + denseHelper(contains);
+        contains.clear();
+        if(nodes.size() == 0) {
+            break;
+        }
+        contains.push_back(nodes.back());
+        nodes.pop_back();
+    }
+    _dimension = sum - 1;
+    
+}
+
+double hGraph::denseHelper(std::vector<int> nodes) {
+    if(nodes.size() == 1) {
+        return 0;
+    }
+    hGraph newGraph;
+    newGraph = zeroGraph(nodes.size());
+    for(int i = 0; i < nodes.size(); i++) {
+        for(int j = i+1; j < nodes.size(); j++) {
+            if(this->isConnected(nodes.at(i), nodes.at(j))) {
+                newGraph.flipEdge(i,j);
+            }
+        }
+    }
+    newGraph.setThreads(_numThreads < nodes.size() ? _numThreads : nodes.size());
+    return newGraph.calcDimension();
+}
+
 void hGraph::oldCalcDimension() { //Calculates dimensionality recursively. See Knill, "On the dimensionanity and Euler Characteristic of Random Graphs"
                                   //This algorithm is no longer in used, but is left here in case it comes up
     
@@ -733,7 +799,7 @@ void hGraph::oldCalcDimension() { //Calculates dimensionality recursively. See K
             dimen += unitSphere(i).oldDimension(0, unitSphere(i).getSize(), false);
         }
         dimen = dimen/(static_cast<double>(NUM_NODES));
-        _dimension = 1 + dimen;
+        std::cout << 1 + dimen << std::endl;
 
     }
     
